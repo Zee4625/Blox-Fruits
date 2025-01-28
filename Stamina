@@ -1,0 +1,749 @@
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local ScreenGui = Instance.new("ScreenGui")
+local ScrollingFrame = Instance.new("ScrollingFrame")
+local Stamina = Instance.new("TextButton")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+local Esp = Instance.new("TextButton")
+local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+local Health = Instance.new("TextButton")
+local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
+local UIListLayout = Instance.new("UIListLayout")
+local Xbutton = Instance.new("TextButton")
+local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
+
+--Properties:
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+ScrollingFrame.Parent = ScreenGui
+ScrollingFrame.Active = true
+ScrollingFrame.BackgroundColor3 = Color3.fromRGB(88, 88, 88)
+ScrollingFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ScrollingFrame.BorderSizePixel = 0
+ScrollingFrame.Position = UDim2.new(0.865528882, 0, 0.234206066, 0)
+ScrollingFrame.Size = UDim2.new(0.134096012, 0, 0.385952711, 0)
+
+Stamina.Name = "Stamina"
+Stamina.Parent = ScrollingFrame
+Stamina.BackgroundColor3 = Color3.fromRGB(212, 212, 212)
+Stamina.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Stamina.BorderSizePixel = 2
+Stamina.Size = UDim2.new(0, 200, 0, 50)
+Stamina.Font = Enum.Font.SourceSans
+Stamina.Text = "Stamina: off"
+Stamina.TextColor3 = Color3.fromRGB(0, 0, 0)
+Stamina.TextScaled = true
+Stamina.TextSize = 14.000
+Stamina.TextWrapped = true
+Stamina.LayoutOrder = 3
+
+UIAspectRatioConstraint.Parent = Stamina
+UIAspectRatioConstraint.AspectRatio = 4.000
+
+Esp.Name = "Esp"
+Esp.Parent = ScrollingFrame
+Esp.BackgroundColor3 = Color3.fromRGB(212, 212, 212)
+Esp.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Esp.BorderSizePixel = 2
+Esp.Size = UDim2.new(0, 200, 0, 50)
+Esp.Font = Enum.Font.SourceSans
+Esp.Text = "Esp: off"
+Esp.TextColor3 = Color3.fromRGB(0, 0, 0)
+Esp.TextScaled = true
+Esp.TextSize = 14.000
+Esp.TextWrapped = true
+Esp.LayoutOrder = 1
+
+UIAspectRatioConstraint_2.Parent = Esp
+UIAspectRatioConstraint_2.AspectRatio = 4.000
+
+Health.Name = "Health"
+Health.Parent = ScrollingFrame
+Health.BackgroundColor3 = Color3.fromRGB(212, 212, 212)
+Health.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Health.BorderSizePixel = 2
+Health.Size = UDim2.new(0, 200, 0, 50)
+Health.Font = Enum.Font.SourceSans
+Health.Text = "Health: off"
+Health.TextColor3 = Color3.fromRGB(0, 0, 0)
+Health.TextScaled = true
+Health.TextSize = 14.000
+Health.TextWrapped = true
+Health.LayoutOrder = 2
+
+UIAspectRatioConstraint_3.Parent = Health
+UIAspectRatioConstraint_3.AspectRatio = 4.000
+
+UIListLayout.Parent = ScrollingFrame
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 10)
+
+
+local ScreenGuiforx = Instance.new("ScreenGui")
+ScreenGuiforx.Parent = ScreenGui.Parent
+ScreenGuiforx.ResetOnSpawn = false
+
+Xbutton.Name = "Xbutton"
+Xbutton.Parent = ScreenGuiforx
+Xbutton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+Xbutton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Xbutton.BorderSizePixel = 0
+Xbutton.Position = UDim2.new(0.945387304, 0, 0.196453407, 0)
+Xbutton.Size = UDim2.new(0.0533072241, 0, 0.0591098741, 0)
+Xbutton.Font = Enum.Font.SourceSans
+Xbutton.Text = "X"
+Xbutton.TextColor3 = Color3.fromRGB(0, 0, 0)
+Xbutton.TextScaled = true
+Xbutton.TextSize = 14.000
+Xbutton.TextWrapped = true
+
+
+local Death = Instance.new("TextButton")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+
+--Properties:
+
+Death.Name = "Death"
+Death.Parent = ScrollingFrame
+Death.BackgroundColor3 = Color3.fromRGB(212, 212, 212)
+Death.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Death.BorderSizePixel = 2
+Death.LayoutOrder = 4
+Death.Size = UDim2.new(0, 200, 0, 50)
+Death.Font = Enum.Font.SourceSans
+Death.Text = "Death"
+Death.TextColor3 = Color3.fromRGB(0, 0, 0)
+Death.TextScaled = true
+Death.TextSize = 14.000
+Death.TextWrapped = true
+
+local DeathCanBeUsed = false
+
+UIAspectRatioConstraint.Parent = Death
+UIAspectRatioConstraint.AspectRatio = 4.000
+
+UITextSizeConstraint.Parent = Xbutton
+UITextSizeConstraint.MaxTextSize = 33
+
+UIAspectRatioConstraint_4.Parent = Xbutton
+UIAspectRatioConstraint_4.AspectRatio = 1.441
+
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local MouseKill = Instance.new("TextButton")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+
+--Properties:
+
+MouseKill.Name = "MouseKill"
+MouseKill.Parent = ScrollingFrame
+MouseKill.BackgroundColor3 = Color3.fromRGB(212, 212, 212)
+MouseKill.BorderColor3 = Color3.fromRGB(0, 0, 0)
+MouseKill.BorderSizePixel = 2
+MouseKill.LayoutOrder = 5
+MouseKill.Size = UDim2.new(0, 200, 0, 50)
+MouseKill.Font = Enum.Font.SourceSans
+MouseKill.Text = "MouseKill: off"
+MouseKill.TextColor3 = Color3.fromRGB(0, 0, 0)
+MouseKill.TextScaled = true
+MouseKill.TextSize = 14.000
+MouseKill.TextWrapped = true
+
+
+
+
+UIAspectRatioConstraint.Parent = MouseKill
+UIAspectRatioConstraint.AspectRatio = 4.000
+
+
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local Tp = Instance.new("TextBox")
+local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+
+--Properties:
+
+Tp.Name = "Tp"
+Tp.Parent = ScrollingFrame
+Tp.BackgroundColor3 = Color3.fromRGB(212, 212, 212)
+Tp.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Tp.BorderSizePixel = 2
+Tp.LayoutOrder = 6
+Tp.Size = UDim2.new(0, 200, 0, 50)
+Tp.Font = Enum.Font.SourceSans
+Tp.Text = "Tp to:..."
+Tp.TextColor3 = Color3.fromRGB(0, 0, 0)
+Tp.TextScaled = false
+Tp.TextSize = 100
+Tp.TextWrapped = true
+
+
+
+UITextSizeConstraint.Parent = Tp
+UITextSizeConstraint.MaxTextSize = 14
+
+UIAspectRatioConstraint.Parent = Tp
+UIAspectRatioConstraint.AspectRatio = 4.000
+
+
+local StaminaOnoff= false
+local EspOnOff = false
+local HealthOnOff = false
+local Heartbeat1
+local XOnOff = true
+local MousekillOnOff = false
+
+Stamina.MouseButton1Up:Connect(function()
+	
+	if StaminaOnoff == false then
+		StaminaOnoff = true
+		Stamina.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+		Stamina.Text = "Stamina: On"
+		
+
+		local runservice = game:GetService("RunService")
+
+	Heartbeat1 = runservice.Heartbeat:Connect(function()
+		
+			local Characters = game.Workspace:FindFirstChild("Characters")
+
+			local player = game.Players.LocalPlayer
+
+			
+
+			
+
+				local Attributes = player.Character:FindFirstChild("Attributes")
+				local Stamina = Attributes:GetAttribute("Stamina")
+				local Thirst = Attributes:GetAttribute("Thirst")
+
+				if Stamina < 100 then
+					Attributes:SetAttribute("Stamina",100)
+
+
+				end
+				if Thirst < 70 then
+					Attributes:SetAttribute("Thirst",70)
+				end
+			end)
+
+			
+
+	
+	
+
+
+
+	elseif StaminaOnoff == true then
+		Stamina.BackgroundColor3 = Color3.fromRGB(212,212,212)
+		Stamina.Text = "Stamina: off"
+		StaminaOnoff = false
+		Heartbeat1:Disconnect()
+
+		local Characters = game.Workspace:FindFirstChild("Characters")
+
+		local player = game.Players.LocalPlayer
+
+
+
+
+
+		local Attributes = player.Character:FindFirstChild("Attributes")
+		local Stamina = Attributes:GetAttribute("Stamina")
+		local Thirst = Attributes:GetAttribute("Thirst")
+
+		
+			Attributes:SetAttribute("Stamina",100)
+			Attributes:SetAttribute("Thirst",90)
+		
+		
+		
+	end
+	
+end)
+
+local Heartbeat2
+
+Health.MouseButton1Up:Connect(function()
+
+	if HealthOnOff == false then
+		HealthOnOff = true
+		Health.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+		Health.Text = "Health: On"
+
+
+		local runservice = game:GetService("RunService")
+
+		Heartbeat2 = runservice.Heartbeat:Connect(function()
+
+			
+
+
+			local args = {
+				[1] = 2.604166666666667,
+				[2] = "iryan96"
+			}
+
+			local Player = game.Players.LocalPlayer
+
+				
+				local Character = Player.Character
+
+				local Humanoid = Character:FindFirstChild("Humanoid")
+
+				if Humanoid.Health < 100 then
+
+
+
+					game.ReplicatedStorage.Events.TakeDamage:FireServer(-1,"iryan96")
+
+				end
+			
+
+		end)
+
+
+
+
+
+	elseif HealthOnOff == true then
+		Health.BackgroundColor3 = Color3.fromRGB(212,212,212)
+		Health.Text = "Health: off"
+		HealthOnOff = false
+		Heartbeat2:Disconnect()
+		local Player = game.Players.LocalPlayer
+
+
+		local Character = Player.Character
+
+		local Humanoid = Character:FindFirstChild("Humanoid")
+		
+		
+		game.ReplicatedStorage.Events.TakeDamage:FireServer(0.11,"iryan96")
+        
+
+	end
+
+end)
+
+local Heartbeat3
+
+Esp.MouseButton1Up:Connect(function()
+
+	if EspOnOff == false then
+		EspOnOff = true
+		Esp.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+		Esp.Text = "Esp: On"
+
+
+		local runservice = game:GetService("RunService")
+
+		Heartbeat3 = runservice.Heartbeat:Connect(function()
+			local Players = game:GetService("Players"):GetChildren()
+			local RunService = game:GetService("RunService")
+			local highlight = Instance.new("Highlight")
+			highlight.Name = "Highlight"
+
+
+
+
+
+
+
+			
+
+				local charactersfolder = game.Workspace:FindFirstChild("Characters")
+
+				for i, v in pairs(charactersfolder:GetChildren()) do
+					if v.Name ~= "HighlightedPlayers" then
+
+						if v:FindFirstChild("HumanoidRootPart") then
+							local HumanoidRootPart = v:FindFirstChild("HumanoidRootPart")
+
+							if not HumanoidRootPart:FindFirstChild("Highlight") then
+								local highlightClone = highlight:Clone()
+								highlightClone.Adornee = v
+								highlightClone.Parent = HumanoidRootPart
+								highlightClone.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+								highlightClone.Name = "Highlight"
+								task.wait()
+							end
+						end
+
+					end
+				end
+		
+
+		end)
+
+
+
+
+
+	elseif EspOnOff == true then
+		Esp.BackgroundColor3 = Color3.fromRGB(212,212,212)
+		Esp.Text = "Esp: off"
+		EspOnOff = false
+		Heartbeat3:Disconnect()
+		local charactersfolder = game.Workspace:FindFirstChild("Characters")
+		local Players = game:GetService("Players"):GetChildren()
+		
+		for i, v in pairs(charactersfolder:GetChildren()) do
+			
+			if v.Name ~= "HighlightedPlayers" then
+				
+				 if v:FindFirstChild("HumanoidRootPart") then
+						local HumanoidRootPart = v:FindFirstChild("HumanoidRootPart")
+						
+						if HumanoidRootPart:FindFirstChild("Highlight") then
+							local Highlightfound = HumanoidRootPart:FindFirstChild("Highlight")
+							Highlightfound:Destroy()
+						end
+						
+				 end
+			end
+
+		end
+
+	end
+
+end)
+
+Xbutton.MouseButton1Up:Connect(function()
+	
+	if XOnOff == false then
+		
+		ScreenGui.Enabled = true
+		XOnOff = true
+		Xbutton.BackgroundColor3 = Color3.fromRGB(255,0,0)
+		Xbutton.Text = "X"
+		
+	elseif XOnOff == true then
+		
+		ScreenGui.Enabled = false
+		XOnOff = false
+		Xbutton.BackgroundColor3 = Color3.fromRGB(0, 255, 30)
+		Xbutton.Text = "Open"
+	end
+	
+end)
+
+
+
+Death.MouseButton1Up:Connect(function()
+	
+
+		
+	if DeathCanBeUsed == true then
+		local Player = game.Players.LocalPlayer
+
+
+		local Character = Player.Character
+
+		local Humanoid = Character:FindFirstChild("Humanoid")
+	   
+	   repeat task.wait()
+			
+			
+
+
+			game.ReplicatedStorage.Events.TakeDamage:FireServer(4,"iryan96")
+			
+	   until Humanoid.Health <= 0
+	   Death.BackgroundColor3 = Color3.fromRGB(212,212,212)
+	   DeathCanBeUsed = false
+		
+	end
+end)
+
+local RunService = game:GetService("RunService")
+
+RunService.Heartbeat:Connect(function()
+	
+	local Player = game.Players.LocalPlayer
+	
+	
+	repeat task.wait()
+		
+		
+	until Player.Character
+	local Character = Player.Character
+	local Humanoid = Character:FindFirstChild("Humanoid")
+	local CharactersFolder = game.Workspace:FindFirstChild("Characters")
+	
+	if Player.Character:FindFirstChild("HumanoidRootPart") and Humanoid.Health > 0 and Character.Parent == CharactersFolder then
+		DeathCanBeUsed = true
+		Death.BackgroundColor3 = Color3.fromRGB(255,0,0)
+		
+	else
+		
+		DeathCanBeUsed = false
+		Death.BackgroundColor3 = Color3.fromRGB(212,212,212)
+	end
+	
+end)
+
+local MouseRuntime 
+
+MouseKill.MouseButton1Up:Connect(function()
+	
+	if MousekillOnOff == false and DeathCanBeUsed == true then
+		MousekillOnOff = true
+		MouseKill.BackgroundColor3 = Color3.fromRGB(0,255,0)
+		MouseKill.Text = "MouseKill: On"
+		
+	elseif MousekillOnOff == true then
+		
+		MousekillOnOff = false
+		MouseKill.BackgroundColor3 = Color3.fromRGB(212,212,212)
+		MouseKill.Text = "MouseKill: Off"
+		
+	end
+	
+	
+end)
+
+
+local Userinputservice = game:GetService("UserInputService")
+
+
+function FindHeadHitbox(character)
+	
+	local Animal = character:GetAttribute("Animal")
+	
+	if Animal == "Bison" then
+		return character:FindFirstChild("HeadHitbox")
+		
+	elseif Animal == "DireWolf" then
+		return character:FindFirstChild("HeadHitbox")
+	elseif Animal == "Smilodon" then
+		return character:FindFirstChild("HeadHitbox")
+		
+	elseif Animal == "WesternHorse" then
+		
+		for i, v in pairs(character:GetDescendants()) do
+			if v.Name == "Neck03" then
+				if v.Parent.Name == "HeadHitbox" then
+					
+					return v.Parent
+				end
+			end
+			
+		end
+		--
+			
+	else
+		
+		return nil
+	end
+	
+	
+end
+
+local function AddtoTable(T,T2)
+	
+	local Descendants = T:GetDescendants()
+	for i, v in pairs(Descendants) do
+		
+		table.insert(T2, v)
+	end
+	
+	
+	
+end
+
+
+local function WhitelistforRaycast(T)
+	local Blacklist = {}
+	
+end
+
+
+
+local function raycastTarget(a,t,folder)
+	local direction = (t.Position - a.Position)
+	local IgnoreTable = {a.Parent}
+	local Blacklistparams = RaycastParams.new()
+	Blacklistparams.FilterDescendantsInstances = {IgnoreTable}
+	Blacklistparams.FilterType = Enum.RaycastFilterType.Exclude
+	Blacklistparams.IgnoreWater = true
+	
+	local Finished = false
+
+	
+	local Hits = {}
+	
+	repeat
+		if MousekillOnOff == false then
+			return nil
+		end
+		Blacklistparams.FilterDescendantsInstances = {IgnoreTable}
+		
+		local Raycast = workspace:Raycast(a.Position, direction, Blacklistparams)
+		
+		if Raycast then
+			
+			if Raycast.Instance then
+				
+				if Raycast.Instance.Parent ~= a.Parent then
+					if Raycast.Instance.Parent.Parent == folder and Raycast.Instance.Parent.Name ~= "HighlightedPlayers" then
+						
+						return Raycast.Instance
+					else
+						table.insert(IgnoreTable, Raycast.Instance)
+						table.insert(Hits, Raycast.Instance)
+						task.wait()
+					end
+					
+				else
+					
+					table.insert(IgnoreTable, Raycast.Instance)
+					table.insert(Hits, Raycast.Instance)
+					task.wait()
+				end
+			else
+				Finished = true
+				return nil
+			end--
+		
+		end--
+		task.wait()
+			
+	until Finished == true --
+	
+	
+	
+	
+
+
+	
+end
+
+Userinputservice.InputBegan:Connect(function(input, gameProcessedEvent)
+	
+	if not gameProcessedEvent then
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			if MousekillOnOff == true then
+				
+				 
+				
+					local Player = game.Players.LocalPlayer
+					local mouse = Player:GetMouse()
+					local CharactersFolder = game.Workspace:FindFirstChild("Characters")
+					
+					if DeathCanBeUsed == true then
+						local Target = mouse.Target
+					local Ourcharacter = Player.Character
+						
+						
+						
+						if Target ~= nil then
+							local RaycastTarget = raycastTarget(Ourcharacter:FindFirstChild("HumanoidRootPart"),Target,CharactersFolder)
+							
+							if RaycastTarget ~= nil and RaycastTarget.Parent.Parent == CharactersFolder and RaycastTarget.Parent.Name ~= "HighlightedPlayers" then
+							   local CharacterTarget = RaycastTarget.Parent
+							   local HeadHitbox = FindHeadHitbox(CharacterTarget)
+							
+									
+				
+							   
+							local args = {
+								[1] = CharacterTarget.Humanoid,
+								[2] = HeadHitbox,
+								[3] = 2
+							}
+
+							game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Attack"):FireServer(unpack(args))
+                                  end
+						
+							
+						end
+						
+					end
+					
+					
+			
+			end
+			
+		end
+		
+		
+	end
+	
+	
+end)
+
+local function GetPlayer(name)
+	
+	name = name:lower()
+	
+	
+	for i, v in pairs(game.Players:GetChildren()) do
+		
+		if name == v.Name:lower():sub(1,#name) then
+			return v
+		end
+	end
+	
+	return nil
+	
+end
+
+local CooldownTp = false
+
+
+Tp.FocusLost:Connect(function(enterpressed)
+	 if enterpressed and CooldownTp == false and DeathCanBeUsed == true then
+		
+		local TextEntered = Tp.Text
+		local PlayerTarget = GetPlayer(TextEntered)
+		
+		local Player = game.Players.LocalPlayer
+		local Character = Player.Character
+		local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+		if PlayerTarget ~= nil then
+			
+		if PlayerTarget.Character then
+			local CharacterTarget = PlayerTarget.Character
+			local RootHum = CharacterTarget:FindFirstChild("HumanoidRootPart")
+			if RootHum then
+		
+
+
+		HumanoidRootPart.CFrame = RootHum.CFrame * CFrame.new(70,48,70)
+		
+		CooldownTp = true
+		Tp.Text = "Tp Cooldown..."
+		Tp.BackgroundColor3 = Color3.fromRGB(255,0,0)
+		task.wait(1.5)
+		CooldownTp = false
+		Tp.BackgroundColor3 = Color3.fromRGB(212,212,212)
+		Tp.Text = "Tp to:..."
+		        end
+		    end
+		end
+	 else
+			
+			
+			Tp.Text = "Tp to:..."
+		Tp.BackgroundColor3 = Color3.fromRGB(212,212,212)
+	 
+	 
+		
+		
+		end
+	
+end)
