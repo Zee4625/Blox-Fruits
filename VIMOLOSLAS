@@ -2,7 +2,7 @@ local Games = {
   [2753915549] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Code", -- Blox Fruit Sea 1
   [4442272183] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Code", -- Blox Fruit Sea 2
   [7449423635] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Code", -- Blox Fruit Sea 3
-  [18668065416] = "https://raw.githubusercontent.com/AhmadV99/Script-Games/main/Fisch.lua", -- BlueLOCK
+  [18668065416] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BLLKK", -- BlueLOCK
 }
 
 return Games
