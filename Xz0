@@ -4,7 +4,7 @@ local TextEffect = AcrylicLibrary.TextEffect
 AcrylicLibrary.Theme:HightGreen()
 
 local Window = AcrylicLibrary:CreateWindow({
-    Title = TextEffect:AddColor("ZeeHUB - v6", Color3.fromRGB(0, 255, 0)),
+    Title = TextEffect:AddColor("ZeeHUB - v7", Color3.fromRGB(0, 255, 0)),
     Logo = "rbxassetid://82858721461099",
     Keybind = Enum.KeyCode.LeftControl,
 })
