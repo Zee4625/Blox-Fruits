@@ -742,6 +742,6 @@ https://discord.gg/ecKrSHRZa6
 
 Window:Notify({
 	Title = "⚠️Inportant⚠️",
-	Description = "This is still a beta! Join the discord for more info!",
+	Description = "This is still a beta! Join the discord for more info! FOR BLOX FRUITS!",
 	Duration = 7,
 })
