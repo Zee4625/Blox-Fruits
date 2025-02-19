@@ -14,7 +14,7 @@ local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local humanoid = character:WaitForChild("Humanoid")
 
-local moveSpeed = 69
+local moveSpeed = 52
 local flightActive = false
 local wallhackEnabled = false
 local xrayEnabled = false
@@ -79,7 +79,7 @@ local function activateXRay()
                     if not highlight then
                         highlight = Instance.new("Highlight")
                         highlight.Name = "PlayerHighlight"
-                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                        highlight.FillColor = Color3.fromRGB(255, 255, 255)
                         highlight.FillTransparency = 0.3
                         highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
                         highlight.OutlineTransparency = 0
@@ -102,7 +102,7 @@ local function activateXRay()
                         textLabel.Position = UDim2.new(0, 0, 0, 0)
                         textLabel.BackgroundTransparency = 1
                         textLabel.Text = playerInstance.Name
-                        textLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+                        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                         textLabel.Font = Enum.Font.SourceSansBold
                         textLabel.TextSize = 14
                         textLabel.TextScaled = true
