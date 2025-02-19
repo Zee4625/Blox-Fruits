@@ -14,7 +14,7 @@ local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local humanoid = character:WaitForChild("Humanoid")
 
-local moveSpeed = 52
+local moveSpeed = 46
 local flightActive = false
 local wallhackEnabled = false
 local xrayEnabled = false
