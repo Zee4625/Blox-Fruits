@@ -4,6 +4,7 @@ local Games = {
   [7449423635] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CDBLX", -- Blox Fruit Sea 3
   [18668065416] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BLLKK", -- BlueLOCK 142823291
   [142823291] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/M212", -- MM2
+  [10449761463] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/STR-FKKK", -- TSB
 }
 
 return Games
