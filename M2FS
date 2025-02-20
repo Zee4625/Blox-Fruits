@@ -14,7 +14,7 @@ local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local humanoid = character:WaitForChild("Humanoid")
 
-local moveSpeed = 19
+local moveSpeed = 29
 local flightActive = false
 local wallhackEnabled = false
 local xrayEnabled = false
@@ -54,7 +54,7 @@ end
 
 local function activateJump()
     if humanoid then
-        humanoid.JumpPower = 30  -- Set to a fixed value to avoid excessive scaling
+        humanoid.JumpPower = 50  -- Set to a fixed value to avoid excessive scaling
     end
 end
 
