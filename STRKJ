@@ -501,9 +501,10 @@ local function teleportTo(position)
     end)
 end
 
--- Teleport buttons -- {Title = "Tp Cafe", Position = Vector3.new(-401.87, 73.06, 289.37)},
+-- a
 local locations = {
     {Title = "Tp Mountian", Position = Vector3.new(574.9, 656.2, 134.8)},
+    {Title = "Tp Center", Position = Vector3.new(148.2, 440.8, 30.6)},
     {Title = "Tp Secret Zone", Position = Vector3.new(557.7, 439.5, 480.0)}
 }
 
