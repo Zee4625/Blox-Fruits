@@ -8,8 +8,8 @@ local Games = {
     [116495829188952] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/STR-FKKK", -- Deth rain lobby 
 }
 
-if not Games[game.PlaceId] then
-    game.Players.LocalPlayer:Kick("No games found!")
-else
+if Games[game.PlaceId] then
     loadstring(game:HttpGet(Games[game.PlaceId]))()
+else
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/0X-1"))()
 end
