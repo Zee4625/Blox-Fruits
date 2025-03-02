@@ -525,15 +525,15 @@ TabPLL:AddButton({
     end
 })
 
-
+-- Assuming TabInfo1 is already defined and accessible
 TabPLL:AddButton({
-    Title = "Bachira v2", -- The title of the button
+    Title = "Bachira V2", -- The title of the button
     Tip = "Click to be Bachira", -- Tooltip text when hovered over
     Callback = function()
         -- When the button is clicked, run the script from the URL
         local success, err = pcall(function()
             -- This will execute the script from the specified URL
-            loadstring(game:HttpGet("https://github.com/Zee4625/Blox-Fruits/edit/main/Bachiroi%20v2"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Bachiroi%20v2"))()
         end)
         
         -- If there is an error, display it
