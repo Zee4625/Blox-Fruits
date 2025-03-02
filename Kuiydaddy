@@ -274,7 +274,7 @@ local function activateULT()
     dash(humanoidRootPart.CFrame.LookVector, 18, 0.2) -- Înainte
     dash(humanoidRootPart.CFrame.LookVector, 18, 0.2) -- Înainte
     dash(humanoidRootPart.CFrame.LookVector, 18, 0.2) -- Înainte
-    dash(humanoidRootPart.CFrame.LookVector, 18, 0.2) -- Înainte
+
 
     fireEffect.Enabled = false
     fireEffect:Destroy()
