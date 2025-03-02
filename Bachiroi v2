@@ -17,7 +17,7 @@ buttonDribbling.Size = UDim2.new(0, 85, 0, 80)
 buttonDribbling.Position = UDim2.new(0.44, 0, 0.85, 0)
 buttonDribbling.Text = "Dribbling Mode"
 buttonDribbling.TextColor3 = Color3.new(255, 255, 255)
-buttonDribbling.BackgroundColor3 = Color3.new(0, 0, 0)
+buttonDribbling.BackgroundColor3 = Color3.new(255, 255, 0)
 buttonDribbling.TextScaled = true
 buttonDribbling.Font = Enum.Font.SourceSansBold
 
@@ -27,7 +27,7 @@ buttonCerc.Size = UDim2.new(0, 85, 0, 80)
 buttonCerc.Position = UDim2.new(0.50, 0, 0.85, 0)
 buttonCerc.Text = "Circle Dribbling"
 buttonCerc.TextColor3 = Color3.new(255, 255, 255)
-buttonCerc.BackgroundColor3 = Color3.new(0, 0, 0)
+buttonCerc.BackgroundColor3 = Color3.new(255, 255, 0)
 buttonCerc.TextScaled = true
 buttonCerc.Font = Enum.Font.SourceSansBold
 
@@ -98,6 +98,10 @@ local function activateDribbling()
         humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection2
         wait(0.1)
 
+        local forwardDirection2 = humanoidRootPart.CFrame.LookVector * 6
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection2
+        wait(0.1)
+
         humanoid.WalkSpeed = originalSpeed -- Revine la viteza originală
     end
 
@@ -111,7 +115,7 @@ local function activateDribbling()
         wait(1)
     end
     buttonDribbling.Text = "Dribbling Mode"
-    buttonDribbling.BackgroundColor3 = Color3.new(0, 0, 0) -- Revine la negru
+    buttonDribbling.BackgroundColor3 = Color3.new(255, 255, 0) -- Revine la negru
     cooldownDribbling = false
 end
 
@@ -156,7 +160,7 @@ local function activateSpecialMove()
         wait(1)
     end
     buttonCerc.Text = "Circle Dribbling"
-    buttonCerc.BackgroundColor3 = Color3.new(0, 0, 0) -- Butonul revine la culoarea inițială
+    buttonCerc.BackgroundColor3 = Color3.new(255, 255, 0) -- Butonul revine la culoarea inițială
     cooldownCerc = false
 end
 
@@ -262,6 +266,14 @@ local function activateULT()
         -humanoidRootPart.CFrame.RightVector, -- Stânga
         humanoidRootPart.CFrame.LookVector, -- Înainte
         humanoidRootPart.CFrame.LookVector, -- Înainte
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
     }
 
     for _, dir in ipairs(directions) do
