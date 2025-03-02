@@ -180,7 +180,7 @@ local function activateSpecialMove()
 
     -- Cooldown într-un thread separat
     task.spawn(function()
-        for i = 16, 1, -1 do
+        for i = 14, 1, -1 do
             buttonSpecial.Text = "Cooldown: " .. i .. "s"
             wait(1)
         end
@@ -248,7 +248,7 @@ local function activateULT()
     if cooldownULT then return end
     cooldownULT = true
     buttonULT.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1) -- Buton în cooldown
-    buttonULT.Text = "Cooldown: 70s"
+    buttonULT.Text = "Cooldown: 64s"
 
     local fireEffect = createIntenseFireEffect()
     fireEffect.Enabled = true
@@ -280,7 +280,7 @@ local function activateULT()
 
     -- Cooldown de 20 secunde
     task.spawn(function()
-        for i = 70, 1, -1 do
+        for i = 64, 1, -1 do
             buttonULT.Text = "Cooldown: " .. i .. "s"
             wait(1)
         end
@@ -292,7 +292,7 @@ end
 
 -- Cooldown inițial de 124 secunde la început
 task.spawn(function()
-    for i = 70, 1, -1 do
+    for i = 64, 1, -1 do
         buttonULT.Text = "Cooldown: " .. i .. "s"
         wait(1)
     end
