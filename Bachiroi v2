@@ -1,1 +1,306 @@
-a
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
+local userInputService = game:GetService("UserInputService")
+local cooldownDribbling = false
+local cooldownCerc = false
+local cooldownULT = false
+local TweenService = game:GetService("TweenService")
+
+-- GUI Creation
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+
+-- Dribbling Button
+local buttonDribbling = Instance.new("TextButton", screenGui)
+buttonDribbling.Size = UDim2.new(0, 85, 0, 80)
+buttonDribbling.Position = UDim2.new(0.44, 0, 0.85, 0)
+buttonDribbling.Text = "Dribbling Mode"
+buttonDribbling.TextColor3 = Color3.new(255, 255, 255)
+buttonDribbling.BackgroundColor3 = Color3.new(0, 0, 0)
+buttonDribbling.TextScaled = true
+buttonDribbling.Font = Enum.Font.SourceSansBold
+
+-- Circle Dribbling Button
+local buttonCerc = Instance.new("TextButton", screenGui)
+buttonCerc.Size = UDim2.new(0, 85, 0, 80)
+buttonCerc.Position = UDim2.new(0.50, 0, 0.85, 0)
+buttonCerc.Text = "Circle Dribbling"
+buttonCerc.TextColor3 = Color3.new(255, 255, 255)
+buttonCerc.BackgroundColor3 = Color3.new(0, 0, 0)
+buttonCerc.TextScaled = true
+buttonCerc.Font = Enum.Font.SourceSansBold
+
+-- ULT Button
+local buttonULT = Instance.new("TextButton", screenGui)
+buttonULT.Size = UDim2.new(0, 85, 0, 80)
+buttonULT.Position = UDim2.new(0.92, 0, 0.02, 0)
+buttonULT.Text = "ULT"
+buttonULT.TextColor3 = Color3.new(1, 1, 1)
+buttonULT.BackgroundColor3 = Color3.new(0, 0, 0)
+buttonULT.TextScaled = true
+buttonULT.Font = Enum.Font.SourceSansBold
+
+local function createBlackSmokeEffect()
+    local smokeEffect = Instance.new("ParticleEmitter")
+    smokeEffect.Texture = "rbxassetid://10163506449"  -- Poți folosi o textură de fum negru
+    smokeEffect.Rate = 100  -- Viteza de emisie
+    smokeEffect.Lifetime = NumberRange.new(0.5, 1)
+    smokeEffect.Size = NumberSequence.new(1.22)
+    smokeEffect.Color = ColorSequence.new(Color3.fromRGB(0, 0, 0))  -- Fum negru
+    smokeEffect.Speed = NumberRange.new(5)
+    smokeEffect.VelocitySpread = 50
+    smokeEffect.LightEmission = 0.1  -- Mai puțină lumină
+    smokeEffect.Parent = humanoidRootPart  -- Aplicăm fumul pe HumanoidRootPart
+
+    return smokeEffect
+end
+
+local function activateDribbling()
+    if cooldownDribbling then return end
+    cooldownDribbling = true
+    buttonDribbling.BackgroundColor3 = Color3.new(0, 0, 0) -- Butonul devine negru în cooldown
+
+    -- Creăm și aplicăm fumul negru
+    local smokeEffect = createBlackSmokeEffect()
+    smokeEffect.Enabled = true
+
+    -- Mișcările de dribbling
+    if humanoidRootPart and humanoid then
+        local originalSpeed = humanoid.WalkSpeed
+        humanoid.WalkSpeed = 12 -- Setează viteza la 12
+
+        local leftDirection = humanoidRootPart.CFrame.RightVector * -6
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame + leftDirection
+        wait(0.2)
+
+        local forwardDirection = humanoidRootPart.CFrame.LookVector * 6
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection
+        wait(0.1)
+
+        local rightDirection = humanoidRootPart.CFrame.RightVector * 6
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame + rightDirection
+        wait(0.2)
+
+        local forwardDirection2 = humanoidRootPart.CFrame.LookVector * 6
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection2
+        wait(0.1)
+
+                local forwardDirection = humanoidRootPart.CFrame.LookVector * 6
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection
+        wait(0.1)
+
+        local rightDirection = humanoidRootPart.CFrame.RightVector * 6
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame + rightDirection
+        wait(0.2)
+
+        local forwardDirection2 = humanoidRootPart.CFrame.LookVector * 6
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection2
+        wait(0.1)
+
+        humanoid.WalkSpeed = originalSpeed -- Revine la viteza originală
+    end
+
+    -- Dezactivăm efectul de fum după finalizarea mișcărilor
+    smokeEffect.Enabled = false
+    smokeEffect:Destroy()
+
+    -- Cooldown Logic
+    for i = 8, 1, -1 do
+        buttonDribbling.Text = "Cooldown: " .. i .. "s"
+        wait(1)
+    end
+    buttonDribbling.Text = "Dribbling Mode"
+    buttonDribbling.BackgroundColor3 = Color3.new(0, 0, 0) -- Revine la negru
+    cooldownDribbling = false
+end
+
+local function activateSpecialMove()
+    if cooldownCerc then return end
+    cooldownCerc = true
+    buttonCerc.BackgroundColor3 = Color3.new(0, 0, 0) -- Butonul devine negru în cooldown
+
+    -- Set original speed
+    if humanoidRootPart and humanoid then
+        local originalSpeed = humanoid.WalkSpeed
+        humanoid.WalkSpeed = 21 -- Setează viteza la 21 pentru Circle Dribbling
+
+        -- Generate the circular path
+        local radius = 8  -- Adjust the radius of the circle
+        local speed = 0.05 -- Speed of movement around the circle
+        local angle = 0
+        local steps = 16 -- Number of steps to complete a full circle
+
+        -- Perform the circular movement
+        for i = 1, steps do
+            -- Calculate the new x and z offsets to move in a circular path
+            local xOffset = math.cos(math.rad(angle)) * radius
+            local zOffset = math.sin(math.rad(angle)) * radius
+
+            -- Move the character in the calculated direction
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.new(xOffset, 0, zOffset)
+
+            -- Increment the angle to complete a full circle (360 degrees)
+            angle = angle + (360 / steps)
+
+            -- Wait for the next step
+            wait(speed)
+        end
+
+        humanoid.WalkSpeed = originalSpeed -- Restore original walking speed after the circle dribbling
+    end
+
+    -- Cooldown Logic
+    for i = 16, 1, -1 do
+        buttonCerc.Text = "Cooldown: " .. i .. "s"
+        wait(1)
+    end
+    buttonCerc.Text = "Circle Dribbling"
+    buttonCerc.BackgroundColor3 = Color3.new(0, 0, 0) -- Butonul revine la culoarea inițială
+    cooldownCerc = false
+end
+
+
+local function createIntenseFireEffect()
+    local fireEffect = Instance.new("ParticleEmitter")
+    fireEffect.Texture = "rbxassetid://10163506449"
+    fireEffect.Rate = 500
+    fireEffect.Lifetime = NumberRange.new(0.6, 1.5)
+    fireEffect.Speed = NumberRange.new(15, 30)
+    fireEffect.Rotation = NumberRange.new(-180, 180)
+    fireEffect.VelocitySpread = 250
+    fireEffect.LightEmission = 1.24
+    fireEffect.LightInfluence = 1.55
+    fireEffect.Acceleration = Vector3.new(0, 15, 0)
+    fireEffect.Size = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 2),
+        NumberSequenceKeypoint.new(0.3, 5),
+        NumberSequenceKeypoint.new(1, 0)
+    })
+    fireEffect.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 0)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 0))
+    }
+    fireEffect.Parent = humanoidRootPart
+
+    return fireEffect
+end
+
+local function dash(direction, distance, duration)
+    local goalPosition = humanoidRootPart.Position + direction * distance
+    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+    local goal = {Position = goalPosition}
+
+    local tween = TweenService:Create(humanoidRootPart, tweenInfo, goal)
+    tween:Play()
+    wait(duration)
+end
+
+local cooldownULT = true -- La început ULT e în cooldown
+
+-- Cooldown inițial de 61 secunde (nu poți folosi ULT până trece acest timp)
+task.spawn(function()
+    for i = 61, 1, -1 do
+        buttonULT.Text = "Cooldown: " .. i .. "s"
+        wait(1)
+    end
+    buttonULT.Text = "ULT"
+    cooldownULT = false -- Acum poți folosi abilitatea
+end)
+
+-- Funcție pentru activarea ULT
+local function activateULT()
+    if cooldownULT then return end -- Dacă e în cooldown, nu face nimic!
+    
+    cooldownULT = true -- Activează cooldown-ul
+    buttonULT.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1) -- Buton în cooldown
+    buttonULT.Text = "Cooldown: 64s"
+
+    local fireEffect = createIntenseFireEffect()
+    fireEffect.Enabled = true
+
+    -- Secvență optimizată de dash-uri
+    local directions = {
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        -humanoidRootPart.CFrame.LookVector, -- Spate
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.LookVector, -- Spate
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        -humanoidRootPart.CFrame.LookVector, -- Spate
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        -humanoidRootPart.CFrame.LookVector, -- Spate
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.LookVector, -- Spate
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+    }
+
+    for _, dir in ipairs(directions) do
+        dash(dir, 18, 0.2)
+    end
+
+    fireEffect.Enabled = false
+    fireEffect:Destroy()
+
+    -- Cooldown normal de 64 secunde după utilizare
+    task.spawn(function()
+        for i = 64, 1, -1 do
+            buttonULT.Text = "Cooldown: " .. i .. "s"
+            wait(1)
+        end
+        buttonULT.Text = "ULT"
+        buttonULT.BackgroundColor3 = Color3.new(0, 0, 0) -- Revine la negru
+        cooldownULT = false -- Acum poți folosi din nou abilitatea
+    end)
+end
+
+
+-- Button Click Events
+buttonDribbling.MouseButton1Click:Connect(activateDribbling)
+buttonCerc.MouseButton1Click:Connect(activateSpecialMove)
+buttonULT.MouseButton1Click:Connect(activateULT)
+
+-- Detectare tastatură
+local UserInputService = game:GetService("UserInputService")
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end  -- Evităm conflicte cu alte controale
+
+    if input.KeyCode == Enum.KeyCode.Z then
+        activateDribbling()
+    elseif input.KeyCode == Enum.KeyCode.Y then
+        activateSpecialMove()
+    elseif input.KeyCode == Enum.KeyCode.P then
+        activateULT()
+    end
+end)
+
