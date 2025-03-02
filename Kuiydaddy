@@ -131,7 +131,7 @@ local function activateSpecialMove()
             NumberSequenceKeypoint.new(1, 0)
         })
         fireEffect.Color = ColorSequence.new{
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 140, 0)),  -- Galben
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 0, 0)),  -- Galben
             ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 0)),  -- Roșu
             ColorSequenceKeypoint.new(1, Color3.fromRGB(150, 0, 0))   -- Roșu închis
         }
