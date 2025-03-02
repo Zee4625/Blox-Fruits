@@ -232,9 +232,17 @@ local function activateULT()
         -humanoidRootPart.CFrame.RightVector, -- Stânga
         -humanoidRootPart.CFrame.RightVector, -- Stânga
         -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.LookVector, -- Spate 
+        -humanoidRootPart.CFrame.LookVector, -- Spate 
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
         humanoidRootPart.CFrame.LookVector, -- Înainte
         humanoidRootPart.CFrame.RightVector, -- Dreapta
-        -humanoidRootPart.CFrame.LookVector, -- Spate
+        -humanoidRootPart.CFrame.LookVector, -- Spate 
+       humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
         humanoidRootPart.CFrame.RightVector, -- Dreapta
         humanoidRootPart.CFrame.RightVector, -- Dreapta
         humanoidRootPart.CFrame.RightVector, -- Dreapta
@@ -242,6 +250,8 @@ local function activateULT()
         humanoidRootPart.CFrame.RightVector, -- Dreapta
         -humanoidRootPart.CFrame.RightVector, -- Stânga
         -humanoidRootPart.CFrame.LookVector, -- Spate
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
         -humanoidRootPart.CFrame.RightVector, -- Stânga
         humanoidRootPart.CFrame.LookVector, -- Înainte
         humanoidRootPart.CFrame.LookVector, -- Înainte
@@ -253,6 +263,8 @@ local function activateULT()
         humanoidRootPart.CFrame.RightVector, -- Dreapta
         -humanoidRootPart.CFrame.RightVector, -- Stânga
         -humanoidRootPart.CFrame.RightVector, -- Stânga
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
         -humanoidRootPart.CFrame.RightVector, -- Stânga
         humanoidRootPart.CFrame.LookVector, -- Înainte
         humanoidRootPart.CFrame.LookVector, -- Înainte
@@ -272,8 +284,10 @@ local function activateULT()
         humanoidRootPart.CFrame.RightVector, -- Dreapta
         humanoidRootPart.CFrame.RightVector, -- Dreapta
         humanoidRootPart.CFrame.RightVector, -- Dreapta
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
     }
 
     for _, dir in ipairs(directions) do
