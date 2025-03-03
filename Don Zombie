@@ -44,7 +44,7 @@ buttonULT.Font = Enum.Font.SourceSansBold
 local function createBlackSmokeEffect()
     local smokeEffect = Instance.new("ParticleEmitter")
     smokeEffect.Texture = "rbxassetid://10163506449"  -- Poți folosi o textură de fum negru
-    smokeEffect.Rate = 100  -- Viteza de emisie
+    smokeEffect.Rate = 240  -- Viteza de emisie
     smokeEffect.Lifetime = NumberRange.new(0.5, 1)
     smokeEffect.Size = NumberSequence.new(1.22)
     smokeEffect.Color = ColorSequence.new(Color3.fromRGB(63, 0, 63))  -- Fum negru
@@ -137,7 +137,7 @@ local function activateSpecialMove()
         local originalSpeed = humanoid.WalkSpeed
         
         -- Set a large boost to speed (although BodyVelocity will handle the actual speed)
-        humanoid.WalkSpeed = 72.77  -- Set normal walking speed (this is just for visual reference)
+        humanoid.WalkSpeed = 70  -- Set normal walking speed (this is just for visual reference)
         
         -- Create and configure BodyGyro for orientation control
         local bodyGyro = Instance.new("BodyGyro")
@@ -148,7 +148,7 @@ local function activateSpecialMove()
         -- Create and configure BodyVelocity for movement control
         local bodyVelocity = Instance.new("BodyVelocity")
         bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)  -- Strong force to move the character
-        bodyVelocity.Velocity = humanoidRootPart.CFrame.LookVector * 60  -- Set the movement speed in the current direction
+        bodyVelocity.Velocity = humanoidRootPart.CFrame.LookVector * 70  -- Set the movement speed in the current direction
         bodyVelocity.Parent = humanoidRootPart
         
         -- Check if the player already has a Highlight
@@ -169,7 +169,7 @@ local function activateSpecialMove()
         local smokeEffect = createBlackSmokeEffect()
         
         -- Wait for 3 seconds with the highlight and boost speed
-        wait(1.87)  -- Durata highlight-ului este de 3 secunde
+        wait(1.32)  -- Durata highlight-ului este de 3 secunde
 
         -- After 3 seconds, remove the highlight, smoke effect and reset speed
         if highlight then
@@ -227,7 +227,7 @@ end
 local function createIntenseFireEffect()
     local fireEffect = Instance.new("ParticleEmitter")
     fireEffect.Texture = "rbxassetid://10163506449"
-    fireEffect.Rate = 500
+    fireEffect.Rate = 400
     fireEffect.Lifetime = NumberRange.new(0.6, 1.5)
     fireEffect.Speed = NumberRange.new(15, 30)
     fireEffect.Rotation = NumberRange.new(-180, 180)
@@ -237,18 +237,21 @@ local function createIntenseFireEffect()
     fireEffect.Acceleration = Vector3.new(0, 15, 0)
     fireEffect.Size = NumberSequence.new({
         NumberSequenceKeypoint.new(0, 2),
-        NumberSequenceKeypoint.new(0.3, 5),
+        NumberSequenceKeypoint.new(0.5, 5),
         NumberSequenceKeypoint.new(1, 0)
     })
     fireEffect.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 0)),
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(128, 0, 128)),
         ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 0))
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(128, 0, 128))
     }
     fireEffect.Parent = humanoidRootPart
 
     return fireEffect
 end
+
+
+
 
 local function dash(direction, distance, duration)
     local goalPosition = humanoidRootPart.Position + direction * distance
@@ -264,7 +267,7 @@ local cooldownULT = true -- La început ULT e în cooldown
 
 -- Cooldown inițial de 61 secunde (nu poți folosi ULT până trece acest timp)
 task.spawn(function()
-    for i = 61, 1, -1 do
+    for i = 52, 1, -1 do
         buttonULT.Text = "Cooldown: " .. i .. "s"
         wait(1)
     end
@@ -278,71 +281,37 @@ local function activateULT()
     
     cooldownULT = true -- Activează cooldown-ul
     buttonULT.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1) -- Buton în cooldown
-    buttonULT.Text = "Cooldown: 64s"
+    buttonULT.Text = "Cooldown: 52s"
 
     local fireEffect = createIntenseFireEffect()
     fireEffect.Enabled = true
+
 
     -- Secvență optimizată de dash-uri
     local directions = {
         humanoidRootPart.CFrame.LookVector, -- Înainte
         humanoidRootPart.CFrame.LookVector, -- Înainte
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
         -humanoidRootPart.CFrame.LookVector, -- Spate 
+        humanoidRootPart.CFrame.RightVector, -- Dreapta
+        humanoidRootPart.CFrame.RightVector, -- Dreapta     
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        -humanoidRootPart.CFrame.RightVector, -- Stânga
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
+        humanoidRootPart.CFrame.LookVector, -- Înainte
         -humanoidRootPart.CFrame.LookVector, -- Spate 
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
-        -humanoidRootPart.CFrame.LookVector, -- Spate 
-       humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.LookVector, -- Înainte
         humanoidRootPart.CFrame.RightVector, -- Dreapta
         humanoidRootPart.CFrame.RightVector, -- Dreapta
         humanoidRootPart.CFrame.RightVector, -- Dreapta
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        -humanoidRootPart.CFrame.LookVector, -- Spate
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        -humanoidRootPart.CFrame.LookVector, -- Spate
         humanoidRootPart.CFrame.RightVector, -- Dreapta
         humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
         -humanoidRootPart.CFrame.RightVector, -- Stânga
         -humanoidRootPart.CFrame.RightVector, -- Stânga
         humanoidRootPart.CFrame.LookVector, -- Înainte
         humanoidRootPart.CFrame.LookVector, -- Înainte
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        -humanoidRootPart.CFrame.LookVector, -- Spate
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        -humanoidRootPart.CFrame.LookVector, -- Spate
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        -humanoidRootPart.CFrame.RightVector, -- Stânga
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.LookVector, -- Înainte
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
-        humanoidRootPart.CFrame.RightVector, -- Dreapta
         humanoidRootPart.CFrame.LookVector, -- Înainte
         humanoidRootPart.CFrame.LookVector, -- Înainte
         humanoidRootPart.CFrame.LookVector, -- Înainte
@@ -358,7 +327,7 @@ local function activateULT()
 
     -- Cooldown normal de 64 secunde după utilizare
     task.spawn(function()
-        for i = 64, 1, -1 do
+        for i = 52, 1, -1 do
             buttonULT.Text = "Cooldown: " .. i .. "s"
             wait(1)
         end
@@ -367,6 +336,7 @@ local function activateULT()
         cooldownULT = false -- Acum poți folosi din nou abilitatea
     end)
 end
+
 
 
 -- Button Click Events
