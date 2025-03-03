@@ -1,4 +1,3 @@
-Zombie
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
@@ -26,7 +25,7 @@ buttonDribbling.Font = Enum.Font.SourceSansBold
 local buttonCerc = Instance.new("TextButton", screenGui)
 buttonCerc.Size = UDim2.new(0, 85, 0, 80)
 buttonCerc.Position = UDim2.new(0.50, 0, 0.85, 0)
-buttonCerc.Text = "Circle Dribbling"
+buttonCerc.Text = "Zombie Dash"
 buttonCerc.TextColor3 = Color3.new(255, 255, 255)
 buttonCerc.BackgroundColor3 = Color3.new(63 / 255, 0, 63 / 255)
 buttonCerc.TextScaled = true
@@ -124,6 +123,9 @@ local function activateDribbling()
 end
 -- 550000000000000000
 
+
+
+
 local function activateSpecialMove()
     if cooldownCerc then return end
     cooldownCerc = true
@@ -131,6 +133,24 @@ local function activateSpecialMove()
 
     -- Highlight the player's character with purple color for 3 seconds
     if humanoidRootPart then
+        -- Save the original speed before boosting it
+        local originalSpeed = humanoid.WalkSpeed
+        
+        -- Set a large boost to speed (although BodyVelocity will handle the actual speed)
+        humanoid.WalkSpeed = 71.3  -- Set normal walking speed (this is just for visual reference)
+        
+        -- Create and configure BodyGyro for orientation control
+        local bodyGyro = Instance.new("BodyGyro")
+        bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)  -- Allow rotation control on all axes
+        bodyGyro.CFrame = humanoidRootPart.CFrame  -- Maintain the current orientation
+        bodyGyro.Parent = humanoidRootPart
+        
+        -- Create and configure BodyVelocity for movement control
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)  -- Strong force to move the character
+        bodyVelocity.Velocity = humanoidRootPart.CFrame.LookVector * 60  -- Set the movement speed in the current direction
+        bodyVelocity.Parent = humanoidRootPart
+        
         -- Check if the player already has a Highlight
         local highlight = humanoidRootPart.Parent:FindFirstChild("PlayerHighlight")
         
@@ -138,46 +158,60 @@ local function activateSpecialMove()
         if not highlight then
             highlight = Instance.new("Highlight")
             highlight.Name = "PlayerHighlight"
-            highlight.FillColor = Color3.fromRGB(128, 0, 128)  -- Mov (purple) color
-            highlight.FillTransparency = 0.3  -- Set transparency
-            highlight.OutlineColor = Color3.fromRGB(0, 0, 0)  -- White outline
-            highlight.OutlineTransparency = 0
-            highlight.Parent = humanoidRootPart.Parent
+            highlight.FillColor = Color3.fromRGB(128, 0, 128)  -- Mov închis (purple)
+            highlight.FillTransparency = 0.3  -- Set transparency for fill
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)  -- Outline alb
+            highlight.OutlineTransparency = 0  -- Contur complet vizibil
+            highlight.Parent = humanoidRootPart.Parent  -- Atașează highlight-ul la caracter
         end
         
-        -- Wait for 3 seconds with the highlight
-        wait(4)
+        -- Create black smoke effect
+        local smokeEffect = createBlackSmokeEffect()
+        
+        -- Wait for 3 seconds with the highlight and boost speed
+        wait(1.17)  -- Durata highlight-ului este de 3 secunde
 
-        -- After 3 seconds, remove the highlight
+        -- After 3 seconds, remove the highlight, smoke effect and reset speed
         if highlight then
-            highlight:Destroy()
+            highlight:Destroy()  -- Îndepărtează highlight-ul
         end
+        if smokeEffect then
+            smokeEffect:Destroy()  -- Îndepărtează efectul de fum
+        end
+        
+        -- Remove BodyGyro and BodyVelocity to reset movement and rotation
+        bodyGyro:Destroy()
+        bodyVelocity:Destroy()
+        
+        -- Restore the original speed after the boost
+        humanoid.WalkSpeed = originalSpeed
     end
-
 
     -- Cooldown Logic
-    for i = 16, 1, -1 do
-        buttonCerc.Text = "Cooldown: " .. i .. "s"
-        wait(1)
+    for i = 14, 1, -1 do
+        buttonCerc.Text = "Cooldown: " .. i .. "s"  -- Actualizează timpul de cooldown
+        wait(1)  -- Pauză de 1 secundă între fiecare scădere a timpului
     end
-    buttonCerc.Text = "Circle Dribbling"
-    buttonCerc.BackgroundColor3 = Color3.new(63 / 255, 0, 63 / 255)  -- Reset to original color
-    cooldownCerc = false
+    buttonCerc.Text = "Zombie Dash"  -- Textul butonului revine la valoarea inițială
+    buttonCerc.BackgroundColor3 = Color3.new(63 / 255, 0, 63 / 255)  -- Butonul revine la culoarea inițială
+    cooldownCerc = false  -- Resetăm cooldown-ul
 end
 
+-- Funcția pentru crearea efectului de fum negru
+local function createBlackSmokeEffect()
+    local smokeEffect = Instance.new("ParticleEmitter")
+    smokeEffect.Texture = "rbxassetid://10163506449"  -- Poți folosi o textură de fum negru
+    smokeEffect.Rate = 100  -- Viteza de emisie
+    smokeEffect.Lifetime = NumberRange.new(0.7, 1)
+    smokeEffect.Size = NumberSequence.new(4.72)
+    smokeEffect.Color = ColorSequence.new(Color3.fromRGB(63, 0, 63))  -- Fum negru
+    smokeEffect.Speed = NumberRange.new(5)
+    smokeEffect.VelocitySpread = 50
+    smokeEffect.LightEmission = 0.32  -- Mai puțină lumină
+    smokeEffect.Parent = humanoidRootPart  -- Aplicăm fumul pe HumanoidRootPart
 
-
-
-
-
-
-
-
-
-
-
-
-
+    return smokeEffect
+end
 
 
 
