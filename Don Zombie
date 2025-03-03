@@ -25,7 +25,7 @@ buttonDribbling.Font = Enum.Font.SourceSansBold
 local buttonCerc = Instance.new("TextButton", screenGui)
 buttonCerc.Size = UDim2.new(0, 85, 0, 80)
 buttonCerc.Position = UDim2.new(0.50, 0, 0.85, 0)
-buttonCerc.Text = "Zombie Dash"
+buttonCerc.Text = "Zombie Run"
 buttonCerc.TextColor3 = Color3.new(255, 255, 255)
 buttonCerc.BackgroundColor3 = Color3.new(63 / 255, 0, 63 / 255)
 buttonCerc.TextScaled = true
@@ -137,7 +137,7 @@ local function activateSpecialMove()
         local originalSpeed = humanoid.WalkSpeed
         
         -- Set a large boost to speed (although BodyVelocity will handle the actual speed)
-        humanoid.WalkSpeed = 71.3  -- Set normal walking speed (this is just for visual reference)
+        humanoid.WalkSpeed = 72.77  -- Set normal walking speed (this is just for visual reference)
         
         -- Create and configure BodyGyro for orientation control
         local bodyGyro = Instance.new("BodyGyro")
@@ -169,7 +169,7 @@ local function activateSpecialMove()
         local smokeEffect = createBlackSmokeEffect()
         
         -- Wait for 3 seconds with the highlight and boost speed
-        wait(1.17)  -- Durata highlight-ului este de 3 secunde
+        wait(1.87)  -- Durata highlight-ului este de 3 secunde
 
         -- After 3 seconds, remove the highlight, smoke effect and reset speed
         if highlight then
@@ -192,7 +192,7 @@ local function activateSpecialMove()
         buttonCerc.Text = "Cooldown: " .. i .. "s"  -- Actualizează timpul de cooldown
         wait(1)  -- Pauză de 1 secundă între fiecare scădere a timpului
     end
-    buttonCerc.Text = "Zombie Dash"  -- Textul butonului revine la valoarea inițială
+    buttonCerc.Text = "Zombie Run"  -- Textul butonului revine la valoarea inițială
     buttonCerc.BackgroundColor3 = Color3.new(63 / 255, 0, 63 / 255)  -- Butonul revine la culoarea inițială
     cooldownCerc = false  -- Resetăm cooldown-ul
 end
