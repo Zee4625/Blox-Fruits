@@ -169,7 +169,7 @@ local function activateSpecialMove()
         local smokeEffect = createBlackSmokeEffect()
         
         -- Wait for 3 seconds with the highlight and boost speed
-        wait(1.32)  -- Durata highlight-ului este de 3 secunde
+        wait(1.12)  -- Durata highlight-ului este de 3 secunde
 
         -- After 3 seconds, remove the highlight, smoke effect and reset speed
         if highlight then
