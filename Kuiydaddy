@@ -11,7 +11,7 @@ local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 
 local buttonMYW = Instance.new("TextButton", screenGui)
 buttonMYW.Size = UDim2.new(0, 85, 0, 80)
-buttonMYW.Position = UDim2.new(0.44, 0, 0.85, 0) -- Plasat mai aproape de centru
+buttonMYW.Position = UDim2.new(0.38, 0, 0.85, 0) -- Plasat mai aproape de centru
 buttonMYW.Text = "My Way"
 buttonMYW.TextColor3 = Color3.new(255, 255, 255) -- Text alb
 buttonMYW.BackgroundColor3 = Color3.new(150, 0, 0) -- Negru
@@ -20,15 +20,149 @@ buttonMYW.Font = Enum.Font.SourceSansBold
 
 local buttonSpecial = Instance.new("TextButton", screenGui)
 buttonSpecial.Size = UDim2.new(0, 85, 0, 80)
-buttonSpecial.Position = UDim2.new(0.50, 0, 0.85, 0)
-buttonSpecial.Text = "Fire Dash"
+buttonSpecial.Position = UDim2.new(0.44, 0, 0.85, 0)
+buttonSpecial.Text = "Blazing Rush"
 buttonSpecial.TextColor3 = Color3.new(255, 255, 255) -- Text alb
 buttonSpecial.BackgroundColor3 = Color3.new(150, 0, 0) -- Negru
 buttonSpecial.TextScaled = true
 buttonSpecial.Font = Enum.Font.SourceSansBold
 
+-- BHQ
+-- DASH 1
+-- Circle Dribbling Button
+local buttonZ3 = Instance.new("TextButton", screenGui)
+buttonZ3.Size = UDim2.new(0, 85, 0, 80)
+buttonZ3.Position = UDim2.new(0.50, 0, 0.85, 0)
+buttonZ3.Text = "Red Scale"
+buttonZ3.TextColor3 = Color3.new(255, 255, 255)
+buttonZ3.BackgroundColor3 = Color3.new(150, 0, 0)
+buttonZ3.TextScaled = true
+buttonZ3.Font = Enum.Font.SourceSansBold
 -- HYYYYY
--- Creare animator și încărcare animație
+local buttonZ2 = Instance.new("TextButton", screenGui)
+buttonZ2.Size = UDim2.new(0, 85, 0, 80)
+buttonZ2.Position = UDim2.new(0.56, 0, 0.85, 0)
+buttonZ2.Text = "Warpfire"
+buttonZ2.TextColor3 = Color3.new(255, 255, 255)
+buttonZ2.BackgroundColor3 = Color3.new(150, 0, 0)
+buttonZ2.TextScaled = true
+buttonZ2.Font = Enum.Font.SourceSansBold
+--1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+
+
+
+
+local cooldownZ2 = false
+
+-- Functia pentru a crea efectul de fum negru
+local function createBlackSmokeEffect()
+    local smoke = Instance.new("ParticleEmitter")
+    smoke.Texture = "rbxassetid://10163506449"  -- Textura efect fum
+    smoke.Parent = humanoidRootPart
+    smoke.Lifetime = NumberRange.new(0.5, 1)
+    smoke.Rate = 50
+    smoke.Size = NumberSequence.new(1, 5)
+    smoke.Color = ColorSequence.new(Color3.fromRGB(150, 0, 0))
+    return smoke
+end
+
+-- Functia pentru a găsi cel mai apropiat jucător
+local function getNearestPlayer()
+    local nearestPlayer = nil
+    local shortestDistance = math.huge
+
+    for _, otherPlayer in pairs(Players:GetPlayers()) do
+        if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local otherRoot = otherPlayer.Character.HumanoidRootPart
+            local distance = (humanoidRootPart.Position - otherRoot.Position).magnitude
+
+            if distance < shortestDistance then
+                shortestDistance = distance
+                nearestPlayer = otherRoot
+            end
+        end
+    end
+    return nearestPlayer
+end
+
+-- Activarea abilității Z2 - Warpfire
+local function activateZ2()
+    if cooldownZ2 then return end
+    cooldownZ2 = true
+    buttonZ2.BackgroundColor3 = Color3.new(0, 0, 0) -- Butonul devine negru în cooldown
+
+    if humanoid and humanoidRootPart then
+        local originalSpeed = humanoid.WalkSpeed
+        humanoid.WalkSpeed = 70  -- Creștem viteza temporar
+
+        -- **Aplicăm highlight roșu pe caracter**
+        local highlight = humanoidRootPart.Parent:FindFirstChild("PlayerHighlight") or Instance.new("Highlight")
+        highlight.Name = "PlayerHighlight"
+        highlight.FillColor = Color3.fromRGB(255, 0, 0)  -- Highlight roșu
+        highlight.FillTransparency = 0.35
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        highlight.OutlineTransparency = 0
+        highlight.Parent = humanoidRootPart.Parent
+
+        -- **Efectul de fum negru**
+        local smokeEffect = createBlackSmokeEffect()
+
+        -- **Mișcare în față**
+        local bodyVelocityForward = Instance.new("BodyVelocity")
+        bodyVelocityForward.MaxForce = Vector3.new(400000, 400000, 400000)
+        bodyVelocityForward.Velocity = humanoidRootPart.CFrame.LookVector * 90  -- Se mișcă înainte
+        bodyVelocityForward.Parent = humanoidRootPart
+
+        -- Așteptăm 0.7 secunde pentru mișcarea înainte
+        wait(0.1)
+
+        -- **Mișcare la dreapta (în direcția dreaptă a personajului)**
+        local bodyVelocityRight = Instance.new("BodyVelocity")
+        bodyVelocityRight.MaxForce = Vector3.new(400000, 400000, 400000)
+        bodyVelocityRight.Velocity = humanoidRootPart.CFrame.RightVector * 90  -- Se mișcă la dreapta
+        bodyVelocityRight.Parent = humanoidRootPart
+
+        -- Așteptăm 0.7 secunde pentru mișcarea la dreapta
+        wait(0.14)
+
+        -- **Ștergere efecte și resetare viteză**
+        highlight:Destroy()
+        smokeEffect:Destroy()
+        bodyVelocityForward:Destroy()
+        bodyVelocityRight:Destroy()
+        humanoid.WalkSpeed = originalSpeed
+    end
+
+    -- **Cooldown de 2 secunde**
+    for i = 6, 1, -1 do
+        buttonZ2.Text = "Cooldown: " .. i .. "s"
+        wait(1)
+    end
+    buttonZ2.Text = "Warpfire"
+    buttonZ2.BackgroundColor3 = Color3.new(150, 0, 0)  -- Revine la culoarea inițială
+    cooldownZ2 = false
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+-- Circle Dribbling Button
 local animator = humanoid:FindFirstChild("Animator") or Instance.new("Animator", humanoid)
 local jumpAnimation = Instance.new("Animation")
 jumpAnimation.AnimationId = "rbxassetid://104296357144649"
@@ -101,6 +235,75 @@ local function activateMYW()
 end
 
 
+-- 222222222222222222222222222222
+local cooldownZ3 = false
+
+local function createBlackSmokeEffect()
+    local smoke = Instance.new("ParticleEmitter")
+    smoke.Texture = "rbxassetid://10163506449"  -- Înlocuiește cu ID-ul efectului de fum
+    smoke.Parent = humanoidRootPart
+    smoke.Lifetime = NumberRange.new(0.5, 1)
+    smoke.Rate = 50
+    smoke.Size = NumberSequence.new(1, 5)
+    smoke.Color = ColorSequence.new(Color3.fromRGB(150, 0, 0))
+    return smoke
+end
+
+local function activateZ3()
+    if cooldownZ3 then return end
+    cooldownZ3 = true
+    buttonZ3.BackgroundColor3 = Color3.new(0, 0, 0) -- Butonul devine negru în cooldown
+
+    -- Highlight the player's character
+    if humanoid and humanoidRootPart then
+        local originalSpeed = humanoid.WalkSpeed
+        humanoid.WalkSpeed = 55
+
+        -- BodyGyro pentru orientare
+        local bodyGyro = Instance.new("BodyGyro")
+        bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+        bodyGyro.CFrame = humanoidRootPart.CFrame
+        bodyGyro.Parent = humanoidRootPart
+
+        -- BodyVelocity pentru mișcare în SUS
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
+        bodyVelocity.Velocity = humanoidRootPart.CFrame.UpVector * 55 -- Se ridică în aer
+        bodyVelocity.Parent = humanoidRootPart
+
+        -- Creare highlight doar dacă nu există deja
+        local highlight = humanoidRootPart.Parent:FindFirstChild("PlayerHighlight") or Instance.new("Highlight")
+        highlight.Name = "PlayerHighlight"
+        highlight.FillColor = Color3.fromRGB(150, 0, 0)
+        highlight.FillTransparency = 0.45
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        highlight.OutlineTransparency = 0
+        highlight.Parent = humanoidRootPart.Parent
+
+        -- Creare efect de fum negru
+        local smokeEffect = createBlackSmokeEffect()
+
+        -- Așteptare 0.6 secunde în aer
+        wait(0.27)
+
+        -- Ștergere efecte și resetare viteză
+        highlight:Destroy()
+        smokeEffect:Destroy()
+        bodyGyro:Destroy()
+        bodyVelocity:Destroy()
+        humanoid.WalkSpeed = originalSpeed
+    end
+
+    -- Cooldown de 2 secunde
+    for i = 11, 1, -1 do
+        buttonZ3.Text = "Cooldown: " .. i .. "s"
+        wait(1)
+    end
+    buttonZ3.Text = "Red Scale"
+    buttonZ3.BackgroundColor3 = Color3.new(150, 0, 0)
+    cooldownZ3 = false
+end
+
 
 -- DERFTGYHUJJJJJJJJJJJJJJJJJJJJ
 local TweenService = game:GetService("TweenService")
@@ -153,43 +356,55 @@ local function activateSpecialMove()
         }
         smokeEffect.Parent = humanoidRootPart
 
+        -- Creare Highlight roșu
+        local highlight = humanoidRootPart.Parent:FindFirstChild("FireDashHighlight") or Instance.new("Highlight")
+        highlight.Name = "FireDashHighlight"
+        highlight.FillColor = Color3.fromRGB(255, 0, 0)  -- Roșu intens
+        highlight.FillTransparency = 0.3
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- Contur alb
+        highlight.OutlineTransparency = 0
+        highlight.Parent = humanoidRootPart.Parent
+
         -- Calculăm direcția în care se uită personajul
         local direction = humanoidRootPart.CFrame.LookVector
 
         -- Mișcăm personajul în față cu viteza de 20
-        local goalPosition = humanoidRootPart.Position + direction * 86 -- 15 unități în fața caracterului
+        local goalPosition = humanoidRootPart.Position + direction * 86 -- 86 unități în față
         local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
         local goal = {Position = goalPosition}
 
         local tween = TweenService:Create(humanoidRootPart, tweenInfo, goal)
         tween:Play()
 
-        -- Activăm efectul de foc și fum timp de 2 secunde
+        -- Activăm efectul de foc și fum timp de 1.11 secunde
         fireEffect.Enabled = true
         smokeEffect.Enabled = true
         wait(1.11)
         fireEffect.Enabled = false
         smokeEffect.Enabled = false
 
-        -- Eliminăm efectele după 2 secunde
+        -- Eliminăm efectele după ce mișcarea s-a terminat
         fireEffect:Destroy()
         smokeEffect:Destroy()
+        highlight:Destroy() -- Eliminăm highlight-ul roșu
 
         humanoid.WalkSpeed = originalSpeed
     end
 
     -- Cooldown într-un thread separat
     task.spawn(function()
-        for i = 14, 1, -1 do
+        for i = 16, 1, -1 do
             buttonSpecial.Text = "Cooldown: " .. i .. "s"
             wait(1)
         end
-        buttonSpecial.Text = "Fire Dash"
-        buttonSpecial.BackgroundColor3 = Color3.new(150, 0, 0) -- Revine la galben
+        buttonSpecial.Text = "Blazing Rush"
+        buttonSpecial.BackgroundColor3 = Color3.new(150, 0, 0) -- Revine la roșu
         cooldownSpecial = false
     end)
 end
 
+
+-- 356555555555333333333333333
 
 local cooldownULT = true -- La început, ULT este în cooldown 124 secunde
 local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
@@ -248,12 +463,16 @@ local function activateULT()
     if cooldownULT then return end
     cooldownULT = true
     buttonULT.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1) -- Buton în cooldown
-    buttonULT.Text = "Cooldown: 64s"
+    buttonULT.Text = "Cooldown: 120s"
 
     local fireEffect = createIntenseFireEffect()
     fireEffect.Enabled = true
 
     -- Dash-uri mai scurte
+    dash(humanoidRootPart.CFrame.LookVector, 18, 0.2) -- Înainte
+    dash(humanoidRootPart.CFrame.LookVector, 18, 0.2) -- Înainte
+    dash(humanoidRootPart.CFrame.LookVector, 18, 0.2) -- Înainte
+    dash(humanoidRootPart.CFrame.LookVector, 18, 0.2) -- Înainte
     dash(humanoidRootPart.CFrame.LookVector, 18, 0.2) -- Înainte
     dash(humanoidRootPart.CFrame.LookVector, 18, 0.2) -- Înainte
     dash(humanoidRootPart.CFrame.LookVector, 18, 0.2) -- Înainte
@@ -281,7 +500,7 @@ local function activateULT()
 
     -- Cooldown de 20 secunde
     task.spawn(function()
-        for i = 64, 1, -1 do
+        for i = 120, 1, -1 do
             buttonULT.Text = "Cooldown: " .. i .. "s"
             wait(1)
         end
@@ -293,7 +512,7 @@ end
 
 -- Cooldown inițial de 124 secunde la început
 task.spawn(function()
-    for i = 64, 1, -1 do
+    for i = 120, 1, -1 do
         buttonULT.Text = "Cooldown: " .. i .. "s"
         wait(1)
     end
@@ -305,26 +524,30 @@ end)
 
 
 
-userInputService.InputBegan:Connect(function(input, processed) -- 150, 0, 0
-    if not processed and input.KeyCode == Enum.KeyCode.Z then
-        activateMYW()
-    elseif not processed and input.KeyCode == Enum.KeyCode.Y then
-        activateSpecialMove()
-    end
-end)
-
-
+-- Button Click Events
 buttonMYW.MouseButton1Click:Connect(activateMYW)
 buttonSpecial.MouseButton1Click:Connect(activateSpecialMove)
+buttonZ3.MouseButton1Click:Connect(activateZ3)
+buttonULT.MouseButton1Click:Connect(activateULT)
+buttonZ2.MouseButton1Click:Connect(activateZ2)
 
 
--- Detectare input tastatură (P pentru ULT)
-userInputService.InputBegan:Connect(function(input, processed)
-    if not processed and input.KeyCode == Enum.KeyCode.P then
+
+-- Detectare tastatură
+local UserInputService = game:GetService("UserInputService")
+
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+
+    if input.KeyCode == Enum.KeyCode.One then
+        activateMYW()
+    elseif input.KeyCode == Enum.KeyCode.Two then
+        activateSpecialMove()
+    elseif input.KeyCode == Enum.KeyCode.Three then
+        activateZ3()
+    elseif input.KeyCode == Enum.KeyCode.Four then
+        activateZ2()
+    elseif input.KeyCode == Enum.KeyCode.P then
         activateULT()
     end
 end)
-
--- Conectare buton ULT la funcție
-buttonULT.MouseButton1Click:Connect(activateULT)
-
