@@ -52,49 +52,12 @@ buttonZ2.Font = Enum.Font.SourceSansBold
 
 
 
-local cooldownZ2 = false
-
--- Functia pentru a crea efectul de fum negru
-local function createBlackSmokeEffect()
-    local smoke = Instance.new("ParticleEmitter")
-    smoke.Texture = "rbxassetid://10163506449"  -- Textura efect fum
-    smoke.Parent = humanoidRootPart
-    smoke.Lifetime = NumberRange.new(0.5, 1)
-    smoke.Rate = 50
-    smoke.Size = NumberSequence.new(1, 5)
-    smoke.Color = ColorSequence.new(Color3.fromRGB(150, 0, 0))
-    return smoke
-end
-
--- Functia pentru a găsi cel mai apropiat jucător
-local function getNearestPlayer()
-    local nearestPlayer = nil
-    local shortestDistance = math.huge
-
-    for _, otherPlayer in pairs(Players:GetPlayers()) do
-        if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local otherRoot = otherPlayer.Character.HumanoidRootPart
-            local distance = (humanoidRootPart.Position - otherRoot.Position).magnitude
-
-            if distance < shortestDistance then
-                shortestDistance = distance
-                nearestPlayer = otherRoot
-            end
-        end
-    end
-    return nearestPlayer
-end
-
--- Activarea abilității Z2 - Warpfire
 local function activateZ2()
     if cooldownZ2 then return end
     cooldownZ2 = true
     buttonZ2.BackgroundColor3 = Color3.new(0, 0, 0) -- Butonul devine negru în cooldown
 
     if humanoid and humanoidRootPart then
-        local originalSpeed = humanoid.WalkSpeed
-        humanoid.WalkSpeed = 70  -- Creștem viteza temporar
-
         -- **Aplicăm highlight roșu pe caracter**
         local highlight = humanoidRootPart.Parent:FindFirstChild("PlayerHighlight") or Instance.new("Highlight")
         highlight.Name = "PlayerHighlight"
@@ -104,37 +67,52 @@ local function activateZ2()
         highlight.OutlineTransparency = 0
         highlight.Parent = humanoidRootPart.Parent
 
-        -- **Efectul de fum negru**
-        local smokeEffect = createBlackSmokeEffect()
+        -- **Activează atracția mingii către jucător**
+        local function moveBallToPlayer()
+            while attractBall do
+                ball = game.Workspace:FindFirstChild("Football")
+                if ball then
+                    local playerPosition = humanoidRootPart.Position
+                    local ballPosition = ball.Position
+                    local distance = (playerPosition - ballPosition).Magnitude
 
-        -- **Mișcare în față**
-        local bodyVelocityForward = Instance.new("BodyVelocity")
-        bodyVelocityForward.MaxForce = Vector3.new(400000, 400000, 400000)
-        bodyVelocityForward.Velocity = humanoidRootPart.CFrame.LookVector * 90  -- Se mișcă înainte
-        bodyVelocityForward.Parent = humanoidRootPart
+                    -- Stop movement once the ball reaches the player
+                    if distance < 3 then
+                        attractBall = false
+                        ball.AssemblyLinearVelocity = Vector3.zero
+                        ball.AssemblyAngularVelocity = Vector3.zero
+                        return
+                    end
 
-        -- Așteptăm 0.7 secunde pentru mișcarea înainte
-        wait(0.1)
+                    -- Strong pull towards player
+                    local direction = (playerPosition - ballPosition).Unit
+                    ball.AssemblyLinearVelocity = direction * 350  
 
-        -- **Mișcare la dreapta (în direcția dreaptă a personajului)**
-        local bodyVelocityRight = Instance.new("BodyVelocity")
-        bodyVelocityRight.MaxForce = Vector3.new(400000, 400000, 400000)
-        bodyVelocityRight.Velocity = humanoidRootPart.CFrame.RightVector * 90  -- Se mișcă la dreapta
-        bodyVelocityRight.Parent = humanoidRootPart
+                    -- Opponent avoidance
+                    for _, opponent in ipairs(game.Players:GetPlayers()) do
+                        if opponent.Team ~= player.Team and opponent.Character and opponent.Character:FindFirstChild("HumanoidRootPart") then
+                            local opponentPos = opponent.Character.HumanoidRootPart.Position
+                            if (ballPosition - opponentPos).Magnitude < 15 then
+                                local avoidance = (ballPosition - opponentPos).Unit * 200
+                                ball.AssemblyLinearVelocity = ball.AssemblyLinearVelocity + avoidance
+                            end
+                        end
+                    end
+                end
+                task.wait(0.01)
+            end
+        end
 
-        -- Așteptăm 0.7 secunde pentru mișcarea la dreapta
-        wait(0.14)
+        attractBall = true
+        moveBallToPlayer()
 
-        -- **Ștergere efecte și resetare viteză**
+        -- **Ștergere highlight după 20 secunde**
+        wait(2)
         highlight:Destroy()
-        smokeEffect:Destroy()
-        bodyVelocityForward:Destroy()
-        bodyVelocityRight:Destroy()
-        humanoid.WalkSpeed = originalSpeed
     end
 
     -- **Cooldown de 2 secunde**
-    for i = 6, 1, -1 do
+    for i = 27, 1, -1 do
         buttonZ2.Text = "Cooldown: " .. i .. "s"
         wait(1)
     end
@@ -142,6 +120,7 @@ local function activateZ2()
     buttonZ2.BackgroundColor3 = Color3.new(150, 0, 0)  -- Revine la culoarea inițială
     cooldownZ2 = false
 end
+
 
 
 
