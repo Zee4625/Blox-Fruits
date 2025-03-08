@@ -491,8 +491,9 @@ local Tabinfo1 = Window:AddTab({Title = "Custom-Info", Icon = "server"})
 Tabinfo1:AddParagraph({
 	Title = "⚠️READ⚠️",
 	Description = AcrylicLibrary:HightlightSource([[
-Press Z for the 1 st ability
-Press Y for the 2 st ability
+Press 1 for the 1 st ability
+Press 2 for the 2 st ability
+Press 3 for the 3 st ability
 And press P for the ULT!
 ]])
 })
