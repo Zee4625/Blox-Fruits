@@ -293,8 +293,6 @@ local function activateZ2()
             humanoidRootPart.CFrame.RightVector * -70, -- Stânga
             humanoidRootPart.CFrame.RightVector * -70, -- Stânga
             humanoidRootPart.CFrame.LookVector * 70    -- Înainte
-            humanoidRootPart.CFrame.LookVector * 70    -- Înainte
-            humanoidRootPart.CFrame.LookVector * 70    -- Înainte
         }
 
         -- Aplicăm mișcările
@@ -320,7 +318,7 @@ local function activateZ2()
     end
 
     -- Cooldown de 3 secunde
-    for i = 24, 1, -1 do
+    for i = 17, 1, -1 do
         buttonZ2.Text = "Cooldown: " .. i .. "s"
         wait(1)
     end
