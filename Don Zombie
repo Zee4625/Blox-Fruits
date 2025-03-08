@@ -293,6 +293,8 @@ local function activateZ2()
             humanoidRootPart.CFrame.RightVector * -70, -- Stânga
             humanoidRootPart.CFrame.RightVector * -70, -- Stânga
             humanoidRootPart.CFrame.LookVector * 70    -- Înainte
+            humanoidRootPart.CFrame.LookVector * 70    -- Înainte
+            humanoidRootPart.CFrame.LookVector * 70    -- Înainte
         }
 
         -- Aplicăm mișcările
