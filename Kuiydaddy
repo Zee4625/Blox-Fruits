@@ -139,7 +139,7 @@ local function activateZ2()
         end
 
         -- **Ștergere highlight după 20 secunde**
-        task.delay(20, function()
+        task.delay(2, function()
             if highlight then highlight:Destroy() end
         end)
     end
