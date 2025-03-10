@@ -308,13 +308,13 @@ local function activateZ2()
         end
 
         -- **Ștergere highlight după 20 secunde**
-        task.delay(2, function()
+        task.delay(3, function()
             if highlight then highlight:Destroy() end
         end)
     end
 
     -- **Cooldown de 2 secunde**
-    for i = 17, 1, -1 do
+    for i = 29, 1, -1 do
         buttonZ2.Text = "Cooldown: " .. i .. "s"
         wait(1)
     end
