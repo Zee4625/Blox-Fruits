@@ -444,11 +444,6 @@ end
 
 
 -- 356555555555333333333333333
-
-Partajează
-
-User
-Ai spus:
 local cooldownULT = true -- La început, ULT este în cooldown 124 secunde
 local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 
