@@ -105,7 +105,7 @@ end
 
 local function createBlueSmokeEffect(target)
     local smoke = Instance.new("ParticleEmitter")
-    smoke.Texture = "rbxassetid://10545078665"  -- Efect de fum
+    smoke.Texture = "rbxassetid://10370558405"  -- Efect de fum
     smoke.Parent = target
     smoke.Lifetime = NumberRange.new(1, 2)
     smoke.Rate = 100  -- Fum mai rar
