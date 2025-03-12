@@ -276,108 +276,7 @@ local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
--- Viteza de zbor
-local flightSpeed = 301
-local flightActive = false
-local farmActive = false
 
--- Funcție pentru a găsi toate cuferele
-local function findAllChests()
-    local chests = {}
-    -- Căutăm în Workspace toate părțile care au în nume "chest"
-    for _, obj in pairs(game.Workspace:GetDescendants()) do
-        if obj:IsA("Part") and obj.Name:lower():find("chest") then
-            table.insert(chests, obj.Position)
-        end
-    end
-    return chests
-end
-
--- Funcție de activare/oprire NoClip
-local function toggleNoClip(state)
-    for _, part in pairs(character:GetDescendants()) do
-        if part:IsA("BasePart") then
-            part.CanCollide = not state
-        end
-    end
-end
-
--- Funcție de zbor spre o destinație
-local function flyToPosition(targetPosition)
-    if flightActive then return end
-    flightActive = true
-
-    -- Creează BodyVelocity pentru controlul vitezei de zbor
-    local bodyVelocity = Instance.new("BodyVelocity")
-    bodyVelocity.MaxForce = Vector3.new(1e6, 1e6, 1e6)
-    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-    bodyVelocity.Parent = humanoidRootPart
-
-    -- Creează BodyGyro pentru stabilizare
-    local bodyGyro = Instance.new("BodyGyro")
-    bodyGyro.MaxTorque = Vector3.new(1e6, 1e6, 1e6)
-    bodyGyro.CFrame = humanoidRootPart.CFrame
-    bodyGyro.Parent = humanoidRootPart
-
-    -- NoClip activat
-    local noclipLoop = true
-    task.spawn(function()
-        while noclipLoop do
-            toggleNoClip(true)
-            task.wait(0.1)
-        end
-    end)
-
-    -- Mers lin spre destinație
-    while (humanoidRootPart.Position - targetPosition).Magnitude > 5 do
-        local direction = (targetPosition - humanoidRootPart.Position).unit
-        bodyVelocity.Velocity = direction * flightSpeed
-        task.wait(0.1)
-    end
-
-    -- Oprire lină
-    for i = 1, 22 do
-        bodyVelocity.Velocity = bodyVelocity.Velocity * 0.5
-        task.wait(0.1)
-    end
-
-    -- Oprire completă
-    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-    task.wait(0.5)
-    bodyVelocity:Destroy()
-    bodyGyro:Destroy()
-
-    noclipLoop = false
-    toggleNoClip(false)
-
-    flightActive = false
-end
-
--- Funcție pentru a merge la toate cuferele în buclă continuă
-local function flyThroughAllChests()
-    if farmActive then  -- Oprește farm-ul dacă este deja activ
-        farmActive = false
-        print("Farm de cufere oprit!")
-        return
-    end
-
-    farmActive = true
-    print("Farm de cufere activat!")
-
-    while farmActive do
-        local chests = findAllChests()
-        if #chests == 0 then
-            print("Nu s-au găsit cufere!")
-        end
-        for _, chestPosition in ipairs(chests) do
-            if not farmActive then break end  -- Oprește farm-ul dacă butonul este apăsat din nou
-            print("Merg spre cufăr la poziția: " .. tostring(chestPosition))
-            flyToPosition(chestPosition)
-            task.wait(0.2)  -- Așteaptă puțin între zboruri
-        end
-        task.wait(0.4)  -- Pauză între runde de farmare
-    end
-end
 
 --ne
 -- Add the tabs and functionality in the UI
@@ -433,19 +332,21 @@ end)
 -- Tab-ul Farm pentru activarea funcției de farmare a cuferelelor
 local TabFarm = Window:AddTab({Title = "FARM", Icon = "gift"})
 
-TabFarm:AddToggle({
-    Title = "Farm Chest",
-    Tip = "Farm Chests",
-    Default = false,
-    Callback = function(value)
-        if value then
-            print("Activat farm de cufere")
-            flyThroughAllChests()  -- Activează farm-ul de cufere
-        else
-            farmActive = false  -- Oprește farm-ul dacă este dezactivat
-            print("Dezactivat farm de cufere")
+TabFarm:AddButton({
+    Title = "Auto Farm", -- The title of the button
+    Tip = "Click to auto farm", -- Tooltip text when hovered over
+    Callback = function()
+        -- When the button is clicked, run the script from the URL
+        local success, err = pcall(function()
+            -- This will execute the script from the specified URL
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/X-ZEE"))()
+        end)
+        
+        -- If there is an error, display it
+        if not success then
+            warn("Error loading script: " .. err)
         end
-    end,
+    end
 })
 
 
