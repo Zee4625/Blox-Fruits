@@ -5,8 +5,8 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 520, 0, 320)
-Frame.Position = UDim2.new(0.5, -260, 0.5, -160)
+Frame.Size = UDim2.new(0, 520, 0, 400)
+Frame.Position = UDim2.new(0.5, -260, 0.5, -200)
 Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 Frame.BackgroundTransparency = 0.2
 Frame.BorderSizePixel = 0
@@ -54,6 +54,7 @@ spawn(function()
     end
 end)
 
+-- TextBox pentru introducerea cheii
 local TextBox = Instance.new("TextBox")
 TextBox.Size = UDim2.new(0, 400, 0, 75)
 TextBox.Position = UDim2.new(0.5, -200, 0.4, 0)
@@ -83,6 +84,7 @@ TextBox.FocusLost:Connect(function()
     TextBoxStroke.Color = Color3.fromRGB(100, 100, 100)
 end)
 
+-- Butonul "Enter" pentru validarea cheii
 local Button = Instance.new("TextButton")
 Button.Size = UDim2.new(0, 200, 0, 75)
 Button.Position = UDim2.new(0.5, -100, 0.75, 0)
@@ -102,7 +104,6 @@ ButtonStroke.Parent = Button
 ButtonStroke.Thickness = 2
 ButtonStroke.Color = Color3.fromRGB(0, 120, 180)
 
--- Efect hover cu animație smooth
 Button.MouseEnter:Connect(function()
     Button.BackgroundColor3 = Color3.fromRGB(0, 210, 255)
     ButtonStroke.Color = Color3.fromRGB(0, 150, 255)
@@ -111,6 +112,39 @@ end)
 Button.MouseLeave:Connect(function()
     Button.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
     ButtonStroke.Color = Color3.fromRGB(0, 120, 180)
+end)
+
+-- Butonul "Get Key" pentru copiere URL
+local GetKeyButton = Instance.new("TextButton")
+GetKeyButton.Size = UDim2.new(0, 200, 0, 50)
+GetKeyButton.Position = UDim2.new(0.5, -100, 0.2, 0)
+GetKeyButton.Text = "Get Key"
+GetKeyButton.BackgroundColor3 = Color3.fromRGB(139, 69, 19)  -- Maro
+GetKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+GetKeyButton.Font = Enum.Font.GothamBold
+GetKeyButton.TextSize = 24
+GetKeyButton.Parent = Frame
+
+local GetKeyButtonCorner = Instance.new("UICorner")
+GetKeyButtonCorner.CornerRadius = UDim.new(0, 18)
+GetKeyButtonCorner.Parent = GetKeyButton
+
+local GetKeyButtonStroke = Instance.new("UIStroke")
+GetKeyButtonStroke.Parent = GetKeyButton
+GetKeyButtonStroke.Thickness = 2
+GetKeyButtonStroke.Color = Color3.fromRGB(100, 100, 100)
+
+-- URL pe care îl vom copia
+local url = "https://link-hub.net/1274367/zeehub-code"
+
+-- Copiere URL și schimbare text la buton
+GetKeyButton.MouseButton1Click:Connect(function()
+    -- Copiere URL în clipboard
+    setclipboard(url)
+    
+    -- Modificăm textul și culoarea butonului
+    GetKeyButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  -- Verde
+    GetKeyButton.Text = "Paste the URL in your Chrome for the Key!"
 end)
 
 -- Funcția de verificare a cheii
@@ -132,4 +166,3 @@ Button.MouseButton1Click:Connect(function()
         game.Players.LocalPlayer:Kick("NO KEY FOUND!")
     end
 end)
-
