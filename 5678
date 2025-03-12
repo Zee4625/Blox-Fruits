@@ -1,1 +1,135 @@
-a
+local CorrectKey = "ZEo777MwZ" -- Cheia corectă
+
+-- Creare UI Key System
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 520, 0, 320)
+Frame.Position = UDim2.new(0.5, -260, 0.5, -160)
+Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Frame.BackgroundTransparency = 0.2
+Frame.BorderSizePixel = 0
+Frame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 22)
+UICorner.Parent = Frame
+
+-- Gradient dinamic
+local UIGradient = Instance.new("UIGradient")
+UIGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(45, 45, 45)), 
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 10, 10))
+}
+UIGradient.Rotation = 90
+UIGradient.Parent = Frame
+
+-- Titlul ZeeHUB cu efect RGB în colțul din STÂNGA SUS
+local Title = Instance.new("TextLabel")
+Title.Text = "ZeeHUB"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 28
+Title.TextColor3 = Color3.fromRGB(255, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(0, 140, 0, 35)
+Title.Position = UDim2.new(0, 15, 0, 10)
+Title.Parent = Frame
+
+-- Animare RGB pe titlu
+spawn(function()
+    while true do
+        for i = 0, 255, 5 do
+            Title.TextColor3 = Color3.fromRGB(i, 0, 255 - i)
+            wait(0.05)
+        end
+        for i = 0, 255, 5 do
+            Title.TextColor3 = Color3.fromRGB(255 - i, i, 0)
+            wait(0.05)
+        end
+        for i = 0, 255, 5 do
+            Title.TextColor3 = Color3.fromRGB(0, 255 - i, i)
+            wait(0.05)
+        end
+    end
+end)
+
+local TextBox = Instance.new("TextBox")
+TextBox.Size = UDim2.new(0, 400, 0, 75)
+TextBox.Position = UDim2.new(0.5, -200, 0.4, 0)
+TextBox.PlaceholderText = "Type the key here"
+TextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.Font = Enum.Font.GothamBold
+TextBox.TextSize = 26
+TextBox.ClearTextOnFocus = false
+TextBox.Text = ""
+TextBox.Parent = Frame
+
+local TextBoxCorner = Instance.new("UICorner")
+TextBoxCorner.CornerRadius = UDim.new(0, 18)
+TextBoxCorner.Parent = TextBox
+
+local TextBoxStroke = Instance.new("UIStroke")
+TextBoxStroke.Parent = TextBox
+TextBoxStroke.Thickness = 2
+TextBoxStroke.Color = Color3.fromRGB(100, 100, 100)
+
+TextBox.Focused:Connect(function()
+    TextBoxStroke.Color = Color3.fromRGB(0, 200, 255)
+end)
+
+TextBox.FocusLost:Connect(function()
+    TextBoxStroke.Color = Color3.fromRGB(100, 100, 100)
+end)
+
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.new(0, 200, 0, 75)
+Button.Position = UDim2.new(0.5, -100, 0.75, 0)
+Button.Text = "Enter"
+Button.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Font = Enum.Font.GothamBold
+Button.TextSize = 30
+Button.Parent = Frame
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0, 18)
+ButtonCorner.Parent = Button
+
+local ButtonStroke = Instance.new("UIStroke")
+ButtonStroke.Parent = Button
+ButtonStroke.Thickness = 2
+ButtonStroke.Color = Color3.fromRGB(0, 120, 180)
+
+-- Efect hover cu animație smooth
+Button.MouseEnter:Connect(function()
+    Button.BackgroundColor3 = Color3.fromRGB(0, 210, 255)
+    ButtonStroke.Color = Color3.fromRGB(0, 150, 255)
+end)
+
+Button.MouseLeave:Connect(function()
+    Button.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    ButtonStroke.Color = Color3.fromRGB(0, 120, 180)
+end)
+
+-- Funcția de verificare a cheii
+Button.MouseButton1Click:Connect(function()
+    local keyInput = TextBox.Text
+    
+    if keyInput == CorrectKey then
+        ScreenGui:Destroy()
+        
+        -- RULEAZĂ DOAR SCRIPTUL TĂU PERSONALIZAT
+        local Games = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/VIMOLOSLAS"))()
+
+        for PlaceID, Execute in pairs(Games) do
+            if PlaceID == game.PlaceId then
+                loadstring(game:HttpGet(Execute))()
+            end
+        end
+    else
+        game.Players.LocalPlayer:Kick("NO KEY FOUND!")
+    end
+end)
+
