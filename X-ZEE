@@ -19,14 +19,19 @@ local function DistanceFromPlrSort(ObjectList)
 end
 
 local function getChestsSorted()
-    local Chests = {}
-    for _, Object in pairs(workspace:GetDescendants()) do
-        if Object:IsA("Part") and Object.Name:find("Chest") and Object:FindFirstChild("TouchInterest") then
-            table.insert(Chests, Object)
+    while true do
+        local Chests = {}
+        for _, Object in pairs(workspace:GetDescendants()) do
+            if Object:IsA("Part") and Object.Name:find("Chest") and Object:FindFirstChild("TouchInterest") then
+                table.insert(Chests, Object)
+            end
         end
+        if #Chests > 0 then
+            DistanceFromPlrSort(Chests)
+            return Chests
+        end
+        task.wait(0.5) -- Așteaptă până apar cufere noi
     end
-    DistanceFromPlrSort(Chests)
-    return Chests
 end
 
 local function toggleNoclip(Toggle)
@@ -53,6 +58,8 @@ local function main()
         local Chests = getChestsSorted()
         if #Chests > 0 then
             Teleport(Chests[1].CFrame)
+        else
+            print("Niciun cufăr găsit, încerc din nou...")
         end
         task.wait(0.1) -- Evită suprasolicitarea serverului
     end
