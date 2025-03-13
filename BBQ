@@ -546,8 +546,8 @@ TabPLL:AddButton({
 
 -- Assuming TabInfo1 is already defined and accessible
 TabPLL:AddButton({
-    Title = "Don Lorenzo V2", -- The title of the button
-    Tip = "Click to be Bachira", -- Tooltip text when hovered over
+    Title = "Hacker V7", -- The title of the button
+    Tip = "Hack Mode V7", -- Tooltip text when hovered over
     Callback = function()
         -- When the button is clicked, run the script from the URL
         local success, err = pcall(function()
