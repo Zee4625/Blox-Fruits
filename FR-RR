@@ -1,0 +1,68 @@
+local MaxSpeed = 300 -- Studs per second
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local Locations = workspace:FindFirstChild("_WorldOrigin") and workspace._WorldOrigin:FindFirstChild("Locations")
+
+local function getCharacter()
+    while not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") do
+        LocalPlayer.CharacterAdded:Wait()
+    end
+    return LocalPlayer.Character
+end
+
+local function DistanceFromPlrSort(ObjectList)
+    local RootPart = getCharacter().HumanoidRootPart
+    table.sort(ObjectList, function(A, B)
+        local RootPos = RootPart.Position
+        return (RootPos - A.Position).Magnitude < (RootPos - B.Position).Magnitude
+    end)
+end
+
+local function getFruitsSorted()
+    while true do
+        local Fruits = {}
+        for _, Object in pairs(workspace:GetDescendants()) do
+            if Object:IsA("Part") and Object.Name:find("Fruit") and Object:FindFirstChild("TouchInterest") then
+                table.insert(Fruits, Object)
+            end
+        end
+        if #Fruits > 0 then
+            DistanceFromPlrSort(Fruits)
+            return Fruits
+        end
+        task.wait(0.5) -- Așteaptă până apar fructe noi
+    end
+end
+
+local function toggleNoclip(Toggle)
+    for _, v in pairs(getCharacter():GetChildren()) do
+        if v:IsA("BasePart") then
+            v.CanCollide = not Toggle
+        end
+    end
+end
+
+local function Teleport(Goal, Speed)
+    Speed = Speed or MaxSpeed
+    toggleNoclip(true)
+    local RootPart = getCharacter().HumanoidRootPart
+    while (RootPart.Position - Goal.Position).Magnitude > 1 do
+        local Direction = (Goal.Position - RootPart.Position).unit
+        RootPart.CFrame = RootPart.CFrame + Direction * (Speed * task.wait())
+    end
+    toggleNoclip(false)
+end
+
+local function main()
+    while true do
+        local Fruits = getFruitsSorted()
+        if #Fruits > 0 then
+            Teleport(Fruits[1].CFrame)
+        else
+            print("Niciun fruct găsit, încerc din nou...")
+        end
+        task.wait(0.1) -- Evită suprasolicitarea serverului
+    end
+end
+
+task.spawn(main)
