@@ -582,7 +582,46 @@ TabPLL:AddButton({
 })
 
 -- GYAAA
+
+
+
+
+local TabCK = Window:AddTab({Title = "Special", Icon = "dribbble"})
+
+TabCK:AddButton({
+    Title = "Control FootBall", -- The title of the button
+    Tip = "Click to Control", -- Tooltip text when hovered over
+    Callback = function()
+        -- When the button is clicked, run the script from the URL
+        local success, err = pcall(function()
+            -- This will execute the script from the specified URL
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Control11111"))()
+        end)
+        
+        -- If there is an error, display it
+        if not success then
+            warn("Error loading script: " .. err)
+        end
+    end
+})
+
+
+
+
+
+
+
+
+
+
+
+
 local Tabinfo = Window:AddTab({Title = "INFO", Icon = "Zee"})
+
+
+
+
+
 
 Tabinfo:AddParagraph({
 	Title = "Info",
@@ -600,3 +639,7 @@ Window:Notify({
 	Description = "This is still a beta! Join the discord for more info! FOR BLUE LOCK RIVALS!",
 	Duration = 7,
 })
+
+
+
+-- https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Control11111
