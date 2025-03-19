@@ -1,0 +1,258 @@
+--vvvv
+local v0 = game:GetService("Players")
+local v1 = game:GetService("RunService")
+local v2 = game:GetService("UserInputService")
+local v3 = v0.LocalPlayer
+local v4 = v3.Character or v3.CharacterAdded:Wait()
+local v5 = v4:WaitForChild("Humanoid")
+local v6 = v4:WaitForChild("HumanoidRootPart")
+local v7 = workspace.CurrentCamera
+local v8 = v5:WaitForChild("Animator")
+local v9 = Instance.new("Animation")
+v9.AnimationId = "rbxassetid://125865269944406"
+local v11 = v8:LoadAnimation(v9)
+local v12 = Instance.new("ScreenGui")
+v12.Parent = v3:WaitForChild("PlayerGui")
+
+-- Butonul "ASCEND" (Plasat în colțul stânga jos)
+local v14 = Instance.new("TextButton")
+v14.Size = UDim2.new(0.2, 0, 0.1, 0)
+v14.Position = UDim2.new(0, 10, 1, -70)  -- Colțul stânga jos
+v14.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+v14.Text = "ASCEND"
+v14.Parent = v12
+
+-- Butonul "CONTROL" (Plasat în colțul stânga jos, mai jos decât ASCEND)
+local v20 = Instance.new("TextButton")
+v20.Size = UDim2.new(0.2, 0, 0.1, 0)
+v20.Position = UDim2.new(0, 10, 1, -150) -- Colțul stânga jos, mai jos decât ASCEND
+v20.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+v20.Text = "CONTROL"
+v20.Parent = v12
+
+local v26 = Instance.new("Frame")
+v26.Size = UDim2.new(0.3, 0, 0.3, 0)
+v26.Position = UDim2.new(0.35, 0, 0.6, 0)
+v26.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+v26.Visible = false
+v26.Parent = v12
+
+local v32 = Instance.new("TextLabel")
+v32.Size = UDim2.new(1, 0, 0.3, 0)
+v32.BackgroundTransparency = 1
+v32.Text = "Speed: 70"
+v32.TextColor3 = Color3.fromRGB(255, 255, 255)
+v32.TextScaled = true
+v32.Parent = v26
+
+local v39 = Instance.new("Frame")
+v39.Size = UDim2.new(0.9, 0, 0.4, 0)
+v39.Position = UDim2.new(0.05, 0, 0.5, 0)
+v39.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+v39.Parent = v26
+
+local v44 = Instance.new("Frame")
+v44.Size = UDim2.new(1, 0, 0, 0)
+v44.Position = UDim2.new(0, 0, 1, 0)
+v44.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+v44.Parent = v39
+
+local v49 = Instance.new("TextLabel")
+v49.Size = UDim2.new(0.3, 0, 0.1, 0)
+v49.Position = UDim2.new(0.35, 0, 0.8, 0)
+v49.BackgroundTransparency = 1
+v49.Text = "Made by Zee4625"
+v49.TextColor3 = Color3.fromRGB(255, 255, 255)
+v49.TextScaled = true
+v49.Parent = v12
+v49.Visible = false
+
+local v58 = false
+local v59 = false
+local v60 = 35
+local v61
+local v62
+local v63
+local v64 = 2.5
+local v65 = 70
+
+local function v66()
+    return workspace:FindFirstChild("Football")
+end
+
+local function v67()
+    local v70 = 0
+    local v71
+    while true do
+        if v70 == 0 then
+            v63 = Instance.new("BodyVelocity")
+            v63.Velocity = Vector3.new(5, 25, 0)
+            v70 = 1
+        end
+        if v70 == 1 then
+            v62 = v1.Heartbeat:Connect(function(v97)
+                local v98 = 0
+                while true do
+                    if v98 == 0 then
+                        if not v58 or not v61 or not v61.Parent or v59 then
+                            local v112 = 0
+                            while true do
+                                if v112 == 0 then
+                                    if v63 then
+                                        v63:Destroy()
+                                        v63 = nil
+                                    end
+                                    if v62 then
+                                        v62:Disconnect()
+                                        v62 = nil
+                                    end
+                                    v112 = 1
+                                end
+                            end
+                        end
+                        v71 = v71 + (85 * v97)
+                        v98 = 1
+                    end
+                    if v98 == 3 then
+                        v61.Velocity = Vector3.new(0, 0, 0)
+                        break
+                    end
+                    if v98 == 1 then
+                        v98 = 1
+                    end
+                end
+            end)
+            break
+        end
+    end
+end
+
+v1.Heartbeat:Connect(function()
+    if v58 then
+        if v6.Position.Y < v60 then
+            v6.Velocity = Vector3.new(0, 25, 0)
+        else
+            v6.Velocity = Vector3.new(0, 25, 0)
+            local v105 = v5.MoveDirection
+            if v105.Magnitude > 0 then
+                v6.Position = v6.Position + ((v105 * v64) / 10)
+            end
+        end
+    end
+end)
+
+local function v68()
+    if not v61 then return end
+    if v62 then v62:Disconnect() end
+    if v63 then v63:Destroy() end
+    v7.CameraSubject = v61
+    local v73 = Instance.new("BodyVelocity")
+    v73.MaxForce = Vector3.new(1535952, 136839, 1374247)
+    v73.Parent = v61
+    local v76
+    v76 = v1.Heartbeat:Connect(function()
+        while true do
+            if not v59 or not v61 or not v61.Parent then
+                v73:Destroy()
+                v7.CameraSubject = v4
+                if v76 then v76:Disconnect() end
+                return
+            end
+            v73.Velocity = v7.CFrame.LookVector * v65
+            break
+        end
+    end)
+end
+
+v14.MouseButton1Click:Connect(function()
+    if v58 then
+        v58 = false
+        v14.Text = "ASCEND"
+        v11:Stop()
+        if v62 then
+            v62:Disconnect()
+            v62 = nil
+        end
+        if v63 then
+            v63:Destroy()
+            v63 = nil
+        end
+    else
+        v58 = true
+        v14.Text = "STOP"
+        v11:Play()
+        v61 = v66()
+        if v61 then v67() end
+    end
+end)
+
+v20.MouseButton1Click:Connect(function()
+    local v77 = 0
+    while true do
+        if v77 == 0 then
+            if not v61 then
+                v61 = v66()
+                if not v61 then
+                    warn("No Ball Found!")
+                    return
+                end
+            end
+            v59 = not v59
+            v77 = 1
+        end
+        if v77 == 1 then
+            v20.BackgroundColor3 = (v59 and Color3.fromRGB(255, 0, 0)) or Color3.fromRGB(255, 255, 0)
+            v26.Visible = v59
+            v77 = 2
+        end
+        if v77 == 2 then
+            if v59 then
+                v68()
+            elseif v58 then
+                v67()
+            end
+            break
+        end
+    end
+end)
+
+local v69 = false
+v44.InputBegan:Connect(function(v78)
+    if v78.UserInputType == Enum.UserInputType.MouseButton1 or v78.UserInputType == Enum.UserInputType.Touch then
+        v69 = true
+    end
+end)
+
+v2.InputEnded:Connect(function(v79)
+    if v79.UserInputType == Enum.UserInputType.MouseButton1 or v79.UserInputType == Enum.UserInputType.Touch then
+        v69 = false
+    end
+end)
+
+v1.RenderStepped:Connect(function()
+    if v69 then
+        local v86 = v2:GetMouseLocation().X
+        local v87 = v39.AbsolutePosition.X
+        local v88 = v87 + v39.AbsoluteSize.X
+        local v89 = (v86 - v87) / (v88 - v87)
+        v44.Position = UDim2.new(math.clamp(v89, 0, 1), 0, 0, 0)
+        v65 = math.floor(100 + (v89 * 100))
+        v32.Text = "Speed: " .. tostring(v65)
+    end
+end)
+
+v2.InputBegan:Connect(function(v80, v81)
+    if v81 then return end
+    if v80.KeyCode == Enum.KeyCode.Y then
+        v14.MouseButton1Click:Fire()
+    elseif v80.KeyCode == Enum.KeyCode.U then
+        v20.MouseButton1Click:Fire()
+    elseif v80.KeyCode == Enum.KeyCode.Key6 then
+        -- Simulează click pe butonul CONTROL când se apasă tasta 6
+        v20.MouseButton1Click:Fire()  
+    end
+end)
+
+v49.Visible = true
+wait(2)
+v49.Visible = false
