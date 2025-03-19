@@ -589,7 +589,7 @@ TabCK:AddButton({
 })
 
 -- Assuming TabInfo1 is already defined and accessible
-TabPLL:AddButton({
+TabCK:AddButton({
     Title = "Hacker MODE", -- The title of the button
     Tip = "Hack Mode", -- Tooltip text when hovered over
     Callback = function()
