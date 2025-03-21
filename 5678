@@ -97,7 +97,7 @@ GetKeyButton.Font = Enum.Font.GothamBold
 GetKeyButton.TextSize = 24
 GetKeyButton.Parent = Frame
 
-local url = "https://linkvertise.com/1325609/zeehub-key-code1?o=sharing"
+local url = "https://link-hub.net/1274367/zeehub-code"
 
 GetKeyButton.MouseButton1Click:Connect(function()
     setclipboard(url)
