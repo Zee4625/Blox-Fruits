@@ -495,6 +495,8 @@ Press 1 for the 1 st ability
 Press 2 for the 2 st ability
 Press 3 for the 3 st ability
 And press P for the ULT!
+Shot the ball wait 1 second then use a shot move:
+Most of the time is the 4.
 ]])
 })
 
@@ -503,6 +505,7 @@ Tabinfo1:AddParagraph({
 	Description = AcrylicLibrary:HightlightSource([[
 Rejoin and dont use any buffs,
 Go here and use a custom character!
+Return to lobby if u want to change ur character!
 ]])
 })
 
