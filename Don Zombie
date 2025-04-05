@@ -9,18 +9,16 @@ local runService = game:GetService("RunService")
 
 local isActive = false
 local isCooldown = false
-local abilityDuration = 20  -- Timp cât durează abilitatea
-local cooldownTime = 20  -- Cooldown după terminarea abilității
-local moveSpeed = 63  -- Viteza în timpul abilității
-local normalSpeed = humanoid.WalkSpeed  -- Viteza normală
+local abilityDuration = 20
+local cooldownTime = 20
+local moveSpeed = 63
+local normalSpeed = humanoid.WalkSpeed
 
--- ID-ul aurelor
 local auraTextureId = "rbxassetid://6736565076"
-
--- Culori pentru glow și highlight
+local darkAuraId = "rbxassetid://18286002631"
 local glowColors = {Color3.fromRGB(128, 0, 128), Color3.fromRGB(0, 0, 139)}
 
--- Creare buton
+-- Creare buton Hack Mode
 local buttonSpecial = Instance.new("TextButton", screenGui)
 buttonSpecial.Size = UDim2.new(0, 85, 0, 80)
 buttonSpecial.Position = UDim2.new(0.44, 0, 0.85, 0)
@@ -29,182 +27,230 @@ buttonSpecial.BackgroundColor3 = Color3.new(0, 0, 0)
 buttonSpecial.TextScaled = true
 buttonSpecial.Font = Enum.Font.SourceSansBold
 
--- Efect RGB pe buton
+-- Creare buton Step
+local buttonDark = Instance.new("TextButton", screenGui)
+buttonDark.Size = UDim2.new(0, 85, 0, 80)
+buttonDark.Position = UDim2.new(0.50, 0, 0.85, 0)
+buttonDark.Text = "Step"
+buttonDark.BackgroundColor3 = Color3.new(0, 0, 0)
+buttonDark.TextScaled = true
+buttonDark.Font = Enum.Font.SourceSansBold
+
+-- Efect RGB pe butoane
 local function applySmoothRGB(button)
-    spawn(function()
-        while true do
-            for _, color in pairs({
-                Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 165, 0), Color3.fromRGB(255, 255, 0),
-                Color3.fromRGB(0, 255, 0), Color3.fromRGB(0, 255, 255), Color3.fromRGB(0, 0, 255),
-                Color3.fromRGB(128, 0, 128), Color3.fromRGB(255, 0, 255)
-            }) do
-                local tween = tweenService:Create(button, TweenInfo.new(0.5, Enum.EasingStyle.Linear), {TextColor3 = color})
-                tween:Play()
-                wait(0.5)
-            end
-        end
-    end)
+	spawn(function()
+		while true do
+			for _, color in pairs({
+				Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 165, 0), Color3.fromRGB(255, 255, 0),
+				Color3.fromRGB(0, 255, 0), Color3.fromRGB(0, 255, 255), Color3.fromRGB(0, 0, 255),
+				Color3.fromRGB(128, 0, 128), Color3.fromRGB(255, 0, 255)
+				}) do
+				local tween = tweenService:Create(button, TweenInfo.new(0.5, Enum.EasingStyle.Linear), {TextColor3 = color})
+				tween:Play()
+				wait(0.5)
+			end
+		end
+	end)
 end
 applySmoothRGB(buttonSpecial)
+applySmoothRGB(buttonDark)
 
--- Funcție pentru efectul de highlight
-local function createHighlight()
-    local highlight = Instance.new("Highlight")
-    highlight.FillTransparency = 0.3  
-    highlight.OutlineTransparency = 0
-    highlight.FillColor = glowColors[1]  
-    highlight.Parent = game.Workspace
-    highlight.Adornee = character
+-- Highlight
+local function createHighlight(color)
+	local highlight = Instance.new("Highlight")
+	highlight.FillTransparency = 0.3
+	highlight.OutlineTransparency = 0
+	highlight.FillColor = color
+	highlight.Parent = game.Workspace
+	highlight.Adornee = character
 
-    spawn(function()
-        while isActive do
-            for _, color in ipairs(glowColors) do
-                local tween = tweenService:Create(highlight, TweenInfo.new(1, Enum.EasingStyle.Linear), {FillColor = color})
-                tween:Play()
-                wait(1)
-            end
-        end
-        highlight:Destroy()  
-    end)
+	spawn(function()
+		while isActive do
+			wait(0.5)
+			if color == glowColors[1] then
+				for _, c in ipairs(glowColors) do
+					local tween = tweenService:Create(highlight, TweenInfo.new(1, Enum.EasingStyle.Linear), {FillColor = c})
+					tween:Play()
+					wait(1)
+				end
+			end
+		end
+		highlight:Destroy()
+	end)
 
-    return highlight
+	return highlight
 end
 
--- Funcție pentru a crea particule
-local function createAura(target)
-    local attachment = Instance.new("Attachment")
-    attachment.Parent = target
+-- Aura
+local function createAura(target, textureId)
+	local attachment = Instance.new("Attachment")
+	attachment.Parent = target
 
-    local aura = Instance.new("ParticleEmitter")
-    aura.Name = "AuraEffect"
-    aura.Texture = auraTextureId
-    aura.Lifetime = NumberRange.new(1.5, 2)
-    aura.Rate = 6  -- Și mai puține particule
-    aura.Speed = NumberRange.new(1, 2)
-    aura.Size = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0.3), 
-        NumberSequenceKeypoint.new(1, 0.5)
-    })
-    aura.LightEmission = 0.5
-    aura.Parent = attachment
+	local aura = Instance.new("ParticleEmitter")
+	aura.Texture = textureId
+	aura.Lifetime = NumberRange.new(1.5, 2)
+	aura.Rate = 20
+	aura.Speed = NumberRange.new(2, 4)
+	aura.Size = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.3), 
+		NumberSequenceKeypoint.new(1, 0.6)
+	})
+	aura.LightEmission = 0.5
+	aura.Parent = attachment
 
-    return aura, attachment
+	return aura, attachment
 end
 
--- Funcție pentru a crea aura sferică
+-- Sfera decorativa
 local function createSphereAura()
-    local parts = {}
+	local parts = {}
+	for i = 1, 8 do
+		local angle = (math.pi * 2) * (i / 8)
+		local offset = Vector3.new(math.cos(angle) * 3, math.sin(angle) * 3, 0)
 
-    for i = 1, 8 do
-        local angle = (math.pi * 2) * (i / 8)
-        local offset = Vector3.new(math.cos(angle) * 3, math.sin(angle) * 3, 0)
+		local part = Instance.new("Part")
+		part.Size = Vector3.new(0.5, 0.5, 0.5)
+		part.Shape = Enum.PartType.Ball
+		part.Material = Enum.Material.Neon
+		part.Color = glowColors[1]
+		part.Anchored = true
+		part.CanCollide = false
+		part.Parent = game.Workspace
 
-        local part = Instance.new("Part")
-        part.Size = Vector3.new(0.5, 0.5, 0.5)
-        part.Shape = Enum.PartType.Ball
-        part.Material = Enum.Material.Neon
-        part.Color = glowColors[1]
-        part.Anchored = true
-        part.CanCollide = false
-        part.Parent = game.Workspace
+		table.insert(parts, part)
 
-        table.insert(parts, part)
-
-        spawn(function()
-            while isActive do
-                part.Position = humanoidRootPart.Position + offset
-                wait(0.05)
-            end
-            part:Destroy()
-        end)
-    end
-
-    return parts
+		spawn(function()
+			while isActive do
+				part.Position = humanoidRootPart.Position + offset
+				wait(0.05)
+			end
+			part:Destroy()
+		end)
+	end
+	return parts
 end
 
--- Funcție pentru a crește viteza și a permite mișcarea cu tastele
+-- Miscare WASD + velocity
 local function moveWithKeys()
-    runService.RenderStepped:Connect(function()
-        if isActive then
-            local direction = Vector3.new(0, 0, 0)
-            local userInput = game:GetService("UserInputService")
-
-            if userInput:IsKeyDown(Enum.KeyCode.W) then
-                direction = direction + humanoidRootPart.CFrame.LookVector
-            end
-            if userInput:IsKeyDown(Enum.KeyCode.S) then
-                direction = direction - humanoidRootPart.CFrame.LookVector
-            end
-            if userInput:IsKeyDown(Enum.KeyCode.A) then
-                direction = direction - humanoidRootPart.CFrame.RightVector
-            end
-            if userInput:IsKeyDown(Enum.KeyCode.D) then
-                direction = direction + humanoidRootPart.CFrame.RightVector
-            end
-
-            humanoidRootPart.Velocity = direction * moveSpeed
-        end
-    end)
+	runService.RenderStepped:Connect(function()
+		if isActive then
+			local direction = Vector3.new(0, 0, 0)
+			if userInputService:IsKeyDown(Enum.KeyCode.W) then
+				direction += humanoidRootPart.CFrame.LookVector
+			end
+			if userInputService:IsKeyDown(Enum.KeyCode.S) then
+				direction -= humanoidRootPart.CFrame.LookVector
+			end
+			if userInputService:IsKeyDown(Enum.KeyCode.A) then
+				direction -= humanoidRootPart.CFrame.RightVector
+			end
+			if userInputService:IsKeyDown(Enum.KeyCode.D) then
+				direction += humanoidRootPart.CFrame.RightVector
+			end
+			humanoidRootPart.Velocity = direction * moveSpeed
+		end
+	end)
 end
 
--- Funcția principală care activează aura și cooldown-ul
+-- Hack Mode
 local function activateAura()
-    if isActive or isCooldown then return end
-    isActive = true
+	if isActive or isCooldown then return end
+	isActive = true
 
-    -- Aplică highlight
-    local highlight = createHighlight()
+	local highlight = createHighlight(glowColors[1])
+	local sphereParts = createSphereAura()
+	local auraEmitters = {}
 
-    -- Creează aura sferică
-    local sphereParts = createSphereAura()
+	for _, limb in pairs(character:GetChildren()) do
+		if limb:IsA("BasePart") then
+			local emitter, attachment = createAura(limb, auraTextureId)
+			table.insert(auraEmitters, {emitter = emitter, attachment = attachment})
+		end
+	end
 
-    -- Creează particule pe tot corpul
-    local auraEmitters = {}
-    for _, limb in pairs(character:GetChildren()) do
-        if limb:IsA("BasePart") then
-            local emitter, attachment = createAura(limb)
-            table.insert(auraEmitters, {emitter = emitter, attachment = attachment})
-        end
-    end
+	humanoid.WalkSpeed = moveSpeed
+	moveWithKeys()
+	buttonSpecial.Text = "IN USE"
 
-    -- Creștere viteză și activare control tastatură
-    humanoid.WalkSpeed = moveSpeed
-    moveWithKeys()
+	wait(abilityDuration)
 
-    -- Afișează "Activ" pe buton
-    buttonSpecial.Text = "IN USE"
-    
-    -- Așteaptă durata abilității
-    wait(abilityDuration)
+	for _, data in ipairs(auraEmitters) do
+		data.emitter.Enabled = false
+		data.attachment:Destroy()
+	end
 
-    -- Oprire efecte
-    for _, data in ipairs(auraEmitters) do
-        data.emitter.Enabled = false
-        data.attachment:Destroy()
-    end
-    highlight:Destroy()
-    humanoid.WalkSpeed = normalSpeed
+	highlight:Destroy()
+	humanoid.WalkSpeed = normalSpeed
+	isActive = false
+	isCooldown = true
 
-    -- Începere cooldown
-    isActive = false
-    isCooldown = true
-    for i = cooldownTime, 1, -1 do
-        buttonSpecial.Text = "Cooldown: " .. i .. "s"
-        wait(1)
-    end
+	for i = cooldownTime, 1, -1 do
+		buttonSpecial.Text = "Cooldown: " .. i .. "s"
+		wait(1)
+	end
 
-    -- Resetare buton
-    isCooldown = false
-    buttonSpecial.Text = "Hack Mode"
+	isCooldown = false
+	buttonSpecial.Text = "Hack Mode"
 end
 
--- Legăm butonul de funcție
-buttonSpecial.MouseButton1Click:Connect(activateAura)
+-- Step (Dark Dash)
+local isDarkCooldown = false
+local function activateDark()
+	if isActive or isDarkCooldown then return end
+	isActive = true
+	local highlight = createHighlight(Color3.new(0, 0, 0))
 
--- Activare și prin tasta "1"
+	-- Particule negre
+	local auraEmitters = {}
+	for _, limb in pairs(character:GetChildren()) do
+		if limb:IsA("BasePart") then
+			local emitter, attachment = createAura(limb, darkAuraId)
+			table.insert(auraEmitters, {emitter = emitter, attachment = attachment})
+		end
+	end
+
+	-- Dash sequence
+	local function dash(offset)
+		humanoidRootPart.CFrame = humanoidRootPart.CFrame + offset
+	end
+
+	dash(Vector3.new(5, 0, 0))
+	wait(0.2)
+	dash(Vector3.new(-10, 0, 0))
+	wait(0.2)
+	dash(Vector3.new(5, 5, 0))
+	wait(0.2)
+	dash(Vector3.new(0, -7, -3))
+	wait(1.4)
+
+	for _, data in ipairs(auraEmitters) do
+		data.emitter.Enabled = false
+		data.attachment:Destroy()
+	end
+
+	highlight:Destroy()
+	isActive = false
+	isDarkCooldown = true
+
+	for i = 10, 1, -1 do
+		buttonDark.Text = "Cooldown: " .. i .. "s"
+		wait(1)
+	end
+
+	isDarkCooldown = false
+	buttonDark.Text = "Step"
+end
+
+-- Conectam butoanele
+buttonSpecial.MouseButton1Click:Connect(activateAura)
+buttonDark.MouseButton1Click:Connect(activateDark)
+
+-- Activare Hack Mode cu tasta 1
 userInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.One then
-        activateAura()
-    end
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.One then
+		activateAura()
+	elseif input.KeyCode == Enum.KeyCode.Two then
+		activateDark()
+	end
 end)
