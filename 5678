@@ -1,4 +1,4 @@
-local CorrectKey = "Cksa233" -- Cheia corectă
+local CorrectKey = "ZHUB2025k" -- Cheia corectă
 
 -- Creare UI Key System
 local ScreenGui = Instance.new("ScreenGui")
