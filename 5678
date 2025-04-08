@@ -1,142 +1,146 @@
-local CorrectKey = "ZHUB2025k" -- Cheia corectă
+local CorrectKey = "ZHUB2025k"
 
--- Creare UI Key System
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+-- UI Setup
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "KeySystem"
 
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 600, 0, 500)
-Frame.Position = UDim2.new(0.5, -300, 0.5, -250)
-Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-Frame.BackgroundTransparency = 0.3
-Frame.BorderSizePixel = 0
-Frame.Parent = ScreenGui
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 500, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = gui
 
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 22)
-UICorner.Parent = Frame
+local mainCorner = Instance.new("UICorner", mainFrame)
+mainCorner.CornerRadius = UDim.new(0, 16)
 
--- Gradient dinamic
-local UIGradient = Instance.new("UIGradient")
-UIGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 60, 60)), 
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
-}
-UIGradient.Rotation = 90
-UIGradient.Parent = Frame
+local shadow = Instance.new("ImageLabel", mainFrame)
+shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+shadow.Position = UDim2.new(0.5, 0, 0.5, 10)
+shadow.Size = UDim2.new(1, 30, 1, 30)
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+shadow.ImageTransparency = 0.6
+shadow.ScaleType = Enum.ScaleType.Slice
+shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+shadow.ZIndex = 0
+shadow.BackgroundTransparency = 1
 
--- Titlul ZeeHUB (mare și vizibil)
-local Title = Instance.new("TextLabel")
-Title.Text = "ZeeHUB"
-Title.Font = Enum.Font.GothamBlack
-Title.TextSize = 50
-Title.TextColor3 = Color3.fromRGB(255, 0, 0)
-Title.BackgroundTransparency = 1
-Title.Size = UDim2.new(1, 0, 0, 60)
-Title.Position = UDim2.new(0, 0, 0, 10)
-Title.TextStrokeTransparency = 0.5
-Title.Parent = Frame
+-- Title
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 60)
+title.Position = UDim2.new(0, 0, 0, 10)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBlack
+title.Text = "ZeeHUB Access"
+title.TextSize = 42
+title.TextStrokeTransparency = 0.8
+title.TextColor3 = Color3.fromRGB(255, 0, 0)
 
 spawn(function()
-    while true do
-        for i = 0, 255, 5 do
-            Title.TextColor3 = Color3.fromRGB(i, 0, 255 - i)
-            wait(0.05)
-        end
-        for i = 0, 255, 5 do
-            Title.TextColor3 = Color3.fromRGB(255 - i, i, 0)
-            wait(0.05)
-        end
-        for i = 0, 255, 5 do
-            Title.TextColor3 = Color3.fromRGB(0, 255 - i, i)
-            wait(0.05)
-        end
-    end
+	while true do
+		for i = 0, 255, 5 do
+			title.TextColor3 = Color3.fromRGB(i, 0, 255 - i)
+			wait(0.05)
+		end
+		for i = 0, 255, 5 do
+			title.TextColor3 = Color3.fromRGB(255 - i, i, 0)
+			wait(0.05)
+		end
+		for i = 0, 255, 5 do
+			title.TextColor3 = Color3.fromRGB(0, 255 - i, i)
+			wait(0.05)
+		end
+	end
 end)
 
--- TextBox pentru introducerea cheii
-local TextBox = Instance.new("TextBox")
-TextBox.Size = UDim2.new(0, 280, 0, 75)
-TextBox.Position = UDim2.new(0.7, -140, 0.35, 0)
-TextBox.PlaceholderText = "Type the key here"
-TextBox.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextBox.Font = Enum.Font.GothamBold
-TextBox.TextSize = 26
-TextBox.ClearTextOnFocus = false
-TextBox.Text = ""
-TextBox.Parent = Frame
+-- TextBox
+local input = Instance.new("TextBox", mainFrame)
+input.Size = UDim2.new(0, 350, 0, 50)
+input.Position = UDim2.new(0.5, -175, 0.3, 0)
+input.PlaceholderText = "Enter your key..."
+input.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+input.TextColor3 = Color3.fromRGB(255, 255, 255)
+input.Font = Enum.Font.Gotham
+input.TextSize = 20
+input.ClearTextOnFocus = false
 
-local TextBoxCorner = Instance.new("UICorner")
-TextBoxCorner.CornerRadius = UDim.new(0, 18)
-TextBoxCorner.Parent = TextBox
+Instance.new("UICorner", input).CornerRadius = UDim.new(0, 10)
 
--- Buton "Enter"
-local Button = Instance.new("TextButton")
-Button.Size = UDim2.new(0, 280, 0, 75)
-Button.Position = UDim2.new(0.7, -140, 0.55, 0)
-Button.Text = "Enter"
-Button.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-Button.Font = Enum.Font.GothamBold
-Button.TextSize = 30
-Button.Parent = Frame
+-- Status Label
+local statusLabel = Instance.new("TextLabel", mainFrame)
+statusLabel.Size = UDim2.new(1, 0, 0, 30)
+statusLabel.Position = UDim2.new(0, 0, 0.45, 0)
+statusLabel.Text = ""
+statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+statusLabel.BackgroundTransparency = 1
+statusLabel.TextSize = 20
+statusLabel.Font = Enum.Font.GothamSemibold
 
-local ButtonCorner = Instance.new("UICorner")
-ButtonCorner.CornerRadius = UDim.new(0, 18)
-ButtonCorner.Parent = Button
+-- Enter Button
+local enterBtn = Instance.new("TextButton", mainFrame)
+enterBtn.Size = UDim2.new(0, 350, 0, 50)
+enterBtn.Position = UDim2.new(0.5, -175, 0.6, 0)
+enterBtn.Text = "Enter"
+enterBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+enterBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+enterBtn.Font = Enum.Font.GothamBold
+enterBtn.TextSize = 22
+Instance.new("UICorner", enterBtn).CornerRadius = UDim.new(0, 10)
 
--- Buton "Get Key"
-local GetKeyButton = Instance.new("TextButton")
-GetKeyButton.Size = UDim2.new(0, 220, 0, 50)
-GetKeyButton.Position = UDim2.new(0.05, 0, 0.35, 0)
-GetKeyButton.Text = "Get Key"
-GetKeyButton.BackgroundColor3 = Color3.fromRGB(150, 75, 30)
-GetKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-GetKeyButton.Font = Enum.Font.GothamBold
-GetKeyButton.TextSize = 24
-GetKeyButton.Parent = Frame
+-- Buttons below
+local function createSmallBtn(text, color, posY)
+	local btn = Instance.new("TextButton", mainFrame)
+	btn.Size = UDim2.new(0, 150, 0, 40)
+	btn.Position = UDim2.new(0.25, -75, posY, 0)
+	btn.Text = text
+	btn.BackgroundColor3 = color
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Font = Enum.Font.GothamSemibold
+	btn.TextSize = 18
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+	return btn
+end
 
-local url = "https://link-hub.net/1274367/zeehub-code"
+local getKeyBtn = createSmallBtn("Get Key", Color3.fromRGB(255, 140, 0), 0.8)
+local discordBtn = createSmallBtn("Discord", Color3.fromRGB(88, 101, 242), 0.8)
+discordBtn.Position = UDim2.new(0.75, -75, 0.8, 0)
 
-GetKeyButton.MouseButton1Click:Connect(function()
-    setclipboard(url)
-    GetKeyButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    GetKeyButton.Text = "Copied!"
+-- Clipboard Links
+local keyURL = "https://link-hub.net/1274367/zeehub-code"
+local discordURL = "https://discord.gg/ecKrSHRZa6"
+
+getKeyBtn.MouseButton1Click:Connect(function()
+	setclipboard(keyURL)
+	getKeyBtn.Text = "Copied!"
+	getKeyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
 end)
 
--- Buton "Discord"
-local DiscordButton = Instance.new("TextButton")
-DiscordButton.Size = UDim2.new(0, 220, 0, 50)
-DiscordButton.Position = UDim2.new(0.05, 0, 0.55, 0)
-DiscordButton.Text = "Discord"
-DiscordButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
-DiscordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-DiscordButton.Font = Enum.Font.GothamBold
-DiscordButton.TextSize = 24
-DiscordButton.Parent = Frame
-
-local discordLink = "https://discord.gg/ecKrSHRZa6"
-
-DiscordButton.MouseButton1Click:Connect(function()
-    setclipboard(discordLink)
-    DiscordButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    DiscordButton.Text = "Copied!"
+discordBtn.MouseButton1Click:Connect(function()
+	setclipboard(discordURL)
+	discordBtn.Text = "Copied!"
+	discordBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
 end)
 
--- Funcția de verificare a cheii
-Button.MouseButton1Click:Connect(function()
-    local keyInput = TextBox.Text
-    
-    if keyInput == CorrectKey then
-        ScreenGui:Destroy()
-        local Games = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/VIMOLOSLAS"))()
-        for PlaceID, Execute in pairs(Games) do
-            if PlaceID == game.PlaceId then
-                loadstring(game:HttpGet(Execute))()
-            end
-        end
-    else
-        game.Players.LocalPlayer:Kick("NO KEY FOUND!")
-    end
+-- Key Check Logic
+enterBtn.MouseButton1Click:Connect(function()
+	if input.Text == CorrectKey then
+		statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+		statusLabel.Text = "Key Accepted! Loading..."
+		wait(1)
+		gui:Destroy()
+
+		-- Execute scripts
+		local Games = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/VIMOLOSLAS"))()
+		for PlaceID, Execute in pairs(Games) do
+			if PlaceID == game.PlaceId then
+				loadstring(game:HttpGet(Execute))()
+			end
+		end
+	else
+		statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+		statusLabel.Text = "Invalid key. Please try again."
+	end
 end)
