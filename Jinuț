@@ -2,12 +2,14 @@ local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local Debris = game:GetService("Debris")
 
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local humanoid = character:WaitForChild("Humanoid")
 
+-- UI
 local gui = Instance.new("ScreenGui")
 gui.Parent = player:WaitForChild("PlayerGui")
 
@@ -32,106 +34,121 @@ text.Text = ""
 text.TextColor3 = Color3.new(0, 0, 0)
 text.Parent = frame
 
+-- Config
 local ultimateReady = false
-local chargeTime = 60  -- secunde pentru a încărca
-local abilityDuration = 34 -- secunde pentru abilitate
+local chargeTime = 60
+local abilityDuration = 34
 local moveSpeed = 275
 local flightActive = false
 local wallhackEnabled = false
 
 function chargeUltimate()
-    for i = 1, chargeTime do
-        local tween = TweenService:Create(bar, TweenInfo.new(0.2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {Size = UDim2.new(i / chargeTime, 0, 1, 0)})
-        tween:Play()
-        wait(1)
-    end
-    ultimateReady = true
-    text.Text = "ARISE!"
+	for i = 1, chargeTime do
+		local tween = TweenService:Create(bar, TweenInfo.new(0.2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
+			Size = UDim2.new(i / chargeTime, 0, 1, 0)
+		})
+		tween:Play()
+		wait(1)
+	end
+	ultimateReady = true
+	text.Text = "ARISE!"
 end
 
 function toggleNoClip(state)
-    for _, part in pairs(character:GetDescendants()) do
-        if part:IsA("BasePart") then
-            part.CanCollide = not state
-        end
-    end
+	for _, part in pairs(character:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.CanCollide = not state
+		end
+	end
 end
 
 function moveWithKeys()
-    local userInput = game:GetService("UserInputService")
-    while flightActive do
-        local direction = Vector3.new(0, 0, 0)
-        if userInput:IsKeyDown(Enum.KeyCode.W) then
-            direction = direction + humanoidRootPart.CFrame.LookVector
-        end
-        if userInput:IsKeyDown(Enum.KeyCode.S) then
-            direction = direction - humanoidRootPart.CFrame.LookVector
-        end
-        if userInput:IsKeyDown(Enum.KeyCode.A) then
-            direction = direction - humanoidRootPart.CFrame.RightVector
-        end
-        if userInput:IsKeyDown(Enum.KeyCode.D) then
-            direction = direction + humanoidRootPart.CFrame.RightVector
-        end
-        humanoidRootPart.Velocity = direction * moveSpeed
-        wait(0.1)
-    end
+	local userInput = game:GetService("UserInputService")
+	while flightActive do
+		local direction = Vector3.new(0, 0, 0)
+		if userInput:IsKeyDown(Enum.KeyCode.W) then
+			direction = direction + humanoidRootPart.CFrame.LookVector
+		end
+		if userInput:IsKeyDown(Enum.KeyCode.S) then
+			direction = direction - humanoidRootPart.CFrame.LookVector
+		end
+		if userInput:IsKeyDown(Enum.KeyCode.A) then
+			direction = direction - humanoidRootPart.CFrame.RightVector
+		end
+		if userInput:IsKeyDown(Enum.KeyCode.D) then
+			direction = direction + humanoidRootPart.CFrame.RightVector
+		end
+		humanoidRootPart.Velocity = direction * moveSpeed
+		wait(0.1)
+	end
 end
 
 function toggleWallHack()
-    wallhackEnabled = not wallhackEnabled
-    for _, part in pairs(character:GetChildren()) do
-        if part:IsA("BasePart") then
-            part.CanCollide = not wallhackEnabled
-        end
-    end
+	wallhackEnabled = not wallhackEnabled
+	for _, part in pairs(character:GetChildren()) do
+		if part:IsA("BasePart") then
+			part.CanCollide = not wallhackEnabled
+		end
+	end
 end
 
+-- Activare abilitate
 UIS.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.G and ultimateReady then
-        ultimateReady = false
-        text.Text = ""
-        
-        local tween = TweenService:Create(bar, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0, 0, 1, 0)})
-        tween:Play()
-        
-        local highlight = Instance.new("Highlight")
-        highlight.FillColor = Color3.fromRGB(100, 0, 255)
-        highlight.FillTransparency = 0.3
-        highlight.Parent = character
-        
-        -- Efect de strălucire la ochi
-        for _, v in pairs(character:GetChildren()) do
-            if v:IsA("Part") and v.Name == "Head" then
-                local eyeGlow = Instance.new("PointLight")
-                eyeGlow.Color = Color3.fromRGB(100, 0, 255)
-                eyeGlow.Brightness = 2
-                eyeGlow.Range = 5
-                eyeGlow.Parent = v
-                
-                game:GetService("Debris"):AddItem(eyeGlow, abilityDuration)
-            end
-        end
-        
-        toggleNoClip(true)
-        flightActive = true
-        
-        spawn(moveWithKeys)
-        
-        wait(abilityDuration)
-        
-        highlight:Destroy()
-        for _, v in pairs(character:GetChildren()) do
-            if v:IsA("PointLight") and v.Parent.Name == "Head" then
-                v:Destroy()
-            end
-        end
-        flightActive = false
-        toggleNoClip(false)
-        chargeUltimate()
-    end
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.G and ultimateReady then
+		ultimateReady = false
+		text.Text = ""
+
+		-- Muzică
+		local sound = Instance.new("Sound")
+		sound.SoundId = "rbxassetid://132797975335722"
+		sound.Volume = 1
+		sound.Looped = false
+		sound.Parent = humanoidRootPart
+		sound:Play()
+		Debris:AddItem(sound, abilityDuration)
+
+		-- Reset UI bar
+		local tween = TweenService:Create(bar, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Size = UDim2.new(0, 0, 1, 0)
+		})
+		tween:Play()
+
+		-- Highlight
+		local highlight = Instance.new("Highlight")
+		highlight.FillColor = Color3.fromRGB(100, 0, 255)
+		highlight.FillTransparency = 0.3
+		highlight.Parent = character
+
+		-- Glow la ochi
+		for _, v in pairs(character:GetChildren()) do
+			if v:IsA("Part") and v.Name == "Head" then
+				local eyeGlow = Instance.new("PointLight")
+				eyeGlow.Color = Color3.fromRGB(100, 0, 255)
+				eyeGlow.Brightness = 2
+				eyeGlow.Range = 5
+				eyeGlow.Parent = v
+				Debris:AddItem(eyeGlow, abilityDuration)
+			end
+		end
+
+		toggleNoClip(true)
+		flightActive = true
+
+		spawn(moveWithKeys)
+
+		wait(abilityDuration)
+
+		highlight:Destroy()
+		for _, v in pairs(character:GetChildren()) do
+			if v:IsA("PointLight") and v.Parent.Name == "Head" then
+				v:Destroy()
+			end
+		end
+		flightActive = false
+		toggleNoClip(false)
+		chargeUltimate()
+	end
 end)
 
 chargeUltimate()
-
