@@ -485,7 +485,7 @@ task.spawn(function()
     end
 end)
 
-local TabWork = Window:AddTab({Title= "Hubs", Icon = "Wheel"})
+local TabWork = Window:AddTab({Title= "Hubs", Icon = "Planet"})
 
 -- Assuming TabInfo1 is already defined and accessible
 TabWork:AddButton({
