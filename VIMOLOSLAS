@@ -5,6 +5,7 @@ local Games = {
     [18668065416] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BLLKK", -- BlueLOCK 142823291
     [142823291] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/M212", -- MM2
     [10449761463] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/STR-FKKK", -- TSB 
+    [126884695634066] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/GRW" --GROW A GRD
 }
 
 if Games[game.PlaceId] then
