@@ -500,8 +500,8 @@ https://discord.gg/ecKrSHRZa6
 })
 
 Window:Notify({
-	Title = "⚠️⚠️⚠️Inportant⚠️⚠️⚠️",
-	Description = "This is still a beta! Join the discord for more info! THIS IS FOR ANY GAME BUT IS THE BETA!!",
+	Title = "⚠️Inportant⚠️",
+	Description = "This is still a beta! Join the discord for more info! THIS IS FOR GROW A GARDEN BUT IS THE BETA!!",
 	Duration = 12,
 })
 
