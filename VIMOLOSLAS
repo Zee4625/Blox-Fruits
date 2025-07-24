@@ -6,8 +6,6 @@ local Games = {
     [142823291] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/M212", -- MM2
     [10449761463] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/STR-FKKK", -- TSB 
     [126884695634066] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/GRO", -- GROW A GRD 79546208627805
-    [79546208627805] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/deer", -- extra
-    [17323507436] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JUMPs" -- Jump stars
 }
 
 if Games[game.PlaceId] then
