@@ -380,13 +380,7 @@ TabESP:AddButton({
     end,
 })
 
-TabESP:AddButton({
-    Title = "Hacker eye",
-    Tip = "Click to join a random lobby to the game",
-    Callback = function()
-        game:GetService("TeleportService"):Teleport(game.PlaceId)
-    end,
-})
+
 
 -- Update dropdown constantly
 task.spawn(function()
