@@ -1,6 +1,7 @@
 -- // ZEEHUB KEY SYSTEM - ULTRA MODERN UI \\ --
 
 local CorrectKey = "ZEEHUB2025"
+local MobileKey = "MOBILEALONE"
 local KeyLink = "https://link-hub.net/1274367/zeehub-code"
 local DiscordLink = "https://discord.gg/ecKrSHRZa6"
 
@@ -158,6 +159,17 @@ verifyBtn.MouseButton1Click:Connect(function()
 				loadstring(game:HttpGet(Execute))()
 			end
 		end
+
+	elseif input.Text == MobileKey then
+		statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+		statusLabel.Text = "✅ Mobile key accepted! Launching..."
+
+		task.wait(1)
+		gui:Destroy()
+		blur:Destroy()
+
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Mobile"))()
+
 	else
 		statusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
 		statusLabel.Text = "❌ Invalid key, try again."
