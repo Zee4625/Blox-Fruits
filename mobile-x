@@ -1,118 +1,58 @@
--- FULL OPTIMIZED SCRIPT FOR MOBILE & PC -- NOTE: Script includes improved GUI layout, mobile responsiveness, rounded corners, and all functionality in one place -- Original functionality preserved: Fly, Speed, Jump Boost, X-Ray, ESP, Wallhack, Teleport
-
--- SERVICES local Players = game:GetService("Players") local RunService = game:GetService("RunService") local UserInputService = game:GetService("UserInputService") local TeleportService = game:GetService("TeleportService")
+--[ AlonexZeeHUB - Fully Functional Mobile-Compatible Admin Panel Script ]-- -- SERVICES local Players = game:GetService("Players") local RunService = game:GetService("RunService") local UserInputService = game:GetService("UserInputService") local ContextActionService = game:GetService("ContextActionService")
 
 local player = Players.LocalPlayer local character = player.Character or player.CharacterAdded:Wait() local humanoidRootPart = character:WaitForChild("HumanoidRootPart") local humanoid = character:WaitForChild("Humanoid")
 
--- CHARACTER REBIND ON RESPAWN local function rebindCharacter() character = player.Character or player.CharacterAdded:Wait() humanoidRootPart = character:WaitForChild("HumanoidRootPart") humanoid = character:WaitForChild("Humanoid") end player.CharacterAdded:Connect(rebindCharacter)
+player.CharacterAdded:Connect(function(char) character = char humanoidRootPart = character:WaitForChild("HumanoidRootPart") humanoid = character:WaitForChild("Humanoid") end)
 
--- VARIABLES local flyActive, flightActive, xrayEnabled, wallhackEnabled = false, false, false, false local spyTarget, flyConnection, flightConnection, jumpBoostConnection = nil, nil, nil, nil local moveSpeed = 39 local bodyGyro, bodyVelocity local highlights, wallhackOriginals = {}, {}
+-- SETTINGS local flyActive = false local flySpeed = 70
 
--- SCREEN GUI local screenGui = Instance.new("ScreenGui") screenGui.Name = "AloneZeeHUB" screenGui.ResetOnSpawn = false screenGui.Parent = player:WaitForChild("PlayerGui")
+-- GUI INIT local screenGui = Instance.new("ScreenGui") screenGui.Name = "AlonexZeeHubMobile" screenGui.Parent = player:WaitForChild("PlayerGui") screenGui.ResetOnSpawn = false
 
--- MAIN FRAME local mainFrame = Instance.new("Frame") mainFrame.AnchorPoint = Vector2.new(0.5, 0.5) mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0) mainFrame.Size = UDim2.new(0.75, 0, 0.7, 0) mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25) mainFrame.BorderSizePixel = 0 mainFrame.Active = true mainFrame.Draggable = true mainFrame.Parent = screenGui
+-- MAIN PANEL local mainFrame = Instance.new("Frame") mainFrame.Size = UDim2.new(0.85, 0, 0.7, 0) mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0) mainFrame.AnchorPoint = Vector2.new(0.5, 0.5) mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) mainFrame.BorderSizePixel = 0 mainFrame.Parent = screenGui mainFrame.Active = true mainFrame.Draggable = true Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
 
-Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12) Instance.new("UIGradient", mainFrame).Color = ColorSequence.new{ ColorSequenceKeypoint.new(0, Color3.fromRGB(170, 0, 255)), ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 0)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 0)) }
+local title = Instance.new("TextLabel") title.Size = UDim2.new(1, 0, 0, 50) title.Position = UDim2.new(0, 0, 0, 0) title.BackgroundTransparency = 1 title.Text = "Alone x ZeeHUB Mobile" title.Font = Enum.Font.GothamBlack title.TextSize = 26 title.TextColor3 = Color3.fromRGB(255, 255, 255) title.Parent = mainFrame
 
--- TITLE BAR local titleBar = Instance.new("Frame") titleBar.Size = UDim2.new(1, 0, 0, 50) titleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30) titleBar.Parent = mainFrame
+-- BUTTON CREATOR FUNCTION local function createButton(name, callback) local btn = Instance.new("TextButton") btn.Size = UDim2.new(0.9, 0, 0, 45) btn.Position = UDim2.new(0.05, 0, 0, 0) btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40) btn.Text = name btn.Font = Enum.Font.GothamBold btn.TextSize = 18 btn.TextColor3 = Color3.fromRGB(255, 255, 255) btn.Parent = mainFrame Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6) btn.MouseButton1Click:Connect(callback) return btn end
 
-local titleLabel = Instance.new("TextLabel") titleLabel.Text = "Alone x ZeeHUB" titleLabel.Size = UDim2.new(1, -40, 1, 0) titleLabel.Position = UDim2.new(0, 10, 0, 0) titleLabel.Font = Enum.Font.GothamBold titleLabel.TextSize = 26 titleLabel.TextColor3 = Color3.new(1, 1, 1) titleLabel.TextStrokeTransparency = 0.2 titleLabel.BackgroundTransparency = 1 titleLabel.TextXAlignment = Enum.TextXAlignment.Left titleLabel.Parent = titleBar
+-- STACK LAYOUT local btnLayout = Instance.new("UIListLayout") btnLayout.Padding = UDim.new(0, 10) btnLayout.SortOrder = Enum.SortOrder.LayoutOrder btnLayout.Parent = mainFrame
 
--- RGB TITLE local hue = 0 RunService.Heartbeat:Connect(function(dt) hue = (hue + dt * 0.2) % 1 titleLabel.TextColor3 = Color3.fromHSV(hue, 0.8, 1) end)
+-- FLY FUNCTION local flyConnection function toggleFly() flyActive = not flyActive if flyActive then local bodyGyro = Instance.new("BodyGyro") local bodyVelocity = Instance.new("BodyVelocity") bodyGyro.P = 9e4 bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9) bodyGyro.CFrame = humanoidRootPart.CFrame bodyGyro.Parent = humanoidRootPart bodyVelocity.Velocity = Vector3.zero bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9) bodyVelocity.Parent = humanoidRootPart
 
--- CLOSE BUTTON local closeButton = Instance.new("TextButton") closeButton.Size = UDim2.new(0, 40, 0, 40) closeButton.Position = UDim2.new(1, -45, 0, 5) closeButton.Text = "X" closeButton.Font = Enum.Font.GothamBold closeButton.TextColor3 = Color3.new(1,1,1) closeButton.TextSize = 22 closeButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50) closeButton.Parent = titleBar Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 8) closeButton.MouseButton1Click:Connect(function() screenGui:Destroy() end)
+flyConnection = RunService.Heartbeat:Connect(function()
+		local camCF = workspace.CurrentCamera.CFrame
+		local direction = Vector3.zero
+		if UserInputService:IsKeyDown(Enum.KeyCode.W) then direction += camCF.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.S) then direction -= camCF.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.A) then direction -= camCF.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.D) then direction += camCF.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.Space) then direction += camCF.UpVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then direction -= camCF.UpVector end
+		bodyGyro.CFrame = camCF
+		bodyVelocity.Velocity = direction.Unit * flySpeed
+	end)
 
--- CONTENT FRAME local contentFrame = Instance.new("ScrollingFrame") contentFrame.Size = UDim2.new(1, -20, 1, -60) contentFrame.Position = UDim2.new(0, 10, 0, 55) contentFrame.BackgroundTransparency = 1 contentFrame.ScrollBarThickness = 6 contentFrame.Parent = mainFrame
-
-Instance.new("UIListLayout", contentFrame).Padding = UDim.new(0, 8)
-
--- TOGGLE CREATOR local function CreateToggle(text, callback) local holder = Instance.new("Frame") holder.Size = UDim2.new(1, 0, 0, 40) holder.BackgroundColor3 = Color3.fromRGB(35, 35, 35) holder.Parent = contentFrame Instance.new("UICorner", holder).CornerRadius = UDim.new(0, 6)
-
-local label = Instance.new("TextLabel")
-label.Text = text
-label.Size = UDim2.new(0.7, 0, 1, 0)
-label.BackgroundTransparency = 1
-label.Font = Enum.Font.GothamSemibold
-label.TextColor3 = Color3.fromRGB(230, 230, 230)
-label.TextSize = 18
-label.TextXAlignment = Enum.TextXAlignment.Left
-label.Position = UDim2.new(0, 10, 0, 0)
-label.Parent = holder
-
-local toggle = Instance.new("TextButton")
-toggle.Size = UDim2.new(0, 60, 0, 26)
-toggle.Position = UDim2.new(1, -70, 0.5, -13)
-toggle.Font = Enum.Font.GothamBold
-toggle.TextSize = 14
-toggle.Text = "OFF"
-toggle.TextColor3 = Color3.new(1,1,1)
-toggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-toggle.Parent = holder
-Instance.new("UICorner", toggle).CornerRadius = UDim.new(0, 6)
-
-local on = false
-toggle.MouseButton1Click:Connect(function()
-    on = not on
-    toggle.Text = on and "ON" or "OFF"
-    toggle.BackgroundColor3 = on and Color3.fromRGB(0, 200, 50) or Color3.fromRGB(60, 60, 60)
-    callback(on)
-end)
+else
+	if flyConnection then flyConnection:Disconnect() end
+	for _, v in pairs(humanoidRootPart:GetChildren()) do
+		if v:IsA("BodyGyro") or v:IsA("BodyVelocity") then v:Destroy() end
+	end
+end
 
 end
 
--- BUTTON CREATOR local function CreateButton(text, callback) local button = Instance.new("TextButton") button.Size = UDim2.new(1, 0, 0, 40) button.Font = Enum.Font.GothamBold button.TextSize = 18 button.Text = text button.TextColor3 = Color3.new(1,1,1) button.BackgroundColor3 = Color3.fromRGB(40, 40, 40) button.Parent = contentFrame Instance.new("UICorner", button).CornerRadius = UDim.new(0, 6) button.MouseButton1Click:Connect(callback) end
+-- SPEED FUNCTION local speedOn = false function toggleSpeed() speedOn = not speedOn humanoid.WalkSpeed = speedOn and 50 or 16 end
 
--- FUNCTIONAL TOGGLES CreateToggle("Fly Mode", function(state) flyActive = state if flyConnection then flyConnection:Disconnect() end if not flyActive then if bodyGyro then bodyGyro:Destroy() end if bodyVelocity then bodyVelocity:Destroy() end return end bodyGyro = Instance.new("BodyGyro") bodyGyro.P = 9e4 bodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9) bodyGyro.CFrame = humanoidRootPart.CFrame bodyGyro.Parent = humanoidRootPart
+-- JUMP BOOST FUNCTION local jumpOn = false function toggleJump() jumpOn = not jumpOn humanoid.JumpPower = jumpOn and 100 or 50 end
 
-bodyVelocity = Instance.new("BodyVelocity")
-bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-bodyVelocity.Parent = humanoidRootPart
+-- TELEPORT TO PLAYER function teleportToPlayer() local name = game:GetService("Players"):FindFirstChild(player.Name).PlayerGui.AlonexZeeHubMobile.TeleportBox.Text local target = Players:FindFirstChild(name) if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then humanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0) end end
 
-flyConnection = RunService.Heartbeat:Connect(function()
-    if not flyActive then return end
-    bodyGyro.CFrame = workspace.CurrentCamera.CFrame
-    local moveVec = Vector3.new()
-    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-        moveVec += workspace.CurrentCamera.CFrame.LookVector
-    end
-    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-        moveVec -= workspace.CurrentCamera.CFrame.LookVector
-    end
-    if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-        moveVec -= workspace.CurrentCamera.CFrame.RightVector
-    end
-    if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-        moveVec += workspace.CurrentCamera.CFrame.RightVector
-    end
-    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-        moveVec += Vector3.new(0, 1, 0)
-    end
-    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
-        moveVec -= Vector3.new(0, 1, 0)
-    end
-    bodyVelocity.Velocity = moveVec.Magnitude > 0 and moveVec.Unit * moveSpeed or Vector3.zero
-end)
+-- BUTTONS createButton("Fly", toggleFly) createButton("Speed Boost", toggleSpeed) createButton("Jump Boost", toggleJump)
 
-end)
+-- TELEPORT UI local tpInput = Instance.new("TextBox") tpInput.Name = "TeleportBox" tpInput.PlaceholderText = "Player Name to TP" tpInput.Size = UDim2.new(0.9, 0, 0, 40) tpInput.BackgroundColor3 = Color3.fromRGB(240, 240, 240) tpInput.TextColor3 = Color3.fromRGB(0,0,0) tpInput.TextSize = 16 tpInput.Font = Enum.Font.Gotham Instance.new("UICorner", tpInput).CornerRadius = UDim.new(0, 6) tpInput.Parent = mainFrame
 
-CreateToggle("Speed Mode", function(state) flightActive = state if flightConnection then flightConnection:Disconnect() end flightConnection = RunService.Heartbeat:Connect(function() humanoid.WalkSpeed = flightActive and moveSpeed or 16 end) end)
+createButton("Teleport", teleportToPlayer)
 
-CreateToggle("Jump Boost", function(state) if jumpBoostConnection then jumpBoostConnection:Disconnect() end humanoid.JumpPower = state and 75 or 50 end)
+-- CLOSE BUTTON local closeBtn = Instance.new("TextButton") closeBtn.Size = UDim2.new(0.25, 0, 0, 35) closeBtn.Position = UDim2.new(0.72, 0, 1, -40) closeBtn.Text = "X" closeBtn.Font = Enum.Font.GothamBold closeBtn.TextSize = 20 closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50) closeBtn.TextColor3 = Color3.new(1,1,1) Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6) closeBtn.Parent = mainFrame closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
 
-CreateToggle("X-Ray", function(state) xrayEnabled = state for _, part in pairs(workspace:GetDescendants()) do if part:IsA("BasePart") and not part:IsDescendantOf(character) then part.Transparency = state and 0.5 or 0 if state then part.CanCollide = false else part.CanCollide = true end end end end)
-
-CreateToggle("ESP", function(state) for _, plr in pairs(Players:GetPlayers()) do if plr ~= player then if state then local hl = Instance.new("Highlight", plr.Character) hl.FillColor = Color3.new(1,1,1) hl.OutlineColor = Color3.new(1,1,1) highlights[plr] = hl else if highlights[plr] then highlights[plr]:Destroy() highlights[plr] = nil end end end end end)
-
-CreateToggle("Wallhack", function(state) wallhackEnabled = state for _, plr in pairs(Players:GetPlayers()) do if plr ~= player and plr.Character then for _, part in pairs(plr.Character:GetDescendants()) do if part:IsA("BasePart") then if state then wallhackOriginals[part] = part.Transparency part.Transparency = 0.5 elseif wallhackOriginals[part] then part.Transparency = wallhackOriginals[part] wallhackOriginals[part] = nil end end end end end end)
-
--- TELEPORT TO PLAYER local teleportFrame = Instance.new("Frame") teleportFrame.Size = UDim2.new(1, 0, 0, 50) teleportFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35) teleportFrame.Parent = contentFrame Instance.new("UICorner", teleportFrame).CornerRadius = UDim.new(0, 6)
-
-local nameBox = Instance.new("TextBox") nameBox.PlaceholderText = "Player Name" nameBox.Size = UDim2.new(0.6, 0, 0.6, 0) nameBox.Position = UDim2.new(0.05, 0, 0.2, 0) nameBox.Font = Enum.Font.Gotham nameBox.TextSize = 16 nameBox.TextColor3 = Color3.new(0,0,0) nameBox.BackgroundColor3 = Color3.fromRGB(240, 240, 240) nameBox.Parent = teleportFrame Instance.new("UICorner", nameBox).CornerRadius = UDim.new(0, 6)
-
-local tpBtn = Instance.new("TextButton") tpBtn.Text = "Teleport" tpBtn.Size = UDim2.new(0.3, 0, 0.6, 0) tpBtn.Position = UDim2.new(0.67, 0, 0.2, 0) tpBtn.Font = Enum.Font.GothamBold tpBtn.TextColor3 = Color3.new(1,1,1) tpBtn.TextSize = 16 tpBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255) tpBtn.Parent = teleportFrame Instance.new("UICorner", tpBtn).CornerRadius = UDim.new(0, 6)
-
-tpBtn.MouseButton1Click:Connect(function() local target = Players:FindFirstChild(nameBox.Text) if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then humanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0) end end)
-
-print("[Alone x ZeeHUB] UI Loaded Successfully")
+print("[Alone x ZeeHUB Mobile Admin Panel Loaded]")
 
