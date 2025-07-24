@@ -1,0 +1,344 @@
+-- Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Variables
+local flightEnabled = false
+local speedEnabled = false
+local jumpBoostEnabled = false
+local xrayEnabled = false
+local espEnabled = false
+local wallhackEnabled = false
+
+local flightSpeed = 50
+local walkSpeedDefault = 16
+local walkSpeedBoost = 100
+local jumpPowerDefault = 50
+local jumpPowerBoost = 75
+
+-- Connections for toggles
+local flightConnection
+local speedConnection
+local jumpBoostConnection
+
+-- GUI Creation
+local ScreenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+ScreenGui.Name = "FullFunctionGUI"
+
+local mainFrame = Instance.new("Frame", ScreenGui)
+mainFrame.Size = UDim2.new(0, 320, 0, 380)
+mainFrame.Position = UDim2.new(0.5, -160, 0.5, -190)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+local title = Instance.new("TextLabel", mainFrame)
+title.Text = "FULL FUNCTION HUB"
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+title.TextColor3 = Color3.fromRGB(255, 0, 100)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 24
+
+-- Close Button
+local closeButton = Instance.new("TextButton", mainFrame)
+closeButton.Size = UDim2.new(0, 40, 0, 40)
+closeButton.Position = UDim2.new(1, -40, 0, 0)
+closeButton.Text = "X"
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 20
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+
+closeButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Helper function to create toggles
+local function CreateToggle(text, default, callback)
+    local frame = Instance.new("Frame", mainFrame)
+    frame.Size = UDim2.new(1, -20, 0, 35)
+    frame.Position = UDim2.new(0, 10, 0, 50 + (#mainFrame:GetChildren()-3)*40)
+    frame.BackgroundTransparency = 1
+
+    local label = Instance.new("TextLabel", frame)
+    label.Text = text
+    label.Size = UDim2.new(0.7, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Font = Enum.Font.Gotham
+    label.TextSize = 18
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextXAlignment = Enum.TextXAlignment.Left
+
+    local toggle = Instance.new("TextButton", frame)
+    toggle.Text = default and "ON" or "OFF"
+    toggle.Size = UDim2.new(0.25, 0, 0.7, 0)
+    toggle.Position = UDim2.new(0.75, 0, 0.15, 0)
+    toggle.Font = Enum.Font.GothamBold
+    toggle.TextSize = 18
+    toggle.TextColor3 = default and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+    toggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    toggle.AutoButtonColor = false
+    toggle.ClipsDescendants = true
+
+    toggle.MouseButton1Click:Connect(function()
+        local isOn = toggle.Text == "ON"
+        if isOn then
+            toggle.Text = "OFF"
+            toggle.TextColor3 = Color3.fromRGB(255, 0, 0)
+            callback(false)
+        else
+            toggle.Text = "ON"
+            toggle.TextColor3 = Color3.fromRGB(0, 255, 0)
+            callback(true)
+        end
+    end)
+end
+
+-- Fly function
+local function ToggleFly(state)
+    flightEnabled = state
+    if flightConnection then flightConnection:Disconnect() end
+
+    if flightEnabled then
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+        bodyVelocity.Velocity = Vector3.new(0,0,0)
+        bodyVelocity.Parent = humanoidRootPart
+
+        flightConnection = RunService.Heartbeat:Connect(function()
+            local moveDir = Vector3.new()
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + workspace.CurrentCamera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - workspace.CurrentCamera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - workspace.CurrentCamera.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + workspace.CurrentCamera.CFrame.RightVector end
+            moveDir = Vector3.new(moveDir.X, 0, moveDir.Z).Unit * flightSpeed
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir = moveDir + Vector3.new(0, flightSpeed, 0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then moveDir = moveDir - Vector3.new(0, flightSpeed, 0) end
+
+            if moveDir.Magnitude > 0 then
+                bodyVelocity.Velocity = moveDir
+            else
+                bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+            end
+        end)
+    else
+        if flightConnection then flightConnection:Disconnect() end
+        for _, obj in pairs(humanoidRootPart:GetChildren()) do
+            if obj:IsA("BodyVelocity") then obj:Destroy() end
+        end
+    end
+end
+
+-- Speed function
+local function ToggleSpeed(state)
+    speedEnabled = state
+    if speedConnection then speedConnection:Disconnect() end
+    if speedEnabled then
+        humanoid.WalkSpeed = walkSpeedBoost
+        speedConnection = RunService.Heartbeat:Connect(function()
+            humanoid.WalkSpeed = walkSpeedBoost
+        end)
+    else
+        humanoid.WalkSpeed = walkSpeedDefault
+    end
+end
+
+-- Jump boost function
+local function ToggleJumpBoost(state)
+    jumpBoostEnabled = state
+    if jumpBoostConnection then jumpBoostConnection:Disconnect() end
+    if jumpBoostEnabled then
+        humanoid.JumpPower = jumpPowerBoost
+        jumpBoostConnection = RunService.Heartbeat:Connect(function()
+            humanoid.JumpPower = jumpPowerBoost
+        end)
+    else
+        humanoid.JumpPower = jumpPowerDefault
+    end
+end
+
+-- X-Ray function
+local function ToggleXRay(state)
+    xrayEnabled = state
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("BasePart") and not part:IsDescendantOf(character) then
+            if xrayEnabled then
+                part.Transparency = 0.5
+                part.CanCollide = false
+            else
+                part.Transparency = 0
+                part.CanCollide = true
+            end
+        end
+    end
+end
+
+-- ESP (Highlight other players)
+local highlights = {}
+
+local function CreateESP(plr)
+    if plr == player then return end
+    local ch = plr.Character
+    if ch and ch:FindFirstChild("HumanoidRootPart") then
+        local highlight = Instance.new("Highlight")
+        highlight.Adornee = ch
+        highlight.FillColor = Color3.fromRGB(255, 255, 255)
+        highlight.FillTransparency = 0.6
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        highlight.OutlineTransparency = 0
+        highlight.Parent = ch
+        highlights[plr] = highlight
+    end
+end
+
+local function RemoveESP(plr)
+    if highlights[plr] then
+        highlights[plr]:Destroy()
+        highlights[plr] = nil
+    end
+end
+
+local function ToggleESP(state)
+    espEnabled = state
+    if espEnabled then
+        for _, plr in pairs(Players:GetPlayers()) do
+            CreateESP(plr)
+        end
+        Players.PlayerAdded:Connect(function(plr)
+            if espEnabled then
+                plr.CharacterAdded:Connect(function()
+                    wait(0.1)
+                    CreateESP(plr)
+                end)
+            end
+        end)
+        Players.PlayerRemoving:Connect(function(plr)
+            RemoveESP(plr)
+        end)
+    else
+        for plr, hl in pairs(highlights) do
+            hl:Destroy()
+        end
+        highlights = {}
+    end
+end
+
+-- Wallhack (make other players semi-transparent)
+local wallhackOriginalTransparency = {}
+
+local function ToggleWallhack(state)
+    wallhackEnabled = state
+    if wallhackEnabled then
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character then
+                for _, part in pairs(plr.Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        wallhackOriginalTransparency[part] = part.Transparency
+                        part.Transparency = 0.5
+                    end
+                end
+            end
+        end
+        Players.PlayerAdded:Connect(function(plr)
+            if wallhackEnabled then
+                plr.CharacterAdded:Connect(function(char)
+                    wait(0.1)
+                    for _, part in pairs(char:GetChildren()) do
+                        if part:IsA("BasePart") then
+                            wallhackOriginalTransparency[part] = part.Transparency
+                            part.Transparency = 0.5
+                        end
+                    end
+                end)
+            end
+        end)
+        Players.PlayerRemoving:Connect(function(plr)
+            if plr.Character then
+                for _, part in pairs(plr.Character:GetChildren()) do
+                    if part:IsA("BasePart") and wallhackOriginalTransparency[part] then
+                        part.Transparency = wallhackOriginalTransparency[part]
+                        wallhackOriginalTransparency[part] = nil
+                    end
+                end
+            end
+        end)
+    else
+        for part, transparency in pairs(wallhackOriginalTransparency) do
+            if part and part.Parent then
+                part.Transparency = transparency
+            end
+        end
+        wallhackOriginalTransparency = {}
+    end
+end
+
+-- Teleport to player
+local function TeleportToPlayer(name)
+    local target = Players:FindFirstChild(name)
+    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+        humanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0)
+    else
+        warn("Player not found or no HumanoidRootPart!")
+    end
+end
+
+-- UI for teleport input
+local teleportFrame = Instance.new("Frame", mainFrame)
+teleportFrame.Size = UDim2.new(1, -20, 0, 50)
+teleportFrame.Position = UDim2.new(0, 10, 1, -60)
+teleportFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+teleportFrame.BorderSizePixel = 0
+
+local teleportLabel = Instance.new("TextLabel", teleportFrame)
+teleportLabel.Size = UDim2.new(0.5, 0, 1, 0)
+teleportLabel.Text = "Teleport to Player:"
+teleportLabel.Font = Enum.Font.Gotham
+teleportLabel.TextSize = 18
+teleportLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+teleportLabel.BackgroundTransparency = 1
+teleportLabel.TextXAlignment = Enum.TextXAlignment.Left
+teleportLabel.Position = UDim2.new(0, 5, 0, 0)
+
+local teleportInput = Instance.new("TextBox", teleportFrame)
+teleportInput.Size = UDim2.new(0.35, 0, 0.7, 0)
+teleportInput.Position = UDim2.new(0.5, 0, 0.15, 0)
+teleportInput.PlaceholderText = "PlayerName"
+teleportInput.Font = Enum.Font.Gotham
+teleportInput.TextSize = 18
+teleportInput.TextColor3 = Color3.fromRGB(0, 0, 0)
+teleportInput.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+teleportInput.ClearTextOnFocus = false
+
+local teleportButton = Instance.new("TextButton", teleportFrame)
+teleportButton.Size = UDim2.new(0.12, 0, 0.7, 0)
+teleportButton.Position = UDim2.new(0.85, 0, 0.15, 0)
+teleportButton.Text = "Go"
+teleportButton.Font = Enum.Font.GothamBold
+teleportButton.TextSize = 18
+teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+teleportButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+
+teleportButton.MouseButton1Click:Connect(function()
+    local name = teleportInput.Text
+    if name ~= "" then
+        TeleportToPlayer(name)
+    end
+end)
+
+-- Create toggles
+CreateToggle("Fly Mode", false, ToggleFly)
+CreateToggle("Speed Mode", false, ToggleSpeed)
+CreateToggle("Jump Boost", false, ToggleJumpBoost)
+CreateToggle("X-Ray", false, ToggleXRay)
+CreateToggle("ESP", false, ToggleESP)
+CreateToggle("Wallhack", false, ToggleWallhack)
+
+print("FULL FUNCTION HUB loaded!")
