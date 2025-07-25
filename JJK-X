@@ -21,7 +21,7 @@ local function loadModule(url)
 end
 
 -- Movement Tab
-local TabMovement = Window:AddTab({Title = "Movement", Icon = "Hamer"})
+local TabMovement = Window:AddTab({Title = "Movement", Icon = "network"})
 
 TabMovement:AddToggle({
     Title = "Backflip (T & E)",
