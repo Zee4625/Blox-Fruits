@@ -1,31 +1,36 @@
--- Jack's GUI V2.12 - SCRIPT SIMPLIFICAT PENTRU TOȚI UTILIZATORII
--- Creat cu Fluent UI + funcții utile fără verificare admin sau notificări inutile
+-- Alone x ZeeHUB GUI V2.15 - NEON RGB + MOBILE Tab 🔥
+-- Design Fluent RGB, fără verificări, cu funcții speciale și suport complet pentru mobil 📱
 
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
 
+-- Fluent UI cu temă RGB neon
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local Window = Fluent:CreateWindow({
-    Title = "Jack's GUI",
-    SubTitle = "V2.12",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
-    Theme = "Amethyst",
+    Title = "Alone x ZeeHUB - MOBILE ",
+    SubTitle = "V2.15 - Mobile + PC",
+    TabWidth = 170,
+    Size = UDim2.fromOffset(640, 520),
+    Theme = "Aqua",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
+-- Tabs
 local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "layout" }),
     Movement = Window:AddTab({ Title = "Movement", Icon = "rocket" }),
-    Utility = Window:AddTab({ Title = "Utility", Icon = "settings" })
+    Utility = Window:AddTab({ Title = "Utility", Icon = "settings" }),
+    Mobile = Window:AddTab({ Title = "Mobile", Icon = "smartphone" })
 }
 
 local Options = Fluent.Options
 
+-- Funcție helper pentru toggles
 local function AddScriptToggle(tab, id, title, description, scriptURL, defaultState)
     local toggle = tab:AddToggle(id, {
-        Title = title,
+        Title = "🌀 " .. title,
         Description = description,
         Default = defaultState or false
     })
@@ -34,25 +39,82 @@ local function AddScriptToggle(tab, id, title, description, scriptURL, defaultSt
 
     toggle:OnChanged(function()
         if Options[id].Value then
-            loadstring(game:HttpGet(scriptURL))()
-        else
-            print(title .. " disabled")
+            task.spawn(function()
+                pcall(function()
+                    loadstring(game:HttpGet(scriptURL))()
+                end)
+            end)
         end
     end)
 end
 
--- EXEMPLE DE SCRIPTURI UTILE
-AddScriptToggle(Tabs.Movement, "Fly", "Fly", "X to fly", "https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/fly.lua")
-AddScriptToggle(Tabs.Utility, "Reset", "Reset Character", "Instant Reset", "https://pastebin.com/raw/xxxxxxxx")
-AddScriptToggle(Tabs.Main, "Pose", "Pose", "Press P to activate", "https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/pose")
-AddScriptToggle(Tabs.Main, "Teleport", "Teleport", "Press C to teleport", "https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/teleport.lua")
-AddScriptToggle(Tabs.Utility, "Serverhop", "Server Hop", "Join a different server", "https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/serverhop")
+-- ✅ Scripturi utile clasice
+AddScriptToggle(Tabs.Movement, "Fly", "Fly", "X pentru activare/dezactivare", "https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/fly.lua")
+AddScriptToggle(Tabs.Utility, "Reset", "Reset Character", "Instant Reset", "https://pastebin.com/raw/BL9u7kGw")
+AddScriptToggle(Tabs.Main, "Pose", "Pose", "P pentru poziție animată", "https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/pose")
+AddScriptToggle(Tabs.Main, "Teleport", "Teleport", "C pentru a te teleporta în față", "https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/teleport.lua")
+AddScriptToggle(Tabs.Utility, "Serverhop", "Server Hop", "Schimbă serverul automat", "https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/serverhop")
 
--- Anti-Cheat dezactivat dacă e cazul
+-- 📱 MOBILE-ONLY: Funcții dedicate cu controale touchscreen
+local highlightToggle = Tabs.Mobile:AddToggle("Highlight", {
+    Title = "✨ Highlight Players",
+    Description = "Contur vizibil jucători",
+    Default = false
+})
+highlightToggle:OnChanged(function(val)
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            local char = plr.Character
+            if char then
+                local hl = char:FindFirstChildOfClass("Highlight") or Instance.new("Highlight", char)
+                hl.Enabled = val
+                hl.FillColor = Color3.fromRGB(0, 255, 255)
+                hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            end
+        end
+    end
+end)
+
+local speedSlider = Tabs.Mobile:AddSlider("MobileSpeed", {
+    Title = "⚡ Speed Control",
+    Description = "Setează viteza de mers",
+    Default = 16,
+    Min = 16,
+    Max = 100,
+    Rounding = 0
+})
+speedSlider:OnChanged(function(val)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = val
+    end
+end)
+
+local flyMobile = Tabs.Mobile:AddToggle("FlyMobile", {
+    Title = "🕊️ Fly (Mobile Control)",
+    Description = "Zboară atingând ecranul",
+    Default = false
+})
+flyMobile:OnChanged(function(val)
+    if val then
+        loadstring(game:HttpGet("https://pastebin.com/raw/k4y1GSXz"))() -- script cu controale mobile pentru fly
+    end
+end)
+
+-- 🐉 Goku Mode (înlocuiește X-Ray)
+Tabs.Mobile:AddButton({
+    Title = "🔥 Goku Mode",
+    Description = "Activează modul Goku Ultra Instinct",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/STAR"))()
+    end
+})
+
+-- 🔒 Dezactivează Anti-Cheat local dacă există
 pcall(function()
-    local AntiCheatController = getsenv(LocalPlayer.PlayerScripts:WaitForChild("PlayerClient")).AntiCheatController
-    if AntiCheatController then
-        AntiCheatController = nil
+    local Client = getsenv(LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerClient"))
+    if Client and Client.AntiCheatController then
+        Client.AntiCheatController = nil
     end
 end)
 
