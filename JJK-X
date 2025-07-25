@@ -141,7 +141,7 @@ TabCombat:AddToggle({
 local TabMain = Window:AddTab({Title = "Main", Icon = "star"})
 
 TabMain:AddButton({
-    Title = "ExeHub",
+    Title = "ZEE-Goku:",
     Tip = "Execute ExeHub by Kingofexe",
     Callback = function()
         loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/STAR")
