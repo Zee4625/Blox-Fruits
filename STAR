@@ -1,2097 +1,317 @@
--- KINGOFEXE HUB V3 BETA --
+-- Alone x ZeeHUB GUI V2.21 - ULTIMATE VERSION RGB + MOBILE READY + UTILITIES COMPLETE
 
--- Shoutout to Grok.ai For Helping Me With The Silent Aim Ui --
-
-if not game:IsLoaded() then
-    game.Loaded:wait()
-end
-
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.ResetOnSpawn = false
-local ImageLabel = Instance.new("ImageLabel")
-local UICorner = Instance.new("UICorner")
-local ScrollingFrame = Instance.new("ScrollingFrame")
-local UICorner_2 = Instance.new("UICorner")
-local UIGradient = Instance.new("UIGradient")
-local Controls = Instance.new("TextLabel")
-local UIStroke = Instance.new("UIStroke")
-UIStroke.Color = Color3.new(1.00, 1.00, 1.00)
-UIStroke.Thickness = 4
-UIStroke.Transparency = 0.3499999940395355
-UIStroke.Parent = ScrollingFrame
-
-local UIGradient23 = Instance.new("UIGradient")
-UIGradient23.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(1.00, 0.35, 0.36)), ColorSequenceKeypoint.new(1.00, Color3.new(0.52, 1.00, 0.90))})
-UIGradient23.Parent = UIStroke
-
-
-local _1 = Instance.new("TextLabel")
-local _2 = Instance.new("TextLabel")
-local _3 = Instance.new("TextLabel")
-local _4 = Instance.new("TextLabel")
-local _5 = Instance.new("TextLabel")
-local _6 = Instance.new("TextLabel")
-local _7 = Instance.new("TextLabel")
-
---Properties:
-
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-ImageLabel.Parent = ScreenGui
-ImageLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-ImageLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ImageLabel.BorderSizePixel = 0
-ImageLabel.Position = UDim2.new(0.877296686, 0, 0.229485437, 0)
-ImageLabel.Size = UDim2.new(0, 168, 0, 58)
-ImageLabel.Image = "rbxassetid://126037446362347"
-
-UICorner.Parent = ImageLabel
-
-ScrollingFrame.Parent = ScreenGui
-ScrollingFrame.Active = true
-ScrollingFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-ScrollingFrame.BackgroundTransparency = 0.200
-ScrollingFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ScrollingFrame.BorderSizePixel = 0
-ScrollingFrame.Position = UDim2.new(0.876796961, 0, 0.350830108, 0)
-ScrollingFrame.Size = UDim2.new(0, 170, 0, 319)
-ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0.829999983, 0)
-ScrollingFrame.ScrollBarThickness = 0
-
-UICorner_2.Parent = ScrollingFrame
-
-UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(149, 73, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(221, 131, 186))}
-UIGradient.Offset = Vector2.new(0.300000012, 0)
-UIGradient.Rotation = 18
-UIGradient.Parent = ScrollingFrame
-
-Controls.Name = "Controls"
-Controls.Parent = ScrollingFrame
-Controls.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Controls.BackgroundTransparency = 1.000
-Controls.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Controls.BorderSizePixel = 0
-Controls.Position = UDim2.new(-0.0893554688, 0, -0.00238247565, 0)
-Controls.Size = UDim2.new(0, 200, 0, 50)
-Controls.Font = Enum.Font.GrenzeGotisch
-Controls.Text = "Controls"
-Controls.TextColor3 = Color3.fromRGB(255, 255, 255)
-Controls.TextSize = 45.000
-Controls.TextStrokeTransparency = 0.000
-Controls.TextWrapped = true
-
-_1.Name = "1"
-_1.Parent = Controls
-_1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-_1.BackgroundTransparency = 1.000
-_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
-_1.BorderSizePixel = 0
-_1.Position = UDim2.new(0.119999997, 0, 7.5, 0)
-_1.Size = UDim2.new(0, 153, 0, 39)
-_1.FontFace = Font.fromId(12187375716)
-_1.Text = "L To Black Flash "
-_1.TextColor3 = Color3.fromRGB(0, 0, 0)
-_1.TextScaled = true
-_1.TextSize = 25.000
-_1.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-_1.TextStrokeTransparency = 0.000
-_1.TextWrapped = true
-
-_2.Name = "2"
-_2.Parent = Controls
-_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-_2.BackgroundTransparency = 1.000
-_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-_2.BorderSizePixel = 0
-_2.Position = UDim2.new(0.159999996, 0, 5.96000004, 0)
-_2.Size = UDim2.new(0, 137, 0, 70)
-_2.FontFace = Font.fromId(12187375716)
-_2.Text = "N To Toggle Follow Behind Target"
-_2.TextColor3 = Color3.fromRGB(0, 0, 0)
-_2.TextScaled = true
-_2.TextSize = 25.000
-_2.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-_2.TextStrokeTransparency = 0.000
-_2.TextWrapped = true
-
-_3.Name = "3"
-_3.Parent = Controls
-_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-_3.BackgroundTransparency = 1.000
-_3.BorderColor3 = Color3.fromRGB(0, 0, 0)
-_3.BorderSizePixel = 0
-_3.Position = UDim2.new(0.150000006, 0, 4.98000002, 0)
-_3.Size = UDim2.new(0, 139, 0, 49)
-_3.FontFace = Font.fromId(12187375716)
-_3.Text = "T To Toggle ESP"
-_3.TextColor3 = Color3.fromRGB(0, 0, 0)
-_3.TextScaled = true
-_3.TextSize = 25.000
-_3.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-_3.TextStrokeTransparency = 0.000
-_3.TextWrapped = true
-
-_4.Name = "4"
-_4.Parent = Controls
-_4.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-_4.BackgroundTransparency = 1.000
-_4.BorderColor3 = Color3.fromRGB(0, 0, 0)
-_4.BorderSizePixel = 0
-_4.Position = UDim2.new(0.0649999976, 0, 1.13999999, 0)
-_4.Size = UDim2.new(0, 172, 0, 49)
-_4.FontFace = Font.fromId(12187375716)
-_4.Text = "V To Fly"
-_4.TextColor3 = Color3.fromRGB(0, 0, 0)
-_4.TextSize = 25.000
-_4.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-_4.TextStrokeTransparency = 0.000
-
-_5.Name = "5"
-_5.Parent = Controls
-_5.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-_5.BackgroundTransparency = 1.000
-_5.BorderColor3 = Color3.fromRGB(0, 0, 0)
-_5.BorderSizePixel = 0
-_5.Position = UDim2.new(0.0250000004, 0, 1.84000003, 0)
-_5.Size = UDim2.new(0, 190, 0, 49)
-_5.FontFace = Font.fromId(12187375716)
-_5.Text = "P To Boost"
-_5.TextColor3 = Color3.fromRGB(0, 0, 0)
-_5.TextSize = 25.000
-_5.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-_5.TextStrokeTransparency = 0.000
-
-_6.Name = "6"
-_6.Parent = Controls
-_6.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-_6.BackgroundTransparency = 1.000
-_6.BorderColor3 = Color3.fromRGB(0, 0, 0)
-_6.BorderSizePixel = 0
-_6.Position = UDim2.new(0.119999997, 0, 2.5999999, 0)
-_6.Size = UDim2.new(0, 154, 0, 70)
-_6.FontFace = Font.fromId(12187375716)
-_6.Text = "Click On Someone = Lock On"
-_6.TextColor3 = Color3.fromRGB(0, 0, 0)
-_6.TextScaled = true
-_6.TextSize = 25.000
-_6.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-_6.TextStrokeTransparency = 0.000
-_6.TextWrapped = true
-
-_7.Name = "7"
-_7.Parent = Controls
-_7.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-_7.BackgroundTransparency = 1.000
-_7.BorderColor3 = Color3.fromRGB(0, 0, 0)
-_7.BorderSizePixel = 0
-_7.Position = UDim2.new(0.104999997, 0, 4, 0)
-_7.Size = UDim2.new(0, 156, 0, 49)
-_7.FontFace = Font.fromId(12187375716)
-_7.Text = "Y To Cancel Lock On"
-_7.TextColor3 = Color3.fromRGB(0, 0, 0)
-_7.TextScaled = true
-_7.TextSize = 25.000
-_7.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
-_7.TextStrokeTransparency = 0.000
-_7.TextWrapped = true
-
--- Scripts:
-
-local function LDCYMXX_fake_script() -- ScrollingFrame.LocalScript 
-	
-	local TweenService = game:GetService("TweenService")
-	
-	local info = TweenInfo.new(
-		5,
-		Enum.EasingStyle.Linear,
-		Enum.EasingDirection.InOut,
-		-1,
-		false,
-		0
-		
-	)
-	TweenService:Create(UIGradient23, info, {Rotation = 360}):Play()
-	
-	local info2 = TweenInfo.new(
-		4,
-		Enum.EasingStyle.Linear,
-		Enum.EasingDirection.InOut,
-		-1,
-		false,
-		0
-	)
-	
-	TweenService:Create(UIGradient, info2, {Rotation = 360}):Play()
-end
-LDCYMXX_fake_script()
-
-
-local function initializeESP()
-	local Players = game:GetService("Players")
-	local UserInputService = game:GetService("UserInputService")
-	local Workspace = game:GetService("Workspace")
-
-	local LocalPlayer = Players.LocalPlayer
-	local highlightsEnabled = true
-	
-	-- Create Highlight
-	local function addVisuals(model)
-		local humanoid = model:FindFirstChildOfClass("Humanoid")
-		local head = model:FindFirstChild("Head")
-		if not humanoid or not head then return end
-		
-
-		
-		if not model:FindFirstChild("PlayerHighlight") then
-			local highlight = Instance.new("Highlight")
-			highlight.Name = "PlayerHighlight"
-			highlight.FillColor = Color3.fromRGB(60, 255, 0)
-			highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
-			highlight.FillTransparency = 0.1
-			highlight.OutlineTransparency = 0.6
-			highlight.Adornee = model
-			highlight.Parent = model
-			
-		end
-	end
-
-	-- Remove Highlight
-	local function removeVisuals(model)
-		if model == LocalPlayer.Character then return end
-
-		local highlight = model:FindFirstChild("PlayerHighlight")
-		if highlight then
-			highlight:Destroy()
-		end
-		
-	end
-
-	-- Toggle All
-	local function toggleAll()
-		highlightsEnabled = not highlightsEnabled
-
-		-- Handle players
-		for _, player in ipairs(Players:GetPlayers()) do
-			if player ~= LocalPlayer and player.Character then
-				if highlightsEnabled then
-					addVisuals(player.Character)
-				else
-					removeVisuals(player.Character)
-				end
-			end
-		end
-
-		-- Handle NPCs
-		for _, model in ipairs(Workspace:GetDescendants()) do
-			if model:IsA("Model") and model ~= LocalPlayer.Character then
-				local humanoid = model:FindFirstChildOfClass("Humanoid")
-				if humanoid then
-					if highlightsEnabled then
-						addVisuals(model)
-					else
-						removeVisuals(model)
-					end
-				end
-			end
-		end
-	end
-
-	-- Handle new characters (players)
-	local function onCharacterAdded(player, character)
-		character:WaitForChild("Humanoid", 5)
-		character:WaitForChild("Head", 5)
-		if highlightsEnabled then
-		    wait()
-			addVisuals(character)
-		end
-	end
-
-	-- Handle new NPCs
-	local function onDescendantAdded(descendant)
-		if descendant:IsA("Model") and descendant ~= LocalPlayer.Character then
-			local humanoid = descendant:FindFirstChildOfClass("Humanoid")
-			local head = descendant:FindFirstChild("Head")
-			if humanoid and head and highlightsEnabled then
-			    wait(0.5)
-				addVisuals(descendant)
-			end
-		end
-	end
-
-	-- Set up for existing players
-	for _, player in ipairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer then
-			if player.Character then
-				onCharacterAdded(player, player.Character)
-			end
-			player.CharacterAdded:Connect(function(char)
-				onCharacterAdded(player, char)
-			end)
-		end
-	end
-
-	-- Set up for new players
-	Players.PlayerAdded:Connect(function(player)
-		if player == LocalPlayer then return end
-		player.CharacterAdded:Connect(function(char)
-		    wait()
-			onCharacterAdded(player, char)
-		end)
-	end)
-
-	-- Set up for existing NPCs
-	for _, model in ipairs(Workspace.Characters:GetDescendants()) do
-		if model:IsA("Model") and model ~= LocalPlayer.Character then
-			local humanoid = model:FindFirstChildOfClass("Humanoid")
-			local head = model:FindFirstChild("Head")
-			if humanoid and head and highlightsEnabled then
-				addVisuals(model)
-			end
-		end
-	end
-
-	-- Monitor for new NPCs
-	Workspace.DescendantAdded:Connect(onDescendantAdded)
-
-	-- Input toggle
-	UserInputService.InputBegan:Connect(function(input, gameProcessed)
-		if not gameProcessed and input.KeyCode == Enum.KeyCode.T then
-			toggleAll()
-		end
-	end)
-end
-
--- Call the function to start the ESP
-initializeESP()
-
-
-
-
-local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-local humanoid = character:WaitForChild("Humanoid")
-local camera = workspace.CurrentCamera
-local defaultFOV = camera.FieldOfView -- Store default FOV (typically 70)
-local bc = character:WaitForChild("Torso")
-
--- Configuration
-local FLY_KEY = Enum.KeyCode.V
-local BOOST_KEY = Enum.KeyCode.P
-local FORWARD_SPEED = 190 -- Speed when moving forward
-local TILT_SPEED = 80 -- Reduced speed when tilting (sideways or backward)
-local BOOST_SPEED = 350 -- Speed during super boost
-local TILT_ANGLE_SIDE = math.rad(15) -- Tilt angle for left/right (15 degrees)
-local TILT_ANGLE_BACK = math.rad(10) -- Smaller tilt angle for backward (10 degrees)
-local BOOST_DURATION = 5 -- Duration of boost in seconds
-local BOOST_COOLDOWN = 0.5 -- Cooldown between boosts in seconds
-local BOOST_FOV = 120 -- FOV during boost
-local FOV_TWEEN_DURATION = 0.4 -- Duration for FOV transition
-
--- Animation IDs (Replace with actual IDs from Roblox Animation Editor)
-local IDLE_ANIMATION = "rbxassetid://79114529635631"
-local FORWARD_ANIMATION = "rbxassetid://103328566379131"
-local LEFT_ANIMATION = "rbxassetid://140235795151204"
-local RIGHT_ANIMATION = "rbxassetid://140235795151204"
-
-local IDLE = Instance.new("Animation", character)
-IDLE.AnimationId = IDLE_ANIMATION
-local FORWARD = Instance.new("Animation", character)
-FORWARD.AnimationId = FORWARD_ANIMATION
-local LEFT = Instance.new("Animation", character)
-LEFT.AnimationId = LEFT_ANIMATION
-local RIGHT = Instance.new("Animation", character)
-RIGHT.AnimationId = RIGHT_ANIMATION
-
--- State variables
-local isFlying = false
-local isBoosting = false
-local boostCooldown = 0
-local bodyVelocity = nil
-local bodyGyro = nil
-local particleEmitter = nil
-local trail = nil
-local second = nil
-local highlight = nil
-local DarkAura = nil
-local DarkAura1 = nil
-local DarkAura2 = nil
-local DarkAura3 = nil
-local DarkAura4 = nil
-local DarkAura5 = nil
-local DarkAura6 = nil
-local DarkAura7 = nil
-local DarkAura8 = nil
-local DarkAura9 = nil
-local Lightning1 = nil
-local Lightning2 = nil
-local Lightning5 = nil
-local AwakeningL = nil
-local AwakeningD = nil
-local Detail = nil
-local Attachment = nil
-local Attachment1 = nil
-local PointLight = nil
-local DarkAuraa = nil
-local DarkAuraa1 = nil
-local DarkAuraa2 = nil
-local DarkAuraa3 = nil
-local DarkAuraa4 = nil
-local Sparkss = nil
-local Auraa = nil
-local Attachment3 = nil
-local a = nil
-local a1 = nil
-local a2 = nil
-local a3 = nil
-local a4 = nil
-local a5 = nil
-local currentAnimationTrack = nil
-local idleTrack = nil
-local forwardTrack = nil
-local leftTrack = nil
-local rightTrack = nil
-
--- Character parts
-local Head = character.Head
-local Left_Arm = character["Left Arm"]
-local Right_Arm = character["Right Arm"]
-local Right_Leg = character["Right Leg"]
-local Left_Leg = character["Left Leg"]
-local Torso = character:WaitForChild("Torso")
--- Torso fallback for R6/R15
-local Torso = game.Players.LocalPlayer.Character and (game.Players.LocalPlayer.Character:FindFirstChild("Torso") or game.Players.LocalPlayer.Character:FindFirstChild("UpperTorso"))
-if not Torso then
-	error("Torso not found in character")
-end
-
--- Function to start flying
-local function startFlying()
-	if isFlying then return end
-	isFlying = true
-
-	-- Create BodyVelocity for movement
-	bodyVelocity = Instance.new("BodyVelocity")
-	bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-	bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-	bodyVelocity.Parent = humanoidRootPart
-
-	-- Create BodyGyro for orientation and tilt
-	bodyGyro = Instance.new("BodyGyro")
-	bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-	bodyGyro.P = 10000 -- Original responsiveness
-	bodyGyro.D = 1000 -- Original damping
-	bodyGyro.Parent = humanoidRootPart
-
-	-- Load animations
-	local animator = humanoid:WaitForChild("Animator")
-	idleTrack = animator:LoadAnimation(IDLE)
-	idleTrack.Priority = Enum.AnimationPriority.Movement
-	forwardTrack = animator:LoadAnimation(FORWARD)
-	forwardTrack.Priority = Enum.AnimationPriority.Movement
-	leftTrack = animator:LoadAnimation(LEFT)
-	leftTrack.Priority = Enum.AnimationPriority.Movement
-	rightTrack = animator:LoadAnimation(RIGHT)
-	rightTrack.Priority = Enum.AnimationPriority.Movement
-
-	-- Create trail for boost
-	trail = Instance.new("Trail")
-	trail.Name = "trail"
-	trail.FaceCamera = true
-	trail.MinLength = 0.05000000074505806
-	trail.LightInfluence = 1
-	trail.Lifetime = 0.4
-	trail.Enabled = false
-	trail.Attachment0 = Instance.new("Attachment", humanoidRootPart)
-	trail.Attachment1 = Instance.new("Attachment", humanoidRootPart)
-	trail.Attachment1.Position = Vector3.new(0, -1, 0) -- Slightly offset for visual effect
-	trail.Parent = humanoidRootPart
-
-	-- Create a highlight
-	highlight = Instance.new("Highlight")
-	highlight.FillColor = Color3.fromRGB(14, 163, 255)
-	highlight.FillTransparency = 0.5
-	highlight.OutlineColor = Color3.fromRGB(47, 38, 181)
-	highlight.Parent = character
-	highlight.Enabled = false
-
-	-- Particle Emitters for Torso
-	DarkAura1 = Instance.new("ParticleEmitter")
-	DarkAura1.Name = "DarkAura1"
-	DarkAura1.Lifetime = NumberRange.new(0.40, 0.60)
-	DarkAura1.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.00, 0.00))})
-	DarkAura1.ZOffset = -1
-	DarkAura1.TimeScale = 0.5
-	DarkAura1.SpreadAngle = Vector2.new(90.00, -90.00)
-	DarkAura1.Speed = NumberRange.new(2.40, 2.40)
-	DarkAura1.Texture = "rbxassetid://5406968633"
-	DarkAura1.Acceleration = Vector3.new(0.00, 6.00, 0.00)
-	DarkAura1.RotSpeed = NumberRange.new(-100.00, 100.00)
-	DarkAura1.Rotation = NumberRange.new(-360.00, 360.00)
-	DarkAura1.LockedToPart = true
-	DarkAura1.Rate = 100
-	DarkAura1.VelocityInheritance = -0.25
-	DarkAura1.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.30, 0.00, 0.00), NumberSequenceKeypoint.new(0.70, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	DarkAura1.Orientation = Enum.ParticleOrientation.VelocityParallel
-	DarkAura1.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.06, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	DarkAura1.Parent = Torso
-
-	Lightning1 = Instance.new("ParticleEmitter")
-	Lightning1.Name = "Lightning1"
-	Lightning1.Lifetime = NumberRange.new(0.05, 0.05)
-	Lightning1.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.16, 0.36, 1.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.16, 0.36, 1.00))})
-	Lightning1.ZOffset = 2
-	Lightning1.LightEmission = 1
-	Lightning1.SpreadAngle = Vector2.new(360.00, 360.00)
-	Lightning1.Speed = NumberRange.new(0.10, 0.10)
-	Lightning1.Brightness = 33
-	Lightning1.Texture = "rbxassetid://6959235625"
-	Lightning1.Rotation = NumberRange.new(-180.00, 180.00)
-	Lightning1.LockedToPart = true
-	Lightning1.Rate = 15
-	Lightning1.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.00, 0.00), NumberSequenceKeypoint.new(0.62, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	Lightning1.Orientation = Enum.ParticleOrientation.VelocityParallel
-	Lightning1.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 4.50, 0.00), NumberSequenceKeypoint.new(1.00, 4.50, 0.00)})
-	Lightning1.Parent = Torso
-
-	DarkAura = Instance.new("ParticleEmitter")
-	DarkAura.Name = "DarkAura"
-	DarkAura.Lifetime = NumberRange.new(0.40, 0.60)
-	DarkAura.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.00, 0.00))})
-	DarkAura.ZOffset = -1
-	DarkAura.TimeScale = 0.5
-	DarkAura.SpreadAngle = Vector2.new(90.00, -90.00)
-	DarkAura.Speed = NumberRange.new(2.40, 2.40)
-	DarkAura.Texture = "rbxassetid://5407035714"
-	DarkAura.Acceleration = Vector3.new(0.00, 6.00, 0.00)
-	DarkAura.RotSpeed = NumberRange.new(-100.00, 100.00)
-	DarkAura.Rotation = NumberRange.new(-360.00, 360.00)
-	DarkAura.LockedToPart = true
-	DarkAura.Rate = 59
-	DarkAura.VelocityInheritance = -0.25
-	DarkAura.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.30, 0.00, 0.00), NumberSequenceKeypoint.new(0.70, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	DarkAura.Orientation = Enum.ParticleOrientation.VelocityParallel
-	DarkAura.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.88, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	DarkAura.Parent = Torso
-
-	DarkAura2 = Instance.new("ParticleEmitter")
-	DarkAura2.Name = "DarkAura2"
-	DarkAura2.Lifetime = NumberRange.new(0.40, 0.60)
-	DarkAura2.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.00, 0.00))})
-	DarkAura2.ZOffset = -1
-	DarkAura2.TimeScale = 0.5
-	DarkAura2.SpreadAngle = Vector2.new(90.00, -90.00)
-	DarkAura2.Speed = NumberRange.new(2.40, 2.40)
-	DarkAura2.Texture = "rbxassetid://5406968633"
-	DarkAura2.Acceleration = Vector3.new(0.00, 6.00, 0.00)
-	DarkAura2.RotSpeed = NumberRange.new(-100.00, 100.00)
-	DarkAura2.Rotation = NumberRange.new(-360.00, 360.00)
-	DarkAura2.LockedToPart = true
-	DarkAura2.Rate = 50
-	DarkAura2.VelocityInheritance = -0.25
-	DarkAura2.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.30, 0.00, 0.00), NumberSequenceKeypoint.new(0.70, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	DarkAura2.Orientation = Enum.ParticleOrientation.VelocityParallel
-	DarkAura2.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.06, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	DarkAura2.Parent = Torso
-
-	DarkAura3 = Instance.new("ParticleEmitter")
-	DarkAura3.Name = "DarkAura3"
-	DarkAura3.Lifetime = NumberRange.new(0.40, 0.60)
-	DarkAura3.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.00, 0.00))})
-	DarkAura3.ZOffset = -1
-	DarkAura3.TimeScale = 0.5
-	DarkAura3.SpreadAngle = Vector2.new(90.00, -90.00)
-	DarkAura3.Speed = NumberRange.new(2.40, 2.40)
-	DarkAura3.Texture = "rbxassetid://5407035714"
-	DarkAura3.Acceleration = Vector3.new(0.00, 6.00, 0.00)
-	DarkAura3.RotSpeed = NumberRange.new(-100.00, 100.00)
-	DarkAura3.Rotation = NumberRange.new(-360.00, 360.00)
-	DarkAura3.LockedToPart = true
-	DarkAura3.Rate = 59
-	DarkAura3.VelocityInheritance = -0.25
-	DarkAura3.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.30, 0.00, 0.00), NumberSequenceKeypoint.new(0.70, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	DarkAura3.Orientation = Enum.ParticleOrientation.VelocityParallel
-	DarkAura3.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.88, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	DarkAura3.Parent = Torso
-
-	DarkAura4 = Instance.new("ParticleEmitter")
-	DarkAura4.Name = "DarkAura4"
-	DarkAura4.Lifetime = NumberRange.new(0.40, 0.60)
-	DarkAura4.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.00, 0.00))})
-	DarkAura4.ZOffset = -1
-	DarkAura4.TimeScale = 0.5
-	DarkAura4.SpreadAngle = Vector2.new(150.00, -150.00)
-	DarkAura4.Speed = NumberRange.new(4.70, 4.70)
-	DarkAura4.Texture = "rbxassetid://5406968633"
-	DarkAura4.Acceleration = Vector3.new(0.00, 6.00, 0.00)
-	DarkAura4.RotSpeed = NumberRange.new(-100.00, 100.00)
-	DarkAura4.Rotation = NumberRange.new(-360.00, 360.00)
-	DarkAura4.LockedToPart = true
-	DarkAura4.Rate = 69
-	DarkAura4.VelocityInheritance = -0.25
-	DarkAura4.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.30, 0.00, 0.00), NumberSequenceKeypoint.new(0.70, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	DarkAura4.Orientation = Enum.ParticleOrientation.VelocityParallel
-	DarkAura4.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.06, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	DarkAura4.Parent = Torso
-
-	DarkAura5 = Instance.new("ParticleEmitter")
-	DarkAura5.Name = "DarkAura5"
-	DarkAura5.Lifetime = NumberRange.new(0.40, 0.60)
-	DarkAura5.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.00, 0.00))})
-	DarkAura5.ZOffset = -1
-	DarkAura5.TimeScale = 0.5
-	DarkAura5.SpreadAngle = Vector2.new(90.00, -90.00)
-	DarkAura5.Speed = NumberRange.new(2.40, 2.40)
-	DarkAura5.Texture = "rbxassetid://5406968633"
-	DarkAura5.Acceleration = Vector3.new(0.00, 6.00, 0.00)
-	DarkAura5.RotSpeed = NumberRange.new(-100.00, 100.00)
-	DarkAura5.Rotation = NumberRange.new(-360.00, 360.00)
-	DarkAura5.LockedToPart = true
-	DarkAura5.Rate = 50
-	DarkAura5.VelocityInheritance = -0.25
-	DarkAura5.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.30, 0.00, 0.00), NumberSequenceKeypoint.new(0.70, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	DarkAura5.Orientation = Enum.ParticleOrientation.VelocityParallel
-	DarkAura5.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.06, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	DarkAura5.Parent = Torso
-
-	Lightning5 = Instance.new("ParticleEmitter")
-	Lightning5.Name = "Lightning5"
-	Lightning5.Lifetime = NumberRange.new(0.08, 0.08)
-	Lightning5.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.10, 0.61, 1.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.10, 0.61, 1.00))})
-	Lightning5.ZOffset = 2
-	Lightning5.LightEmission = 1
-	Lightning5.SpreadAngle = Vector2.new(360.00, 360.00)
-	Lightning5.Speed = NumberRange.new(0.10, 0.10)
-	Lightning5.Brightness = 33
-	Lightning5.Texture = "rbxassetid://6959235625"
-	Lightning5.Rotation = NumberRange.new(-180.00, 180.00)
-	Lightning5.LockedToPart = true
-	Lightning5.Rate = 15
-	Lightning5.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.00, 0.00), NumberSequenceKeypoint.new(0.62, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	Lightning5.Orientation = Enum.ParticleOrientation.VelocityParallel
-	Lightning5.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 6.00, 0.00), NumberSequenceKeypoint.new(1.00, 6.00, 0.00)})
-	Lightning5.Parent = Torso
-
-	DarkAura6 = Instance.new("ParticleEmitter")
-	DarkAura6.Name = "DarkAura6"
-	DarkAura6.Lifetime = NumberRange.new(0.40, 0.60)
-	DarkAura6.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.00, 0.00))})
-	DarkAura6.ZOffset = -1
-	DarkAura6.TimeScale = 0.5
-	DarkAura6.SpreadAngle = Vector2.new(90.00, -90.00)
-	DarkAura6.Speed = NumberRange.new(2.40, 2.40)
-	DarkAura6.Texture = "rbxassetid://5407035714"
-	DarkAura6.Acceleration = Vector3.new(0.00, 6.00, 0.00)
-	DarkAura6.RotSpeed = NumberRange.new(-100.00, 100.00)
-	DarkAura6.Rotation = NumberRange.new(-360.00, 360.00)
-	DarkAura6.LockedToPart = true
-	DarkAura6.Rate = 59
-	DarkAura6.VelocityInheritance = -0.25
-	DarkAura6.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.30, 0.00, 0.00), NumberSequenceKeypoint.new(0.70, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	DarkAura6.Orientation = Enum.ParticleOrientation.VelocityParallel
-	DarkAura6.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.88, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	DarkAura6.Parent = Torso
-
-	Lightning2 = Instance.new("ParticleEmitter")
-	Lightning2.Name = "Lightning2"
-	Lightning2.Lifetime = NumberRange.new(0.08, 0.08)
-	Lightning2.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.11, 0.49, 1.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.11, 0.49, 1.00))})
-	Lightning2.ZOffset = 2
-	Lightning2.LightEmission = 1
-	Lightning2.SpreadAngle = Vector2.new(360.00, 360.00)
-	Lightning2.Speed = NumberRange.new(0.10, 0.10)
-	Lightning2.Brightness = 33
-	Lightning2.Texture = "rbxassetid://6967938745"
-	Lightning2.Rotation = NumberRange.new(-180.00, 180.00)
-	Lightning2.LockedToPart = true
-	Lightning2.Rate = 15
-	Lightning2.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.00, 0.00), NumberSequenceKeypoint.new(0.62, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	Lightning2.Orientation = Enum.ParticleOrientation.VelocityParallel
-	Lightning2.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 4.50, 0.00), NumberSequenceKeypoint.new(1.00, 4.50, 0.00)})
-	Lightning2.Parent = Torso
-
-	DarkAura7 = Instance.new("ParticleEmitter")
-	DarkAura7.Name = "DarkAura7"
-	DarkAura7.Lifetime = NumberRange.new(0.40, 0.60)
-	DarkAura7.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.00, 0.00))})
-	DarkAura7.ZOffset = -1
-	DarkAura7.TimeScale = 0.5
-	DarkAura7.SpreadAngle = Vector2.new(90.00, -90.00)
-	DarkAura7.Speed = NumberRange.new(2.40, 2.40)
-	DarkAura7.Texture = "rbxassetid://5406968633"
-	DarkAura7.Acceleration = Vector3.new(0.00, 6.00, 0.00)
-	DarkAura7.RotSpeed = NumberRange.new(-100.00, 100.00)
-	DarkAura7.Rotation = NumberRange.new(-360.00, 360.00)
-	DarkAura7.LockedToPart = true
-	DarkAura7.Rate = 100
-	DarkAura7.VelocityInheritance = -0.25
-	DarkAura7.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.30, 0.00, 0.00), NumberSequenceKeypoint.new(0.70, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	DarkAura7.Orientation = Enum.ParticleOrientation.VelocityParallel
-	DarkAura7.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.06, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	DarkAura7.Parent = Torso
-
-	DarkAura8 = Instance.new("ParticleEmitter")
-	DarkAura8.Name = "DarkAura8"
-	DarkAura8.Lifetime = NumberRange.new(0.40, 0.60)
-	DarkAura8.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.00, 0.00))})
-	DarkAura8.ZOffset = -1
-	DarkAura8.TimeScale = 0.5
-	DarkAura8.SpreadAngle = Vector2.new(90.00, -90.00)
-	DarkAura8.Speed = NumberRange.new(2.40, 2.40)
-	DarkAura8.Texture = "rbxassetid://5407035714"
-	DarkAura8.Acceleration = Vector3.new(0.00, 6.00, 0.00)
-	DarkAura8.RotSpeed = NumberRange.new(-100.00, 100.00)
-	DarkAura8.Rotation = NumberRange.new(-360.00, 360.00)
-	DarkAura8.LockedToPart = true
-	DarkAura8.Rate = 59
-	DarkAura8.VelocityInheritance = -0.25
-	DarkAura8.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.30, 0.00, 0.00), NumberSequenceKeypoint.new(0.70, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	DarkAura8.Orientation = Enum.ParticleOrientation.VelocityParallel
-	DarkAura8.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.88, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	DarkAura8.Parent = Torso
-
-	DarkAura9 = Instance.new("ParticleEmitter")
-	DarkAura9.Name = "DarkAura9"
-	DarkAura9.Lifetime = NumberRange.new(0.40, 0.60)
-	DarkAura9.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.0, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.00, 0.00))})
-	DarkAura9.ZOffset = -1
-	DarkAura9.TimeScale = 0.5
-	DarkAura9.SpreadAngle = Vector2.new(150.00, -150.00)
-	DarkAura9.Speed = NumberRange.new(4.70, 4.70)
-	DarkAura9.Texture = "rbxassetid://5406968633"
-	DarkAura9.Acceleration = Vector3.new(0.00, 6.00, 0.00)
-	DarkAura9.RotSpeed = NumberRange.new(-100.00, 100.00)
-	DarkAura9.Rotation = NumberRange.new(-360.00, 360.00)
-	DarkAura9.LockedToPart = true
-	DarkAura9.Rate = 69
-	DarkAura9.VelocityInheritance = -0.25
-	DarkAura9.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.30, 0.00, 0.00), NumberSequenceKeypoint.new(0.70, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	DarkAura9.Orientation = Enum.ParticleOrientation.VelocityParallel
-	DarkAura9.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.06, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	DarkAura9.Parent = Torso
-
-	Attachment1 = Instance.new("Attachment")
-	Attachment1.Name = "Attachment1"
-	Attachment1.Parent = Torso
-
-	AwakeningL = Instance.new("ParticleEmitter")
-	AwakeningL.Name = "AwakeningL"
-	AwakeningL.Lifetime = NumberRange.new(0.25, 0.25)
-	AwakeningL.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.53, 0.85)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.53, 0.85))})
-	AwakeningL.ZOffset = 1
-	AwakeningL.LightEmission = 1
-	AwakeningL.SpreadAngle = Vector2.new(10.00, 10.00)
-	AwakeningL.Texture = "rbxassetid://7857596636"
-	AwakeningL.Rotation = NumberRange.new(-5.00, 5.00)
-	AwakeningL.LockedToPart = true
-	AwakeningL.Rate = 12
-	AwakeningL.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.50, 0.36, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	AwakeningL.Orientation = Enum.ParticleOrientation.FacingCameraWorldUp
-	AwakeningL.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 4.19, 0.00), NumberSequenceKeypoint.new(1.00, 5.50, 0.00)})
-	AwakeningL.Parent = Attachment1
-
-	AwakeningD = Instance.new("ParticleEmitter")
-	AwakeningD.Name = "AwakeningD"
-	AwakeningD.Lifetime = NumberRange.new(0.25, 0.25)
-	AwakeningD.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.62, 1.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.62, 1.00))})
-	AwakeningD.ZOffset = 0.800000011920929
-	AwakeningD.SpreadAngle = Vector2.new(10.00, 10.00)
-	AwakeningD.Speed = NumberRange.new(6.00, 6.00)
-	AwakeningD.Texture = "rbxassetid://7857596636"
-	AwakeningD.Rotation = NumberRange.new(-5.00, 5.00)
-	AwakeningD.LockedToPart = true
-	AwakeningD.Rate = 12
-	AwakeningD.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.68, 0.56, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-	AwakeningD.Orientation = Enum.ParticleOrientation.FacingCameraWorldUp
-	AwakeningD.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 5.31, 0.00), NumberSequenceKeypoint.new(1.00, 5.38, 0.00)})
-	AwakeningD.Parent = Attachment1
-
-	Attachment = Instance.new("Attachment")
-	Attachment.WorldOrientation = Vector3.new(0.00, 90.00, 0.00)
-	Attachment.Axis = Vector3.new(0.00, 0.00, -1.00)
-	Attachment.WorldAxis = Vector3.new(0.00, 0.00, -1.00)
-	Attachment.Position = Vector3.new(-0.00, -3.00, 0.00)
-	Attachment.Orientation = Vector3.new(0.00, 90.00, 0.00)
-	Attachment.Parent = Torso
-
-	Detail = Instance.new("ParticleEmitter")
-	Detail.Name = "Detail"
-	Detail.Lifetime = NumberRange.new(0.50, 0.50)
-	Detail.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.11, 0.32, 1.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.11, 0.32, 1.00))})
-	Detail.Drag = 4.5
-	Detail.ZOffset = 1
-	Detail.LightEmission = 1
-	Detail.SpreadAngle = Vector2.new(120.00, 120.00)
-	Detail.Speed = NumberRange.new(20.00, 20.00)
-	Detail.Brightness = 33
-	Detail.Texture = "rbxassetid://6964048307"
-	Detail.Acceleration = Vector3.new(0.00, 40.00, 0.00)
-	Detail.Rotation = NumberRange.new(130.00, 130.00)
-	Detail.LockedToPart = true
-	Detail.Rate = 25
-	Detail.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.36, 1.00, 0.00), NumberSequenceKeypoint.new(0.39, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	Detail.Orientation = Enum.ParticleOrientation.VelocityParallel
-	Detail.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.10, 0.00), NumberSequenceKeypoint.new(0.51, 1.25, 0.28), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	Detail.Parent = Attachment
-
-	PointLight = Instance.new("PointLight")
-	PointLight.Color = Color3.new(0.45, 0.57, 1.00)
-	PointLight.Brightness = 5
-	PointLight.Range = 5
-	PointLight.Parent = Torso
-
-	-- LEFT ARM
-	local function createDarkAuraa(name, rate, texture, size, spreadAngle, speed)
-		local emitter = Instance.new("ParticleEmitter")
-		emitter.Name = name
-		emitter.Lifetime = NumberRange.new(0.40, 0.60)
-		emitter.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.00, 0.00))})
-		emitter.ZOffset = -1
-		emitter.TimeScale = 0.5
-		emitter.SpreadAngle = spreadAngle or Vector2.new(90.00, -90.00)
-		emitter.Speed = NumberRange.new(speed or 2.40, speed or 2.40)
-		emitter.Texture = texture
-		emitter.Acceleration = Vector3.new(0.00, 6.00, 0.00)
-		emitter.RotSpeed = NumberRange.new(-100.00, 100.00)
-		emitter.Rotation = NumberRange.new(-360.00, 360.00)
-		emitter.LockedToPart = true
-		emitter.Rate = rate
-		emitter.VelocityInheritance = -0.25
-		emitter.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.00, 0.00), NumberSequenceKeypoint.new(0.30, 0.00, 0.00), NumberSequenceKeypoint.new(0.70, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00, 0.00)})
-		emitter.Orientation = Enum.ParticleOrientation.VelocityParallel
-		emitter.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, size, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-		emitter.Parent = Left_Arm
-		return emitter
-	end
-
-	Attachment3 = Instance.new("Attachment")
-	Attachment3.Name = "Attachment3"
-	Attachment3.Position = Vector3.new(0.00, -1.5, 0.00)
-	Attachment3.Parent = Left_Arm
-
-	Auraa = Instance.new("ParticleEmitter")
-	Auraa.Name = "Auraa"
-	Auraa.Lifetime = NumberRange.new(0.40, 0.60)
-	Auraa.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-	Auraa.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.60, 1.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.60, 1.00))})
-	Auraa.ZOffset = 2
-	Auraa.LightEmission = 0
-	Auraa.SpreadAngle = Vector2.new(360.00, 360.00)
-	Auraa.Squash = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.00, 0.00), NumberSequenceKeypoint.new(0.06, 0.34, 0.00), NumberSequenceKeypoint.new(0.09, -0.34, 0.00), NumberSequenceKeypoint.new(0.21, 0.41, 0.00), NumberSequenceKeypoint.new(0.27, -0.19, 0.00), NumberSequenceKeypoint.new(0.34, 0.52, 0.00), NumberSequenceKeypoint.new(0.46, -0.49, 0.00), NumberSequenceKeypoint.new(0.54, 0.26, 0.00), NumberSequenceKeypoint.new(0.65, -0.68, 0.00), NumberSequenceKeypoint.new(0.74, -0.19, 0.00), NumberSequenceKeypoint.new(0.85, 0.00, 0.00), NumberSequenceKeypoint.new(0.89, 0.23, 0.00), NumberSequenceKeypoint.new(0.94, 0.15, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	Auraa.Speed = NumberRange.new(0.00, 2.00)
-	Auraa.Brightness = 9
-	Auraa.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-	Auraa.Texture = "rbxassetid://9285330517"
-	Auraa.Acceleration = Vector3.new(0.00, 15.00, 0.00)
-	Auraa.Rotation = NumberRange.new(-360.00, 360.00)
-	Auraa.LockedToPart = true
-	Auraa.Rate = 15
-	Auraa.EmissionDirection = Enum.NormalId.Front
-	Auraa.Size = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 1.35, 0.00), NumberSequenceKeypoint.new(0.36, 1.25, 0.00), NumberSequenceKeypoint.new(0.71, 1.02, 0.00), NumberSequenceKeypoint.new(0.87, 0.64, 0.00), NumberSequenceKeypoint.new(1.00, 0.38, 0.00)})
-	Auraa.Parent = Attachment3
-
-	Sparkss = Instance.new("ParticleEmitter")
-	Sparkss.Name = "Sparkss"
-	Sparkss.Lifetime = NumberRange.new(0.30, 0.50)
-	Sparkss.FlipbookMode = Enum.ParticleFlipbookMode.OneShot
-	Sparkss.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.60, 1.00)), ColorSequenceKeypoint.new(1.00, Color3.new(0.00, 0.60, 1.00))})
-	Sparkss.ZOffset = 2
-	Sparkss.LightEmission = 0
-	Sparkss.SpreadAngle = Vector2.new(360.00, 360.00)
-	Sparkss.Squash = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.00, 0.00), NumberSequenceKeypoint.new(0.10, 0.45, 0.00), NumberSequenceKeypoint.new(0.23, -0.79, 0.00), NumberSequenceKeypoint.new(0.36, 0.56, 0.00), NumberSequenceKeypoint.new(0.45, -0.60, 0.00), NumberSequenceKeypoint.new(0.54, 0.52, 0.00), NumberSequenceKeypoint.new(0.65, -0.56, 0.00), NumberSequenceKeypoint.new(0.73, 0.45, 0.00), NumberSequenceKeypoint.new(0.88, -0.26, 0.00), NumberSequenceKeypoint.new(0.93, 0.19, 0.00), NumberSequenceKeypoint.new(1.00, 0.00, 0.00)})
-	Sparkss.Speed = NumberRange.new(0.00, 5.00)
-	Sparkss.Brightness = 9
-	Sparkss.FlipbookLayout = Enum.ParticleFlipbookLayout.Grid4x4
-	Sparkss.Texture = "rbxassetid://15269497616"
-	Sparkss.Acceleration = Vector3.new(0.00, 20.00, 0.00)
-	Sparkss.Rotation = NumberRange.new(-360.00, 360.00)
-	Sparkss.Rate = 100
-	Sparkss.EmissionDirection = Enum.NormalId.Front
-	Sparkss.VelocityInheritance = 0.5
-	Sparkss.FlipbookStartRandom = true
-	Sparkss.Parent = Attachment3
-
-	DarkAuraa = createDarkAuraa("DarkAuraa", 100, "rbxassetid://5406968633", 1.06)
-	DarkAuraa1 = createDarkAuraa("DarkAuraa1", 59, "rbxassetid://5407035714", 0.88)
-	DarkAuraa2 = createDarkAuraa("DarkAuraa2", 50, "rbxassetid://5406968633", 1.06)
-	DarkAuraa3 = createDarkAuraa("DarkAuraa3", 69, "rbxassetid://5406968633", 1.06, Vector2.new(150.00, -150.00), 4.70)
-	DarkAuraa4 = createDarkAuraa("DarkAuraa4", 59, "rbxassetid://5407035714", 0.88)
-
-	-- RIGHT ARM
-	a = Attachment3:Clone()
-	a1 = DarkAuraa:Clone()
-	a2 = DarkAuraa1:Clone()
-	a3 = DarkAuraa2:Clone()
-	a4 = DarkAuraa3:Clone()
-	a5 = DarkAuraa4:Clone()
-
-	a.Parent = Right_Arm
-	a1.Parent = Right_Arm
-	a2.Parent = Right_Arm
-	a3.Parent = Right_Arm
-	a4.Parent = Right_Arm
-	a5.Parent = Right_Arm
-
-
-
-	-- Disable walking animations and gravity
-	humanoid.PlatformStand = true
-end
-
--- Function to stop flying
-local function stopFlying()
-	if not isFlying then return end
-	isFlying = false
-
-	-- Stop current animation
-	if currentAnimationTrack then
-		currentAnimationTrack:Stop()
-		currentAnimationTrack = nil
-	end
-	if idleTrack then
-		idleTrack:Destroy()
-		idleTrack = nil
-	end
-	if forwardTrack then
-		forwardTrack:Destroy()
-		forwardTrack = nil
-	end
-	if leftTrack then
-		leftTrack:Destroy()
-		leftTrack = nil
-	end
-	if rightTrack then
-		rightTrack:Destroy()
-		rightTrack = nil
-	end
-
-	-- Clean up
-	if bodyVelocity then
-		bodyVelocity:Destroy()
-		bodyVelocity = nil
-	end
-	if bodyGyro then
-		bodyGyro:Destroy()
-		bodyGyro = nil
-	end
-	if particleEmitter then
-		particleEmitter:Destroy()
-		particleEmitter = nil
-	end
-	if trail then
-		trail:Destroy()
-		trail = nil
-	end
-	if highlight then
-		highlight:Destroy()
-		highlight = nil
-	end
-	if DarkAura then
-		DarkAura:Destroy()
-		DarkAura = nil
-	end
-	if DarkAura1 then
-		DarkAura1:Destroy()
-		DarkAura1 = nil
-	end
-	if DarkAura2 then
-		DarkAura2:Destroy()
-		DarkAura2 = nil
-	end
-	if DarkAura3 then
-		DarkAura3:Destroy()
-		DarkAura3 = nil
-	end
-	if DarkAura4 then
-		DarkAura4:Destroy()
-		DarkAura4 = nil
-	end
-	if DarkAura5 then
-		DarkAura5:Destroy()
-		DarkAura5 = nil
-	end
-	if DarkAura6 then
-		DarkAura6:Destroy()
-		DarkAura6 = nil
-	end
-	if DarkAura7 then
-		DarkAura7:Destroy()
-		DarkAura7 = nil
-	end
-	if DarkAura8 then
-		DarkAura8:Destroy()
-		DarkAura8 = nil
-	end
-	if DarkAura9 then
-		DarkAura9:Destroy()
-		DarkAura9 = nil
-	end
-	if Lightning1 then
-		Lightning1:Destroy()
-		Lightning1 = nil
-	end
-	if Lightning2 then
-		Lightning2:Destroy()
-		Lightning2 = nil
-	end
-	if Lightning5 then
-		Lightning5:Destroy()
-		Lightning5 = nil
-	end
-	if AwakeningL then
-		AwakeningL:Destroy()
-		AwakeningL = nil
-	end
-	if AwakeningD then
-		AwakeningD:Destroy()
-		AwakeningD = nil
-	end
-	if Detail then
-		Detail:Destroy()
-		Detail = nil
-	end
-	if Attachment then
-		Attachment:Destroy()
-		Attachment = nil
-	end
-	if Attachment1 then
-		Attachment1:Destroy()
-		Attachment1 = nil
-	end
-	if PointLight then
-		PointLight:Destroy()
-		PointLight = nil
-	end
-	if Auraa then
-		Auraa:Destroy()
-		Auraa = nil
-	end
-	if Sparkss then
-		Sparkss:Destroy()
-		Sparkss = nil
-	end
-	if DarkAuraa then
-		DarkAuraa:Destroy()
-		DarkAuraa = nil
-	end
-	if DarkAuraa1 then
-		DarkAuraa1:Destroy()
-		DarkAuraa1 = nil
-	end
-	if DarkAuraa2 then
-		DarkAuraa2:Destroy()
-		DarkAuraa2 = nil
-	end
-	if DarkAuraa3 then
-		DarkAuraa3:Destroy()
-		DarkAuraa3 = nil
-	end
-	if DarkAuraa4 then
-		DarkAuraa4:Destroy()
-		DarkAuraa4 = nil
-	end
-	if Attachment3 then
-		Attachment3:Destroy()
-		Attachment3 = nil
-	end
-	if a then
-		a:Destroy()
-		a = nil
-	end
-	if a1 then
-		a1:Destroy()
-		a1 = nil
-	end
-	if a2 then
-		a2:Destroy()
-		a2 = nil
-	end
-	if a3 then
-		a3:Destroy()
-		a3 = nil
-	end
-	if a4 then
-		a4:Destroy()
-		a4 = nil
-	end
-	if a5 then
-		a5:Destroy()
-		a5 = nil
-	end
-
-	-- Restore default FOV
-	local tweenInfo = TweenInfo.new(FOV_TWEEN_DURATION, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-	local tween = TweenService:Create(camera, tweenInfo, {FieldOfView = defaultFOV})
-	tween:Play()
-
-	-- Restore walking sound
-	if humanoidRootPart:FindFirstChild("Running") then
-		humanoidRootPart:FindFirstChild("Running").Volume = 0.5
-	end
-
-	-- Restore normal movement
-	humanoid.PlatformStand = false
-end
-
--- Function to handle super boost
-local function triggerBoost()
-	if isBoosting or boostCooldown > 0 then return end
-	isBoosting = true
-
-	-- Enable particle effect and trail for sonic boom
-	if particleEmitter then
-		particleEmitter.Enabled = true
-	end
-	if trail then
-		trail.Enabled = true
-	end
-
-	if highlight then
-		highlight.Enabled = true
-	end
-
-	-- Play sound effect
-	local sound = Instance.new("Sound")
-	sound.SoundId = "rbxassetid://911448736" -- Roblox explosion sound for sonic boom
-	sound.Volume = 1
-	sound.Parent = humanoidRootPart
-	sound:Play()
-
-	-- Clean up sound after playing
-	game:GetService("Debris"):AddItem(sound, sound.TimeLength)
-
-	-- Increase FOV
-	local tweenInfo = TweenInfo.new(FOV_TWEEN_DURATION, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-	local tween = TweenService:Create(camera, tweenInfo, {FieldOfView = BOOST_FOV})
-	tween:Play()
-
-	-- Disable boost and restore effects after duration
-	spawn(function()
-		wait(BOOST_DURATION)
-		isBoosting = false
-		if particleEmitter then
-			particleEmitter.Enabled = false
-		end
-		if trail then
-			trail.Enabled = false
-		end
-		if highlight then
-			highlight.Enabled = false
-		end
-		-- Restore default FOV
-		local restoreTween = TweenService:Create(camera, tweenInfo, {FieldOfView = defaultFOV})
-		restoreTween:Play()
-		boostCooldown = BOOST_COOLDOWN
-		while boostCooldown > 0 do
-			boostCooldown = boostCooldown - wait(0.1)
-		end
-		boostCooldown = 0
-	end)
-end
-
--- Function to update flying movement and orientation
-local function updateFlying()
-	if not isFlying then return end
-
-	local camera = workspace.CurrentCamera
-	local moveDirection = Vector3.new(0, 0, 0)
-
-	-- Get input for movement (WASD)
-	if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-		moveDirection = moveDirection + Vector3.new(0, 0, -1) -- Forward
-	end
-	if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-		moveDirection = moveDirection + Vector3.new(0, 0, 1) -- Backward
-	end
-	if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-		moveDirection = moveDirection + Vector3.new(-1, 0, 0) -- Left
-	end
-	if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-		moveDirection = moveDirection + Vector3.new(1, 0, 0) -- Right
-	end
-
-	-- Normalize movement direction to prevent faster diagonal movement
-	if moveDirection.Magnitude > 1 then
-		moveDirection = moveDirection.Unit
-	end
-
-	-- Animation logic
-	if currentAnimationTrack then
-		currentAnimationTrack:Stop()
-	end
-	if moveDirection.Magnitude == 0 then
-		currentAnimationTrack = idleTrack
-	elseif moveDirection.Z < 0 then -- Forward
-		currentAnimationTrack = forwardTrack
-	elseif moveDirection.X < 0 then -- Left
-		currentAnimationTrack = leftTrack
-	elseif moveDirection.X > 0 then -- Right
-		currentAnimationTrack = rightTrack
-	end
-	if currentAnimationTrack then
-		currentAnimationTrack:Play()
-	end
-
-	-- Calculate speed and tilt based on movement
-	local speed = isBoosting and BOOST_SPEED or FORWARD_SPEED
-	local tiltCFrame = CFrame.new(0, 0, 0) -- Neutral tilt
-
-	if moveDirection.Magnitude > 0 and not isBoosting then
-		-- Determine if moving sideways or backward for speed and tilt
-		local forwardComponent = moveDirection.Z < 0 and -moveDirection.Z or 0
-		local backwardComponent = moveDirection.Z > 0 and moveDirection.Z or 0
-		local sideComponent = math.abs(moveDirection.X)
-
-		if backwardComponent > 0 or sideComponent > 0 then
-			-- Reduce speed when tilting (except during boost)
-			speed = TILT_SPEED
-		end
-
-		-- Apply tilt for left/right
-		if moveDirection.X < 0 then
-			tiltCFrame = CFrame.Angles(0, 0, TILT_ANGLE_SIDE) -- Tilt right when moving left
-		elseif moveDirection.X > 0 then
-			tiltCFrame = CFrame.Angles(0, 0, -TILT_ANGLE_SIDE) -- Tilt left when moving right
-		end
-
-		-- Apply smaller tilt for backward movement
-		if moveDirection.Z > 0 then
-			tiltCFrame = tiltCFrame * CFrame.Angles(TILT_ANGLE_BACK, 0, 0) -- Tilt up when moving backward
-		end
-	end
-
-	-- Transform movement direction to camera's coordinate system
-	local cameraCFrame = camera.CFrame
-	local moveVelocity = cameraCFrame:VectorToWorldSpace(moveDirection * speed)
-
-	-- Update BodyVelocity
-	bodyVelocity.Velocity = moveVelocity
-
-	-- Update BodyGyro to align with camera look direction and apply tilt
-	local lookCFrame = CFrame.new(Vector3.new(0, 0, 0), cameraCFrame.LookVector)
-	bodyGyro.CFrame = lookCFrame * tiltCFrame
-end
-
--- Handle input for toggling flight and boost
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
-	if input.KeyCode == FLY_KEY then
-		if isFlying then
-			stopFlying()
-		else
-			startFlying()
-		end
-	elseif input.KeyCode == BOOST_KEY and isFlying then
-		triggerBoost()
-	end
-end)
-
--- Update flying every frame
-game:GetService("RunService").RenderStepped:Connect(updateFlying)
-
--- Handle character respawn
-player.CharacterAdded:Connect(function(newCharacter)
-	character = newCharacter
-	humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-	humanoid = character:WaitForChild("Humanoid")
-	Head = character:WaitForChild("Head")
-	Left_Arm = character:WaitForChild("Left Arm")
-	Right_Arm = character:WaitForChild("Right Arm")
-	Right_Leg = character:WaitForChild("Right Leg")
-	Left_Leg = character:WaitForChild("Left Leg")
-	Torso = character:WaitForChild("Torso") or character:WaitForChild("UpperTorso")
-	stopFlying() -- Reset flying state
-	if isFlying then
-		startFlying() -- Reload animations for new character
-	end
-end)
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-
-local player = Players.LocalPlayer
-local mouse = player:GetMouse()
-
-local targetCharacter = nil
-local targetPlayer = nil
-local highlight = Instance.new("Highlight")
-local followMode = false
-local hi = nil
-local healthConnection = nil
-local stunConnectionAdded = nil
-local stunConnectionRemoving = nil
-
--- Configure highlight properties
-highlight.OutlineColor = Color3.new(1.00, 0.00, 0.00)
-highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-
-local Stun_Detector = Instance.new("BillboardGui")
-Stun_Detector.Name = "Stun Detector"
-Stun_Detector.Active = true
-Stun_Detector.LightInfluence = 2
-Stun_Detector.AlwaysOnTop = true
-Stun_Detector.Size = UDim2.new(10.00, 0.00, 10.00, 0.00)
-Stun_Detector.ClipsDescendants = true
-Stun_Detector.MaxDistance = math.huge
-Stun_Detector.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-Stun_Detector.StudsOffset = Vector3.new(0.00, 1.00, 0.00)
-Stun_Detector.Enabled = true
-
-local Frame1 = Instance.new("Frame")
-Frame1.AnchorPoint = Vector2.new(0.01, 0.01)
-Frame1.SizeConstraint = Enum.SizeConstraint.RelativeYY
-Frame1.AutomaticSize = Enum.AutomaticSize.XY
-Frame1.Size = UDim2.new(0.10, 0.00, 0.10, 0.00)
-Frame1.AutoLocalize = false
-Frame1.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
-Frame1.Position = UDim2.new(0.45, 0.00, 0.10, 0.00)
-Frame1.BorderSizePixel = 0
-Frame1.BackgroundColor3 = Color3.new(0.00, 1.00, 0.15) -- Default green
-Frame1.Parent = Stun_Detector
-
-local UIStroke5 = Instance.new("UIStroke")
-UIStroke5.Parent = Frame1
-
-local UIGradient10 = Instance.new("UIGradient")
-UIGradient10.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.10, 0.00), NumberSequenceKeypoint.new(1.00, 0.10, 0.00)})
-UIGradient10.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(1.00, Color3.new(1.00, 1.00, 1.00))})
-UIGradient10.Offset = Vector2.new(0.40, 0.40)
-UIGradient10.Rotation = 240
-UIGradient10.Parent = Frame1
-
-local billboardGui = Instance.new("BillboardGui")
-billboardGui.Name = "HealthDisplay"
-billboardGui.Size = UDim2.new(0, 150, 0, 30)
-billboardGui.StudsOffset = Vector3.new(0, 2, 0)
-billboardGui.AlwaysOnTop = true
-billboardGui.MaxDistance = math.huge
-
-local textLabel = Instance.new("TextLabel")
-textLabel.Size = UDim2.new(1.5, 0, 1.5, 0)
-textLabel.Position = UDim2.new(0, -30, 0, -35)
-textLabel.BackgroundTransparency = 1
-textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-textLabel.TextStrokeTransparency = 0.6
-textLabel.TextScaled = true
-textLabel.FontFace = Font.fromId(12187375716)
-textLabel.Text = "Dummy"
-textLabel.Parent = billboardGui
-local c = nil
-
-local function setupScreenGui()
-	if hi then
-		hi:Destroy()
-	end
-
-	hi = Instance.new("ScreenGui")
-	hi.Name = "hi"
-	hi.Parent = player:WaitForChild("PlayerGui")
-	hi.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	hi.Enabled = targetCharacter ~= nil
-
-	local Frame = Instance.new("Frame")
-	Frame.Parent = hi
-	Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Frame.BorderSizePixel = 0
-	Frame.Position = UDim2.new(0.0199044589, 0, 0.290333688, 0)
-	Frame.Size = UDim2.new(0, 228, 0, 333)
-	Frame.Transparency = 0.1
-
-	local UICorner30 = Instance.new("UICorner")
-	UICorner30.Parent = Frame
-    local strokeme = Instance.new("UIStroke")
-	strokeme.Parent = Frame
-	strokeme.Thickness = 2
-	local UIGradient69 = Instance.new("UIGradient")
-	UIGradient69.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 80)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 129, 131))}
-
-	local pic = Instance.new("ImageLabel")
-	pic.Name = "pic"
-	pic.Parent = Frame
-	pic.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	pic.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	pic.BorderSizePixel = 0
-	pic.Position = UDim2.new(0.280701756, 0, 0.02, 0)
-	pic.Size = UDim2.new(0, 100, 0, 100)
-	pic.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
-
-	local UIGradient = Instance.new("UIGradient")
-	UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 129, 131)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 255, 80))}
-	UIGradient.Parent = Frame
-
-	local plrname = Instance.new("TextLabel")
-	plrname.Name = "plrname"
-	plrname.Parent = Frame
-	plrname.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	plrname.BackgroundTransparency = 1.000
-	plrname.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	plrname.BorderSizePixel = 0
-	plrname.Position = UDim2.new(0.00438596494, 0, 0.33, 0)
-	plrname.Size = UDim2.new(0, 227, 0, 50)
-	plrname.FontFace = Font.fromId(12187375716)
-	plrname.Text = "Target: None"
-	plrname.TextColor3 = Color3.fromRGB(0, 0, 0)
-	plrname.TextScaled = true
-	plrname.TextSize = 14.000
-	plrname.TextWrapped = true
-
-	local moveset = Instance.new("TextLabel")
-	moveset.Name = "moveset"
-	moveset.Parent = Frame
-	moveset.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	moveset.BackgroundTransparency = 1.000
-	moveset.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	moveset.BorderSizePixel = 0
-	moveset.Position = UDim2.new(0.00438596494, 0, 0.531531513, 0)
-	moveset.Size = UDim2.new(0, 227, 0, 50)
-	moveset.FontFace = Font.fromId(12187375716)
-	moveset.Text = "Moveset: super tze :3"
-	moveset.TextColor3 = Color3.fromRGB(0, 0, 0)
-	moveset.TextScaled = true
-	moveset.TextSize = 14.000
-	moveset.TextWrapped = true
-
-	local hp = Instance.new("TextLabel")
-	hp.Name = "hp"
-	hp.Parent = Frame
-	hp.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	hp.BackgroundTransparency = 1.000
-	hp.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	hp.BorderSizePixel = 0
-	hp.Position = UDim2.new(0.00438596494, 0, 0.681111097, 0)
-	hp.Size = UDim2.new(0, 227, 0, 50)
-	hp.FontFace = Font.fromId(12187375716)
-	hp.Text = "Health: Select A Player First"
-	hp.TextColor3 = Color3.fromRGB(0, 0, 0)
-	hp.TextScaled = true
-	hp.TextSize = 14.000
-	hp.TextWrapped = true
-
-	local TK = Instance.new("TextLabel")
-	TK.Name = "TK"
-	TK.Parent = Frame
-	TK.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	TK.BackgroundTransparency = 1.000
-	TK.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	TK.BorderSizePixel = 0
-	TK.Position = UDim2.new(0.00438596494, 0, 0.828828812, 0)
-	TK.Size = UDim2.new(0, 227, 0, 50)
-	TK.FontFace = Font.fromId(12187375716)
-	TK.Text = "Total Kills: A Number"
-	TK.TextColor3 = Color3.fromRGB(0, 0, 0)
-	TK.TextScaled = false
-	TK.TextSize = 30
-	TK.TextWrapped = true
-	task.wait()
-
-	local UICorner1 = Instance.new("UICorner")
-	UICorner1.Parent = pic
-end
-
-local function updateHealthDisplay(humanoid)
-	if not targetCharacter or not targetCharacter.Parent then
-		textLabel.Text = "wat"
-		if hi and hi:FindFirstChild("Frame") then
-			hi:FindFirstChild("Frame").hp.Text = "Health: 100/100%"
-		end
-		return
-	end
-
-	local health = math.floor(humanoid.Health + 0.5)
-	local maxHealth = humanoid.MaxHealth
-	textLabel.Text = string.format("%s: %d/%d HP", targetCharacter.Name, health, maxHealth)
-	if hi and hi:FindFirstChild("Frame") then
-		hi:FindFirstChild("Frame").hp.Text = string.format("Target's Health: %d/%d", health, maxHealth).."%"
-	end
-end
-
-local function updateStunDisplay()
-	if targetCharacter then
-		if targetCharacter:FindFirstChild("Stun", true) then
-			Frame1.BackgroundColor3 = Color3.new(1, 0, 0) -- Red when stunned
-		else
-			Frame1.BackgroundColor3 = Color3.new(0, 1, 0.15) -- Green when not stunned
-		end
-	end
-end
-
-local function setupStunListeners()
-	if stunConnectionAdded then
-		stunConnectionAdded:Disconnect()
-		stunConnectionAdded = nil
-	end
-	if stunConnectionRemoving then
-		stunConnectionRemoving:Disconnect()
-		stunConnectionRemoving = nil
-	end
-
-	if targetCharacter then
-		stunConnectionAdded = targetCharacter.DescendantAdded:Connect(function(descendant)
-			if descendant.Name == "Stun" then
-				Frame1.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
-			end
-		end)
-		stunConnectionRemoving = targetCharacter.DescendantRemoving:Connect(function(descendant)
-			if descendant.Name == "Stun" then
-				Frame1.BackgroundColor3 = Color3.new(0, 1, 0.15) -- Green
-			end
-		end)
-		updateStunDisplay() -- Initial check
-	end
-end
-
-local function updateGUI()
-	if healthConnection then
-		healthConnection:Disconnect()
-		healthConnection = nil
-	end
-
-	if targetCharacter and targetPlayer and targetCharacter.Parent then
-		if hi then
-			hi.Enabled = true
-			hi:FindFirstChild("Frame").plrname.Text = "Target: " .. targetCharacter.Name
-			hi:FindFirstChild("Frame"):WaitForChild("TK").Text = "Total Kills: " .. targetPlayer.leaderstats.Kills.Value
-			hi:FindFirstChild("Frame"):WaitForChild("moveset").Text = "Target's Moveset: " .. targetPlayer:GetAttribute("Moveset")
-			hi:FindFirstChild("Frame").pic.Image = Players:GetUserThumbnailAsync(targetPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size150x150)
-
-			local humanoid = targetCharacter:FindFirstChildWhichIsA("Humanoid")
-			if humanoid then
-				updateHealthDisplay(humanoid)
-				healthConnection = humanoid.HealthChanged:Connect(function()
-					updateHealthDisplay(humanoid)
-				end)
-			end
-		end
-	elseif targetCharacter and not targetPlayer and targetCharacter.Parent then
-		if hi then
-			hi.Enabled = true
-			hi:FindFirstChild("Frame").plrname.Text = "Target: " .. targetCharacter.Name .. ", NOT A PLAYER"
-			hi:FindFirstChild("Frame"):WaitForChild("TK").Text = "Total Kills: 0"
-			hi:FindFirstChild("Frame"):WaitForChild("moveset").Text = "Target's Moveset: None"
-			hi:FindFirstChild("Frame").pic.Image = "rbxassetid://126037446362347"
-
-			local humanoid = targetCharacter:FindFirstChildWhichIsA("Humanoid")
-			if humanoid then
-				updateHealthDisplay(humanoid)
-				healthConnection = humanoid.HealthChanged:Connect(function()
-					updateHealthDisplay(humanoid)
-				end)
-			end
-		end
-	else
-		if hi then
-			hi.Enabled = false
-			hp.Text = "if u see this, kingofexe has big dih 🥵🥵"
-		end
-	end
-
-	setupStunListeners()
-end
-
-setupScreenGui()
-
-player.CharacterAdded:Connect(function()
-	setupScreenGui()
-	updateGUI()
-end)
-
-RunService.RenderStepped:Connect(function()
-	if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
-		local myChar = player.Character
-		if myChar and myChar:FindFirstChild("HumanoidRootPart") then
-			local myHRP = myChar.HumanoidRootPart
-			local targetHRP = targetCharacter.HumanoidRootPart
-
-			local myPos = myHRP.Position
-			local targetPos = targetHRP.Position
-
-			local direction = (Vector3.new(targetPos.X, myPos.Y, targetPos.Z) - myPos).Unit
-			local angleY = math.atan2(-direction.X, -direction.Z)
-			myHRP.CFrame = CFrame.new(myPos) * CFrame.Angles(0, angleY, 0)
-
-			if followMode then
-				local offset = -targetHRP.CFrame.LookVector * 3
-				local teleportPos = targetHRP.Position + offset
-				teleportPos = Vector3.new(teleportPos.X, myHRP.Position.Y, teleportPos.Z)
-				myHRP.CFrame = CFrame.new(teleportPos, teleportPos + myHRP.CFrame.LookVector)
-			end
-
-			highlight.Adornee = targetCharacter
-			highlight.Parent = targetCharacter
-		end
-	else
-		highlight.Adornee = nil
-		highlight.Parent = nil
-	end
-end)
-
-mouse.Button1Down:Connect(function()
-	local target = mouse.Target
-	if not target then return end
-
-	local char = target:FindFirstAncestorOfClass("Model")
-	if not char then return end
-
-	local otherhighlights = char:FindFirstChild("PlayerHighlight")
-	if otherhighlights then
-		otherhighlights.Enabled = true
-	end
-
-	local humanoid = char:FindFirstChildWhichIsA("Humanoid")
-	local hrp = char:FindFirstChild("HumanoidRootPart")
-	if not humanoid or not hrp then return end
-	targetCharacter = char
-	targetPlayer = Players:GetPlayerFromCharacter(char)
-	billboardGui.Parent = hrp
-	Stun_Detector.Parent = char:WaitForChild("Head")
-	if c then
-		c:Destroy()
-	end
-
-	if targetCharacter and not targetPlayer then
-		textLabel.Text = "Target: ".. char.Name
-		c = textLabel:Clone()
-		c.Parent = textLabel
-		c.Position = UDim2.fromOffset(-60, -31)
-		c.Text = "THIS ISNT A PLAYER"
-		c.TextColor3 = Color3.fromRGB(255, 0, 4)
-		c.TextScaled = false
-		c.TextSize = 20
-	end
-
-	updateGUI()
-	
-end)
-
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
-	if input.KeyCode == Enum.KeyCode.Y then
-		targetCharacter = nil
-		targetPlayer = nil
-		followMode = false
-		highlight.Adornee = nil
-		highlight.Parent = nil
-		billboardGui.Parent = nil
-		Stun_Detector.Parent = nil
-		textLabel.Text = "No Target"
-		if stunConnectionAdded then
-			stunConnectionAdded:Disconnect()
-			stunConnectionAdded = nil
-		end
-		if stunConnectionRemoving then
-			stunConnectionRemoving:Disconnect()
-			stunConnectionRemoving = nil
-		end
-		updateGUI()
-        if hi then
-		    hi.Enabled = false
-		end 
-	elseif input.KeyCode == Enum.KeyCode.N then
-		if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
-			followMode = not followMode
-			if followMode then
-				local myChar = player.Character
-				if myChar and myChar:FindFirstChild("HumanoidRootPart") then
-					local myHRP = myChar.HumanoidRootPart
-					local targetHRP = targetCharacter.HumanoidRootPart
-					local offset = -targetHRP.CFrame.LookVector * 2
-					local teleportPos = targetHRP.Position + offset
-					teleportPos = Vector3.new(teleportPos.X, myHRP.Position.Y, teleportPos.Z)
-					myHRP.CFrame = CFrame.new(teleportPos, teleportPos + myHRP.CFrame.LookVector)
-				end
-			end
-		else
-			followMode = false
-		end
-	end
-end)
-
-local function setupDivergentFist()
-	local character = player.Character
-	if character and character:FindFirstChild("Moveset") and character.Moveset:FindFirstChild("Divergent Fist") and character:GetAttribute("Moveset") == "Itadori" then
-		local ohInstance1 = character.Moveset:WaitForChild("Divergent Fist")
-		local connection
-		connection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-			if gameProcessed then return end
-			if not ohInstance1 then return end
-
-			if input.KeyCode == Enum.KeyCode.L then
-				game:GetService("ReplicatedStorage").Knit.Knit.Services.DivergentFistService.RE.Activated:FireServer(ohInstance1)
-				task.wait(0.32)
-				game:GetService("ReplicatedStorage").Knit.Knit.Services.DivergentFistService.RE.Activated:FireServer(ohInstance1)
-			end
-		end)
-		return connection
-	end
-end
-
-local divergentFistConnection = setupDivergentFist()
-
-player.CharacterAdded:Connect(function()
-	setupScreenGui()
-	updateGUI()
-	divergentFistConnection = setupDivergentFist()
-end)
-player.CharacterAdded:Connect(function()
-    wait(1)
-    if player.Character:FindFirstChild("Humanoid") then
-        setupDivergentFist()
-    end
-end)
-
-
-game.workspace.Effects.DescendantAdded:Connect(function(descendant)
-    if descendant.Name == "Hitsphere" then
-        descendant.Size = Vector3.new(25,25,25)
-		descendant.Shape = Enum.PartType.Block
-		descendant.Transparency = 0.8
-    end
-end)
-
-local UserInputService = game:GetService("UserInputService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
-
--- Reference to the KeyContainer Frame
-local sg = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
-sg.Name = "inputvisualizer"
-sg.ResetOnSpawn = false
-local keyContainer = Instance.new("Frame")
-keyContainer.Parent = sg
-keyContainer.Position = UDim2.new(0.029, 0, 0.03, 0)
-
-local LKey = Instance.new("TextButton")
-LKey.Name = "LKey"
-LKey.BorderSizePixel = 0
-LKey.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
-LKey.FontFace = Font.new("rbxassetid://12187375716", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-LKey.TextSize = 45
-LKey.Size = UDim2.new(0.00, 73.00, 0.00, 70.00)
-LKey.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
-LKey.Text = "L"
-LKey.TextColor3 = Color3.new(0.00, 0.00, 0.00)
-LKey.Position = UDim2.new(0, 400, 0.00, 0.00)
-LKey.Parent = keyContainer
-
-local UIGradient = Instance.new("UIGradient")
-UIGradient.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 0.22, 0.00)})
-UIGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(0.48, Color3.new(0.76, 0.76, 0.76)), ColorSequenceKeypoint.new(1.00, Color3.new(1.00, 1.00, 1.00))})
-UIGradient.Offset = Vector2.new(0.20, 0.20)
-UIGradient.Rotation = 245
-UIGradient.Parent = LKey
-
-local UICorner = Instance.new("UICorner")
-UICorner.Parent = LKey
-
-local UIStroke = Instance.new("UIStroke")
-UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-UIStroke.Thickness = 1.2000000476837158
-UIStroke.Transparency = 0.30000001192092896
-UIStroke.Parent = LKey
-
-local NKey = Instance.new("TextButton")
-NKey.Name = "NKey"
-NKey.BorderSizePixel = 0
-NKey.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
-NKey.FontFace = Font.new("rbxassetid://12187375716", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-NKey.TextSize = 45
-NKey.Size = UDim2.new(0.00, 73.00, 0.00, 70.00)
-NKey.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
-NKey.Text = "N"
-NKey.TextColor3 = Color3.new(0.00, 0.00, 0.00)
-NKey.Position = UDim2.new(0, 100, 0.00, 0.00)
-NKey.Parent = keyContainer
-
-local UIGradient_1 = Instance.new("UIGradient")
-UIGradient_1.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 0.22, 0.00)})
-UIGradient_1.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(0.48, Color3.new(0.76, 0.76, 0.76)), ColorSequenceKeypoint.new(1.00, Color3.new(1.00, 1.00, 1.00))})
-UIGradient_1.Offset = Vector2.new(0.20, 0.20)
-UIGradient_1.Rotation = 245
-UIGradient_1.Parent = NKey
-
-local UICorner_1 = Instance.new("UICorner")
-UICorner_1.Parent = NKey
-
-local UIStroke_1 = Instance.new("UIStroke")
-UIStroke_1.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-UIStroke_1.Thickness = 1.2000000476837158
-UIStroke_1.Transparency = 0.30000001192092896
-UIStroke_1.Parent = NKey
-
-local PKey = Instance.new("TextButton")
-PKey.Name = "PKey"
-PKey.BorderSizePixel = 0
-PKey.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
-PKey.FontFace = Font.new("rbxassetid://12187375716", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-PKey.TextSize = 45
-PKey.Size = UDim2.new(0.00, 73.00, 0.00, 70.00)
-PKey.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
-PKey.Text = "P"
-PKey.TextColor3 = Color3.new(0.00, 0.00, 0.00)
-PKey.Position = UDim2.new(0, 200, 0.00, 0.00)
-PKey.Parent = keyContainer
-
-local UIGradient_2 = Instance.new("UIGradient")
-UIGradient_2.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 0.22, 0.00)})
-UIGradient_2.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(0.48, Color3.new(0.76, 0.76, 0.76)), ColorSequenceKeypoint.new(1.00, Color3.new(1.00, 1.00, 1.00))})
-UIGradient_2.Offset = Vector2.new(0.20, 0.20)
-UIGradient_2.Rotation = 245
-UIGradient_2.Parent = PKey
-
-local UICorner_2 = Instance.new("UICorner")
-UICorner_2.Parent = PKey
-
-local UIStroke_2 = Instance.new("UIStroke")
-UIStroke_2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-UIStroke_2.Thickness = 1.2000000476837158
-UIStroke_2.Transparency = 0.30000001192092896
-UIStroke_2.Parent = PKey
-
-local TKey = Instance.new("TextButton")
-TKey.Name = "TKey"
-TKey.BorderSizePixel = 0
-TKey.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
-TKey.FontFace = Font.new("rbxassetid://12187375716", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-TKey.TextSize = 45
-TKey.Size = UDim2.new(0.00, 73.00, 0.00, 70.00)
-TKey.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
-TKey.Text = "T"
-TKey.TextColor3 = Color3.new(0.00, 0.00, 0.00)
-TKey.Position = UDim2.new(0, 300, 0.00, 0.00)
-TKey.Parent = keyContainer
-
-local UIGradient_3 = Instance.new("UIGradient")
-UIGradient_3.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 0.22, 0.00)})
-UIGradient_3.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(0.48, Color3.new(0.76, 0.76, 0.76)), ColorSequenceKeypoint.new(1.00, Color3.new(1.00, 1.00, 1.00))})
-UIGradient_3.Offset = Vector2.new(0.20, 0.20)
-UIGradient_3.Rotation = 245
-UIGradient_3.Parent = TKey
-
-local UICorner_3 = Instance.new("UICorner")
-UICorner_3.Parent = TKey
-
-local UIStroke_3 = Instance.new("UIStroke")
-UIStroke_3.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-UIStroke_3.Thickness = 1.2000000476837158
-UIStroke_3.Transparency = 0.30000001192092896
-UIStroke_3.Parent = TKey
-
-local VKey = Instance.new("TextButton")
-VKey.Name = "VKey"
-VKey.BorderSizePixel = 0
-VKey.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
-VKey.FontFace = Font.new("rbxassetid://12187375716", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-VKey.TextSize = 45
-VKey.Size = UDim2.new(0.00, 73.00, 0.00, 70.00)
-VKey.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
-VKey.Text = "V"
-VKey.TextColor3 = Color3.new(0.00, 0.00, 0.00)
-VKey.Parent = keyContainer
-
-local UIGradient_4 = Instance.new("UIGradient")
-UIGradient_4.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 0.22, 0.00)})
-UIGradient_4.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(0.48, Color3.new(0.76, 0.76, 0.76)), ColorSequenceKeypoint.new(1.00, Color3.new(1.00, 1.00, 1.00))})
-UIGradient_4.Offset = Vector2.new(0.20, 0.20)
-UIGradient_4.Rotation = 245
-UIGradient_4.Parent = VKey
-
-local UICorner_4 = Instance.new("UICorner")
-UICorner_4.Parent = VKey
-
-local UIStroke_4 = Instance.new("UIStroke")
-UIStroke_4.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-UIStroke_4.Thickness = 1.2000000476837158
-UIStroke_4.Transparency = 0.30000001192092896
-UIStroke_4.Parent = VKey
-
-local YKey = Instance.new("TextButton")
-YKey.Name = "YKey"
-YKey.BorderSizePixel = 0
-YKey.BackgroundColor3 = Color3.new(1.00, 1.00, 1.00)
-YKey.FontFace = Font.new("rbxassetid://12187375716", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-YKey.TextSize = 45
-YKey.Size = UDim2.new(0.00, 73.00, 0.00, 70.00)
-YKey.BorderColor3 = Color3.new(0.00, 0.00, 0.00)
-YKey.Text = "Y"
-YKey.TextColor3 = Color3.new(0.00, 0.00, 0.00)
-YKey.Position = UDim2.new(0, 500, 0.00, 0.00)
-YKey.Parent = keyContainer
-
-local UIGradient_5 = Instance.new("UIGradient")
-UIGradient_5.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0.00, 0.00, 0.00), NumberSequenceKeypoint.new(1.00, 0.22, 0.00)})
-UIGradient_5.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.00, 0.00, 0.00)), ColorSequenceKeypoint.new(0.48, Color3.new(0.76, 0.76, 0.76)), ColorSequenceKeypoint.new(1.00, Color3.new(1.00, 1.00, 1.00))})
-UIGradient_5.Offset = Vector2.new(0.20, 0.20)
-UIGradient_5.Rotation = 245
-UIGradient_5.Parent = YKey
-
-local UICorner_5 = Instance.new("UICorner")
-UICorner_5.Parent = YKey
-
-local UIStroke_5 = Instance.new("UIStroke")
-UIStroke_5.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-UIStroke_5.Thickness = 1.2000000476837158
-UIStroke_5.Transparency = 0.30000001192092896
-UIStroke_5.Parent = YKey
-
--- Table to map keys to their corresponding UI elements and key codes
-local keyMap = {
-	[Enum.KeyCode.V] = {Button = keyContainer.VKey, KeyCode = Enum.KeyCode.V},
-	[Enum.KeyCode.T] = {Button = keyContainer.TKey, KeyCode = Enum.KeyCode.T},
-	[Enum.KeyCode.P] = {Button = keyContainer.PKey, KeyCode = Enum.KeyCode.P},
-	[Enum.KeyCode.Y] = {Button = keyContainer.YKey, KeyCode = Enum.KeyCode.Y},
-	[Enum.KeyCode.L] = {Button = keyContainer.LKey, KeyCode = Enum.KeyCode.L},
-	[Enum.KeyCode.N] = {Button = keyContainer.NKey, KeyCode = Enum.KeyCode.N}
+-- Fluent UI cu temă RGB neon
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local Window = Fluent:CreateWindow({
+    Title = "Alone x ZeeHUB",
+    SubTitle = "V2.21 - Mobile & PC Ready",
+    TabWidth = 180,
+    Size = UDim2.fromOffset(700, 540),
+    Theme = "Aqua",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "layout" }),
+    Movement = Window:AddTab({ Title = "Movement", Icon = "rocket" }),
+    Utility = Window:AddTab({ Title = "Utility", Icon = "settings" }),
+    Mobile = Window:AddTab({ Title = "Mobile", Icon = "smartphone" })
 }
 
--- Function to update UI when a key is pressed
-local function onInputBegan(input, gameProcessedEvent)
-	-- Ignore inputs processed by the game (e.g., typing in a text box)
-	if gameProcessedEvent then return end
+local Options = Fluent.Options
 
-	-- Check if the input is a key we’re tracking
-	local keyData = keyMap[input.KeyCode]
-	if keyData then
-		keyData.Button.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Green when pressed
-		keyData.Button.BackgroundTransparency = 0
-	end
+-- Helper: toggle script loader
+local function AddScriptToggle(tab, id, title, description, scriptURL, defaultState)
+    local toggle = tab:AddToggle(id, {
+        Title = title,
+        Description = description,
+        Default = defaultState or false
+    })
+    Options[id].Args = { scriptURL = scriptURL }
+    toggle:OnChanged(function()
+        if Options[id].Value then
+            task.spawn(function()
+                pcall(function()
+                    loadstring(game:HttpGet(scriptURL))()
+                end)
+            end)
+        end
+    end)
 end
 
--- Function to update UI when a key is released
-local function onInputEnded(input, gameProcessedEvent)
-	if gameProcessedEvent then return end
+-- SCRIPTURI DE BAZĂ
+AddScriptToggle(Tabs.Movement, "Fly", "Fly Basic", "X pentru activare/dezactivare", "https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/fly.lua")
+AddScriptToggle(Tabs.Utility, "Reset", "Reset Character", "Instant Reset", "https://pastebin.com/raw/BL9u7kGw")
+AddScriptToggle(Tabs.Main, "Pose", "Pose", "P pentru poziție animată", "https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/pose")
+AddScriptToggle(Tabs.Main, "Teleport", "Teleport", "C pentru a te teleporta în față", "https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/teleport.lua")
+AddScriptToggle(Tabs.Utility, "Serverhop", "Server Hop", "Schimbă serverul automat", "https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/serverhop")
 
-	local keyData = keyMap[input.KeyCode]
-	if keyData then
-		-- Revert to default state
-		keyData.Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White when not pressed
-		keyData.Button.BackgroundTransparency = 0
-	end
+-- === UTILITĂȚI EXTINSE === --
+
+-- Highlight jucători (Mobile tab)
+Tabs.Mobile:AddToggle("Highlight", {
+    Title = "Highlight Players",
+    Description = "Conturează jucătorii",
+    Default = false
+}):OnChanged(function(val)
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            local char = plr.Character
+            if char then
+                local hl = char:FindFirstChildOfClass("Highlight") or Instance.new("Highlight", char)
+                hl.Enabled = val
+                hl.FillColor = Color3.fromRGB(0, 255, 255)
+                hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            end
+        end
+    end
+end)
+
+-- Slider Viteză mers (Mobile tab)
+Tabs.Mobile:AddSlider("MobileSpeed", {
+    Title = "Speed",
+    Description = "Viteză mers",
+    Default = 16,
+    Min = 16,
+    Max = 100,
+    Rounding = 0
+}):OnChanged(function(val)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = val
+    end
+end)
+
+-- Fly Mobile (simple toggle + script)
+Tabs.Mobile:AddToggle("FlyMobile", {
+    Title = "Fly (Mobile)",
+    Description = "Zboară atingând ecranul",
+    Default = false
+}):OnChanged(function(val)
+    if val then
+        loadstring(game:HttpGet("https://pastebin.com/raw/k4y1GSXz"))()
+    end
+end)
+
+-- Goku Mode Button (Mobile tab)
+Tabs.Mobile:AddButton({
+    Title = "Goku Mode",
+    Description = "Activează modul Goku Ultra Instinct",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/STAR"))()
+    end
+})
+
+-- Fly custom (Movement tab) - WSAD + Space + Ctrl
+do
+    local flying = false
+    local flyBodyGyro, flyBodyVelocity
+    local speed = 100
+
+    local FlyToggle = Tabs.Movement:AddToggle("CustomFly", {
+        Title = "Fly (Custom)",
+        Description = "Fly cu WSAD + Space + Ctrl",
+        Default = false
+    })
+
+    FlyToggle:OnChanged(function(value)
+        local character = LocalPlayer.Character
+        local humanoid = character and character:FindFirstChild("Humanoid")
+        local hrp = character and character:FindFirstChild("HumanoidRootPart")
+        if not humanoid or not hrp then return end
+
+        flying = value
+        if flying then
+            humanoid.PlatformStand = true
+            flyBodyGyro = Instance.new("BodyGyro", hrp)
+            flyBodyGyro.P = 9e4
+            flyBodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+            flyBodyGyro.CFrame = hrp.CFrame
+
+            flyBodyVelocity = Instance.new("BodyVelocity", hrp)
+            flyBodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            flyBodyVelocity.Velocity = Vector3.new(0, 0, 0)
+
+            local conn
+            conn = RunService.Heartbeat:Connect(function()
+                if not flying then
+                    conn:Disconnect()
+                    humanoid.PlatformStand = false
+                    flyBodyGyro:Destroy()
+                    flyBodyVelocity:Destroy()
+                    return
+                end
+
+                local moveDir = Vector3.new()
+                local camCFrame = workspace.CurrentCamera.CFrame
+                if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir += camCFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir -= camCFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir -= camCFrame.RightVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir += camCFrame.RightVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir += Vector3.new(0, 1, 0) end
+                if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then moveDir -= Vector3.new(0, 1, 0) end
+
+                if moveDir.Magnitude > 0 then
+                    flyBodyVelocity.Velocity = moveDir.Unit * speed
+                else
+                    flyBodyVelocity.Velocity = Vector3.new(0, 0, 0)
+                end
+                flyBodyGyro.CFrame = camCFrame
+            end)
+        else
+            humanoid.PlatformStand = false
+            if flyBodyGyro then flyBodyGyro:Destroy() end
+            if flyBodyVelocity then flyBodyVelocity:Destroy() end
+        end
+    end)
 end
 
--- Function to simulate key press and release using VirtualInputManager
-local function simulateKeyPress(keyData)
-	-- Update UI to show pressed state
-	keyData.Button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-	keyData.Button.BackgroundTransparency = 0
-
-	-- Simulate key press
-	VirtualInputManager:SendKeyEvent(true, keyData.KeyCode, false, game)
-
-	-- Simulate key release after a short delay
-	task.wait()
-	keyData.Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	keyData.Button.BackgroundTransparency = 0
-	VirtualInputManager:SendKeyEvent(false, keyData.KeyCode, false, game)
-end
-
--- Connect button clicks to simulate key presses
-for keyCode, keyData in pairs(keyMap) do
-	keyData.Button.Activated:Connect(function()
-		simulateKeyPress(keyData)
-	end)
-end
-
--- Connect the input events
-UserInputService.InputBegan:Connect(onInputBegan)
-UserInputService.InputEnded:Connect(onInputEnded)
-
-
-local player = game.Players.LocalPlayer
-
-local function customcolors()
-    wait(0.3)
-    local holder = player.PlayerGui.Main:WaitForChild("Moveset")
-	task.wait()
-    if player:GetAttribute("Moveset") == "Todo" then
-        for _, v in pairs(holder:GetDescendants()) do
-            if v.Name == "Cooldown" then
-                v.BackgroundColor3 = Color3.fromRGB(36, 154, 255) 
-            end
-        end
-    end
-    task.wait()
-    if player:GetAttribute("Moveset") == "Itadori" then
-        for _, p in pairs(holder:GetDescendants()) do
-            if p.Name == "Cooldown" then
-                p.BackgroundColor3 = Color3.fromRGB(255, 0, 0) 
-            end
-        end
-    end
-    task.wait()
-    if player:GetAttribute("Moveset") == "Hiromi" then
-        for _, b in pairs(holder:GetDescendants()) do
-            if b.Name == "Cooldown" then
-                local grad = b:WaitForChild("UIGradient")
-                b.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
-                grad.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.693066, 0.372932, 0.372932)), ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))})
-            end
-        end
-    end
-    task.wait()
-    if player:GetAttribute("Moveset") == "Mahito" then
-        for _, y in pairs(holder:GetDescendants()) do
-            if y.Name == "Cooldown" then
-                y.BackgroundColor3 = Color3.fromRGB(161, 113, 163)
-            end
-        end
-    end
-    task.wait()
-    if player:GetAttribute("Moveset") == "Hakari" then
-        for _, c in pairs(holder:GetDescendants()) do
-            if c.Name == "Cooldown" then
-                c.BackgroundColor3 = Color3.fromRGB(111, 223, 93)
-            end
-        end
-    end
-    task.wait()
-    if player:GetAttribute("Moveset") == "Locust" then
-        for _, w in pairs(holder:GetDescendants()) do
-            if w.Name == "Cooldown" then
-                w.BackgroundColor3 = Color3.fromRGB(59, 255, 35)
-            end
-        end
-    end
-    task.wait()
-    if player:GetAttribute("Moveset") == "Megumi" then
-        for _, t in pairs(holder:GetDescendants()) do
-            if t.Name == "Cooldown" then
-                local grad1 = t:WaitForChild("UIGradient")
-                t.BackgroundColor3 = Color3.fromRGB(50, 51, 41)
-                grad1.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0, 0, 0)),ColorSequenceKeypoint.new(0.295, Color3.new(1, 1, 1)), ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))})
-            end
-        end
-    end
-    task.wait()
-    if player:GetAttribute("Moveset") == "Choso" then
-        for _, h in pairs(holder:GetDescendants()) do
-            if h.Name == "Cooldown" then
-                local grad2 = h:WaitForChild("UIGradient")
-                h.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-                grad2.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(1, 0, 0)), ColorSequenceKeypoint.new(1, Color3.new(0.457688, 0.55575, 1))})
-            end
-        end
-    end
-    task.wait()
-    if player:GetAttribute("Moveset") == "Yuki" then
-        for _, k in pairs(holder:GetDescendants()) do
-            if k.Name == "Cooldown" then
-                local grad3 = k:WaitForChild("UIGradient")
-                k.BackgroundColor3 = Color3.fromRGB(222, 33, 255)
-                grad3.Color = ColorSequence.new({ColorSequenceKeypoint.new(0.00, Color3.new(0.425807, 0.101008, 0.607638)), ColorSequenceKeypoint.new(1, Color3.new(0.457688, 0.55575, 1))})
-                print("changed yuki")
+-- Hyper X-Ray - transparență 0.85 pe toate parturile (Utility tab)
+local function SetHyperXRay(enabled)
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("BasePart") then
+            if enabled then
+                part.LocalTransparencyModifier = 0.85
+            else
+                part.LocalTransparencyModifier = 0
             end
         end
     end
 end
 
-player.CharacterAdded:Connect(customcolors)
+Tabs.Utility:AddToggle("HyperXRay", {
+    Title = "Hyper X-Ray",
+    Description = "Transparență 0.85 pe toate parturile",
+    Default = false
+}):OnChanged(function(val)
+    SetHyperXRay(val)
+end)
 
-while true do
-    customcolors()
+-- TELEPORT & BRING & SPY cu select player (Main tab)
+local selectedPlayer = nil
+
+local playerDropdown = Tabs.Main:AddDropdown("PlayerSelect", {
+    Title = "Select Player",
+    Description = "Selectează un jucător",
+    Options = {},
+    Default = nil
+})
+
+local function RefreshPlayerList()
+    local names = {}
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            table.insert(names, plr.Name)
+        end
+    end
+    playerDropdown:SetOptions(names)
 end
+
+RefreshPlayerList()
+Players.PlayerAdded:Connect(RefreshPlayerList)
+Players.PlayerRemoving:Connect(RefreshPlayerList)
+
+playerDropdown:OnChanged(function(name)
+    selectedPlayer = Players:FindFirstChild(name)
+end)
+
+Tabs.Main:AddButton({
+    Title = "Teleport to Player",
+    Description = "Te teleportează instant la jucătorul selectat",
+    Callback = function()
+        if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+        end
+    end
+})
+
+Tabs.Main:AddButton({
+    Title = "Bring Player to Me",
+    Description = "Aduce jucătorul selectat la tine cu zbor invincibil și noclip",
+    Callback = function()
+        if not selectedPlayer or not selectedPlayer.Character or not selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+
+        local targetHRP = selectedPlayer.Character.HumanoidRootPart
+        local bodyGyro = Instance.new("BodyGyro", hrp)
+        bodyGyro.P = 9e4
+        bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        local bodyVelocity = Instance.new("BodyVelocity", hrp)
+        bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+
+        local flying = true
+        local speed = 150
+
+        local conn
+        conn = RunService.Heartbeat:Connect(function()
+            if not flying or not targetHRP.Parent then
+                bodyGyro:Destroy()
+                bodyVelocity:Destroy()
+                conn:Disconnect()
+                return
+            end
+
+            -- Set noclip
+            for _, part in pairs(LocalPlayer.Character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+
+            local direction = (targetHRP.Position - hrp.Position).Unit
+            bodyVelocity.Velocity = direction * speed
+            bodyGyro.CFrame = CFrame.new(hrp.Position, targetHRP.Position)
+
+            if (hrp.Position - targetHRP.Position).Magnitude < 5 then
+                flying = false
+            end
+        end)
+    end
+})
+
+Tabs.Main:AddButton({
+    Title = "Spy Player",
+    Description = "Urmărește camera jucătorului selectat",
+    Callback = function()
+        if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local cam = workspace.CurrentCamera
+            local hrp = selectedPlayer.Character.HumanoidRootPart
+            cam.CameraSubject = hrp
+            cam.CameraType = Enum.CameraType.Custom
+        end
+    end
+})
+
+-- MINIMAL UI - buton pătrat când minimizat
+local minimizedIcon = Instance.new("ImageButton")
+minimizedIcon.Size = UDim2.new(0, 60, 0, 60)
+minimizedIcon.Position = UDim2.new(0, 12, 1, -72)
+minimizedIcon.Image = "rbxassetid://7743879404"
+minimizedIcon.BackgroundTransparency = 1
+minimizedIcon.Visible = false
+minimizedIcon.Parent = CoreGui
+
+Fluent:OnMinimize(function()
+    minimizedIcon.Visible = true
+end)
+
+minimizedIcon.MouseButton1Click:Connect(function()
+    Fluent:ToggleMinimize()
+    minimizedIcon.Visible = false
+end)
+
+-- Actualizare constantă lista de jucători (refresh 30 sec)
+task.spawn(function()
+    while true do
+        RefreshPlayerList()
+        task.wait(30)
+    end
+end)
