@@ -1,0 +1,115 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local InsertService = game:GetService("InsertService")
+local UIS = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local droneAccessoryID = 17865400476
+local allowedAnimationId = "rbxassetid://75390215999547"
+
+local speed = 80
+local smoothness = 0.2
+local tiltAmount = math.rad(45)
+local currentVelocity = Vector3.zero
+local targetVelocity = Vector3.zero
+
+local function getInputDirection()
+	local dir = Vector3.zero
+	if UIS:IsKeyDown(Enum.KeyCode.W) then dir += Vector3.new(0, 0, -1) end
+	if UIS:IsKeyDown(Enum.KeyCode.S) then dir += Vector3.new(0, 0, 1) end
+	if UIS:IsKeyDown(Enum.KeyCode.A) then dir += Vector3.new(-1, 0, 0) end
+	if UIS:IsKeyDown(Enum.KeyCode.D) then dir += Vector3.new(1, 0, 0) end
+	if UIS:IsKeyDown(Enum.KeyCode.Space) then dir += Vector3.new(0, 1, 0) end
+	if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then dir += Vector3.new(0, -1, 0) end
+	return dir.Magnitude > 0 and dir.Unit or Vector3.zero
+end
+
+-- this fuckass shit is fucking broken for no fucking reason and idk wtf to fucking do
+local function attachDroneAccessory(character)
+	local success, model = pcall(function()
+		return InsertService:LoadAsset(droneAccessoryID)
+	end)
+	if success and model then
+		local accessory = model:FindFirstChildOfClass("Accessory")
+		if accessory then
+			accessory.Parent = character
+			local humanoid = character:FindFirstChildOfClass("Humanoid")
+			if humanoid then
+				humanoid:AddAccessory(accessory)
+			end
+		end
+	end
+end
+
+local function enableDroneFlight(character)
+	local root = character:WaitForChild("HumanoidRootPart")
+	local humanoid = character:WaitForChild("Humanoid")
+	local camera = workspace.CurrentCamera
+
+	humanoid.PlatformStand = true
+	currentVelocity = Vector3.zero
+	targetVelocity = Vector3.zero
+
+	RunService.RenderStepped:Connect(function(dt)
+		local inputDir = getInputDirection()
+		local worldDir = camera.CFrame:VectorToWorldSpace(inputDir)
+
+		targetVelocity = worldDir * speed
+		currentVelocity = currentVelocity:Lerp(targetVelocity, smoothness)
+
+		root.Velocity = currentVelocity
+		root.AssemblyAngularVelocity = Vector3.zero
+
+		local forwardTilt = 0
+		local sideTilt = 0
+		if inputDir.Z ~= 0 then forwardTilt = inputDir.Z * tiltAmount end
+		if inputDir.X ~= 0 then sideTilt = -inputDir.X * tiltAmount end
+
+		local look = camera.CFrame.LookVector
+		local yaw = math.atan2(-look.X, -look.Z)
+
+		local goalCFrame = CFrame.new(root.Position)
+			* CFrame.Angles(0, yaw, 0)
+			* CFrame.Angles(forwardTilt, 0, sideTilt)
+
+		root.CFrame = root.CFrame:Lerp(goalCFrame, 0.2)
+	end)
+end
+
+local function setupAnimationBlocking(character)
+	local humanoid = character:WaitForChild("Humanoid")
+	local animator = humanoid:FindFirstChildOfClass("Animator")
+	if not animator then
+		animator = Instance.new("Animator")
+		animator.Parent = humanoid
+	end
+
+	local animation = Instance.new("Animation")
+	animation.AnimationId = allowedAnimationId
+	local track = animator:LoadAnimation(animation)
+	track:Play()
+	task.wait()
+	track.TimePosition = 2.1
+	track:AdjustSpeed(0)
+
+	humanoid.AnimationPlayed:Connect(function(playedTrack)
+		local id = playedTrack.Animation and playedTrack.Animation.AnimationId or ""
+		if id ~= allowedAnimationId then
+			print("Blocked animation:", id)
+			playedTrack:Stop()
+			playedTrack:Destroy()
+		end
+	end)
+end
+
+local function onCharacterAdded(character)
+	attachDroneAccessory(character)
+	enableDroneFlight(character)
+	setupAnimationBlocking(character)
+end
+
+player.CharacterAdded:Connect(onCharacterAdded)
+
+if player.Character then
+	onCharacterAdded(player.Character)
+end
