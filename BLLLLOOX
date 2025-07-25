@@ -1,0 +1,245 @@
+-- FULL SCRIPT: Alone x ZeeHUB + Advanced Features Integration
+
+-- Servicii necesare
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+
+-- Library Fluent UI RGB
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local Window = Fluent:CreateWindow({
+    Title = "Alone x ZeeHUB",
+    SubTitle = "V2.21 - Mobile & PC Ready",
+    TabWidth = 180,
+    Size = UDim2.fromOffset(700, 540),
+    Theme = "Aqua",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+-- Tabs
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "layout" }),
+    Movement = Window:AddTab({ Title = "Movement", Icon = "rocket" }),
+    Utility = Window:AddTab({ Title = "Utility", Icon = "settings" }),
+    Teleport = Window:AddTab({ Title = "Teleport", Icon = "globe" }),
+    ESP = Window:AddTab({ Title = "ESP", Icon = "eye" })
+}
+
+-- State
+local flightActive = false
+local moveSpeed = 275
+local xrayEnabled = false
+local fruitESPEnabled = false
+local wallhackEnabled = false
+
+-- References
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+--=== MOVEMENT ===--
+local function moveWithKeys()
+    local direction = Vector3.new()
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then direction += humanoidRootPart.CFrame.LookVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then direction -= humanoidRootPart.CFrame.LookVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then direction -= humanoidRootPart.CFrame.RightVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then direction += humanoidRootPart.CFrame.RightVector end
+    humanoidRootPart.Velocity = direction * moveSpeed
+end
+
+RunService.Heartbeat:Connect(function()
+    if flightActive then
+        moveWithKeys()
+    end
+end)
+
+Tabs.Movement:AddToggle("SpeedMode", {
+    Title = "Speed Mode",
+    Description = "Fly rapid WSAD",
+    Default = false
+}):OnChanged(function(val)
+    flightActive = val
+end)
+
+Tabs.Movement:AddToggle("Wallhack", {
+    Title = "Wallhack",
+    Description = "Treci prin pereți",
+    Default = false
+}):OnChanged(function()
+    wallhackEnabled = not wallhackEnabled
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = not wallhackEnabled
+        end
+    end
+end)
+
+Tabs.Movement:AddToggle("JumpBoost", {
+    Title = "Jump Boost",
+    Description = "Săritură mare",
+    Default = false
+}):OnChanged(function(val)
+    humanoid.JumpPower = val and 200 or 50
+end)
+
+--=== RANGE ===--
+local initialSizes, initialTransparency = {}, {}
+local function activateRange()
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("MeshPart") and (part.Name:lower():find("hand") or part.Name:lower():find("arm")) then
+            initialSizes[part] = part.Size
+            initialTransparency[part] = part.Transparency
+            part.Size = part.Size * 57.5
+            part.Transparency = 1
+        end
+    end
+end
+
+local function deactivateRange()
+    for part, size in pairs(initialSizes) do
+        if part then
+            part.Size = size
+            part.Transparency = initialTransparency[part]
+        end
+    end
+    initialSizes, initialTransparency = {}, {}
+end
+
+Tabs.Utility:AddToggle("RangeMode", {
+    Title = "Range Mode",
+    Description = "Mărește mânile și itemele",
+    Default = false
+}):OnChanged(function(val)
+    if val then activateRange() else deactivateRange() end
+end)
+
+--=== X-RAY ===--
+local function activateXRay()
+    local function highlightPlayers()
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and p.Character then
+                local ch = p.Character
+                local hl = ch:FindFirstChild("PlayerHighlight") or Instance.new("Highlight")
+                hl.Name = "PlayerHighlight"
+                hl.FillColor = Color3.fromRGB(255, 0, 0)
+                hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                hl.FillTransparency = 0.3
+                hl.OutlineTransparency = 0
+                hl.Parent = ch
+            end
+        end
+    end
+    highlightPlayers()
+    while xrayEnabled do
+        task.wait(4)
+        for _, p in pairs(Players:GetPlayers()) do
+            local ch = p.Character
+            if ch then
+                local hl = ch:FindFirstChild("PlayerHighlight")
+                if hl then hl:Destroy() end
+            end
+        end
+        highlightPlayers()
+    end
+end
+
+Tabs.ESP:AddToggle("XRayESP", {
+    Title = "X-Ray",
+    Description = "Evidențiază jucători",
+    Default = false
+}):OnChanged(function(val)
+    xrayEnabled = val
+    if val then activateXRay() end
+end)
+
+--=== FRUIT ESP ===--
+local fruitESPObjects = {}
+local function activateFruitESP()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("Model") and obj.Name == "Fruit" and not obj:FindFirstChild("FruitBillboard") then
+            local gui = Instance.new("BillboardGui", obj)
+            gui.Name = "FruitBillboard"
+            gui.Size = UDim2.new(0, 100, 0, 30)
+            gui.AlwaysOnTop = true
+            gui.StudsOffset = Vector3.new(0, 3, 0)
+
+            local label = Instance.new("TextLabel", gui)
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.BackgroundTransparency = 1
+            label.Text = "Fruit"
+            label.TextColor3 = Color3.fromRGB(0, 255, 0)
+            label.Font = Enum.Font.SourceSansBold
+            label.TextScaled = true
+
+            table.insert(fruitESPObjects, gui)
+        end
+    end
+end
+
+local function deactivateFruitESP()
+    for _, gui in pairs(fruitESPObjects) do
+        if gui then gui:Destroy() end
+    end
+    fruitESPObjects = {}
+end
+
+Tabs.ESP:AddToggle("FruitESP", {
+    Title = "Fruit ESP",
+    Description = "Evidențiază fructele",
+    Default = false
+}):OnChanged(function(val)
+    fruitESPEnabled = val
+    if val then activateFruitESP() else deactivateFruitESP() end
+end)
+
+--=== TELEPORT ===--
+local function teleportTo(position)
+    local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    local bv = Instance.new("BodyVelocity", hrp)
+    bv.Velocity = Vector3.new()
+    bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+
+    local bg = Instance.new("BodyGyro", hrp)
+    bg.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
+    bg.CFrame = CFrame.new(hrp.Position, position)
+
+    task.spawn(function()
+        repeat
+            local dir = (position - hrp.Position).Unit
+            bv.Velocity = dir * 250
+            bg.CFrame = CFrame.new(hrp.Position, position)
+            task.wait(0.1)
+        until (hrp.Position - position).Magnitude < 5
+        bv:Destroy()
+        bg:Destroy()
+    end)
+end
+
+local teleportPoints = {
+    {Title = "Tp Mansion", Position = Vector3.new(-12549, 337.21, -7467.69)},
+    {Title = "Tp Hydra", Position = Vector3.new(5293.42, 1005.40, 397.52)},
+    {Title = "Tp Haunted Castle", Position = Vector3.new(-9521.26, 142.15, 5535.68)}
+    -- Adaugă mai multe locații după preferințe
+}
+
+for _, point in ipairs(teleportPoints) do
+    Tabs.Teleport:AddButton({
+        Title = point.Title,
+        Description = "Teleport la locație",
+        Callback = function()
+            teleportTo(point.Position)
+        end
+    })
+end
+
+-- Final
+Window:Notify({
+    Title = "ZeeHUB + Alone Fusion",
+    Description = "Script complet integrat cu funcții avansate. BETA!",
+    Duration = 10
+})
