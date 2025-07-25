@@ -1,23 +1,24 @@
--- Alone x ZeeHUB GUI V2.15 - NEON RGB + MOBILE Tab 🔥
--- Design Fluent RGB, fără verificări, cu funcții speciale și suport complet pentru mobil 📱
+-- Alone x ZeeHUB GUI V2.21 - ULTIMATE VERSION RGB + MOBILE READY
+-- Interfață modernă, extensibilă, fără emoji, optimizată pentru toate platformele
 
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
 
 -- Fluent UI cu temă RGB neon
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local Window = Fluent:CreateWindow({
-    Title = "Alone x ZeeHUB - MOBILE ",
-    SubTitle = "V2.15 - Mobile + PC",
-    TabWidth = 170,
-    Size = UDim2.fromOffset(640, 520),
+    Title = "Alone x ZeeHUB",
+    SubTitle = "V2.21 - Mobile & PC Ready",
+    TabWidth = 180,
+    Size = UDim2.fromOffset(700, 540),
     Theme = "Aqua",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- Tabs
 local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "layout" }),
     Movement = Window:AddTab({ Title = "Movement", Icon = "rocket" }),
@@ -27,10 +28,9 @@ local Tabs = {
 
 local Options = Fluent.Options
 
--- Funcție helper pentru toggles
 local function AddScriptToggle(tab, id, title, description, scriptURL, defaultState)
     local toggle = tab:AddToggle(id, {
-        Title = "🌀 " .. title,
+        Title = title,
         Description = description,
         Default = defaultState or false
     })
@@ -48,20 +48,19 @@ local function AddScriptToggle(tab, id, title, description, scriptURL, defaultSt
     end)
 end
 
--- ✅ Scripturi utile clasice
+-- Scripturi principale PC + Utility
 AddScriptToggle(Tabs.Movement, "Fly", "Fly", "X pentru activare/dezactivare", "https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/fly.lua")
 AddScriptToggle(Tabs.Utility, "Reset", "Reset Character", "Instant Reset", "https://pastebin.com/raw/BL9u7kGw")
 AddScriptToggle(Tabs.Main, "Pose", "Pose", "P pentru poziție animată", "https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/pose")
 AddScriptToggle(Tabs.Main, "Teleport", "Teleport", "C pentru a te teleporta în față", "https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/teleport.lua")
 AddScriptToggle(Tabs.Utility, "Serverhop", "Server Hop", "Schimbă serverul automat", "https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/serverhop")
 
--- 📱 MOBILE-ONLY: Funcții dedicate cu controale touchscreen
-local highlightToggle = Tabs.Mobile:AddToggle("Highlight", {
-    Title = "✨ Highlight Players",
-    Description = "Contur vizibil jucători",
+-- MOBILE TAB: funcții tactile
+Tabs.Mobile:AddToggle("Highlight", {
+    Title = "Highlight Players",
+    Description = "Conturează jucătorii",
     Default = false
-})
-highlightToggle:OnChanged(function(val)
+}):OnChanged(function(val)
     for _, plr in pairs(Players:GetPlayers()) do
         if plr ~= LocalPlayer then
             local char = plr.Character
@@ -76,41 +75,56 @@ highlightToggle:OnChanged(function(val)
     end
 end)
 
-local speedSlider = Tabs.Mobile:AddSlider("MobileSpeed", {
-    Title = "⚡ Speed Control",
-    Description = "Setează viteza de mers",
+Tabs.Mobile:AddSlider("MobileSpeed", {
+    Title = "Speed",
+    Description = "Viteză mers",
     Default = 16,
     Min = 16,
     Max = 100,
     Rounding = 0
-})
-speedSlider:OnChanged(function(val)
+}):OnChanged(function(val)
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
         LocalPlayer.Character.Humanoid.WalkSpeed = val
     end
 end)
 
-local flyMobile = Tabs.Mobile:AddToggle("FlyMobile", {
-    Title = "🕊️ Fly (Mobile Control)",
+Tabs.Mobile:AddToggle("FlyMobile", {
+    Title = "Fly (Mobile)",
     Description = "Zboară atingând ecranul",
     Default = false
-})
-flyMobile:OnChanged(function(val)
+}):OnChanged(function(val)
     if val then
-        loadstring(game:HttpGet("https://pastebin.com/raw/k4y1GSXz"))() -- script cu controale mobile pentru fly
+        loadstring(game:HttpGet("https://pastebin.com/raw/k4y1GSXz"))()
     end
 end)
 
--- 🐉 Goku Mode (înlocuiește X-Ray)
 Tabs.Mobile:AddButton({
-    Title = "🔥 Goku Mode",
+    Title = "Goku Mode",
     Description = "Activează modul Goku Ultra Instinct",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/STAR"))()
     end
 })
 
--- 🔒 Dezactivează Anti-Cheat local dacă există
+-- MINIMAL UI: buton pătrat jos dreapta când interfața este minimizată
+local minimizedIcon = Instance.new("ImageButton")
+minimizedIcon.Size = UDim2.new(0, 60, 0, 60)
+minimizedIcon.Position = UDim2.new(0, 12, 1, -72)
+minimizedIcon.Image = "rbxassetid://7743879404"
+minimizedIcon.BackgroundTransparency = 1
+minimizedIcon.Visible = false
+minimizedIcon.Parent = CoreGui
+
+Fluent:OnMinimize(function()
+    minimizedIcon.Visible = true
+end)
+
+minimizedIcon.MouseButton1Click:Connect(function()
+    Fluent:ToggleMinimize()
+    minimizedIcon.Visible = false
+end)
+
+-- Anticheat basic disable dacă este disponibil
 pcall(function()
     local Client = getsenv(LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerClient"))
     if Client and Client.AntiCheatController then
@@ -118,4 +132,4 @@ pcall(function()
     end
 end)
 
--- Sfârșit script
+-- END SCRIPT
