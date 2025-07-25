@@ -1,0 +1,76 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local sidestepDistance = 15        
+local sidestepTime = 0.1           
+local cooldown = 0.1               
+
+local canSlide = true
+
+local leftAnimationId = "rbxassetid://117223862448096"
+local rightAnimationId = "rbxassetid://75203303352791"
+local backAnimationId = "rbxassetid://134581973800784"
+
+local leftAnimation = Instance.new("Animation")
+leftAnimation.AnimationId = leftAnimationId
+
+local rightAnimation = Instance.new("Animation")
+rightAnimation.AnimationId = rightAnimationId
+
+local backAnimation = Instance.new("Animation")
+backAnimation.AnimationId = backAnimationId
+
+local function playAnimation(humanoid, anim)
+	local track = humanoid:LoadAnimation(anim)
+	track:Play()
+end
+
+local function slide(directionVector, anim)
+	if not canSlide then return end
+	canSlide = false
+
+	local character = player.Character or player.CharacterAdded:Wait()
+	local hrp = character:FindFirstChild("HumanoidRootPart")
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+	if not hrp or not humanoid then return end
+
+	playAnimation(humanoid, anim)
+
+	local goalCFrame = hrp.CFrame + (directionVector.Unit * sidestepDistance)
+
+	local tweenInfo = TweenInfo.new(sidestepTime, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+	local tween = TweenService:Create(hrp, tweenInfo, {CFrame = goalCFrame})
+	tween:Play()
+
+	tween.Completed:Wait()
+	task.delay(cooldown, function()
+		canSlide = true
+	end)
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+
+	if input.KeyCode == Enum.KeyCode.C then
+		local direction = math.random(0, 1) == 0 and -1 or 1
+		local character = player.Character or player.CharacterAdded:Wait()
+		local hrp = character:FindFirstChild("HumanoidRootPart")
+		if not hrp then return end
+
+		local rightVec = hrp.CFrame.RightVector * direction
+		local anim = direction == -1 and leftAnimation or rightAnimation
+
+		slide(rightVec, anim)
+
+	elseif input.KeyCode == Enum.KeyCode.X then
+		local character = player.Character or player.CharacterAdded:Wait()
+		local hrp = character:FindFirstChild("HumanoidRootPart")
+		if not hrp then return end
+
+		local backVec = -hrp.CFrame.LookVector
+		slide(backVec, backAnimation)
+	end
+end)
