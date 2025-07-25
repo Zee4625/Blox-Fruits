@@ -2,13 +2,6 @@ local Games = {
     [2753915549] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BLLLLOOX", -- Blox Fruit Sea 1
     [4442272183] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BLLLLOOX", -- Blox Fruit Sea 2
     [7449423635] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BLLLLOOX", -- Blox Fruit Sea 3
-    [18668065416] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BLLKK", -- BlueLOCK 142823291
-    [142823291] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/M212", -- MM2
-    [10449761463] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/STR-FKKK", -- TSB 
-    [126884695634066] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/GRO", -- GROW A GRD 79546208627805
-    [79546208627805] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/deer", -- extra
-    [17323507436] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JUMPs", -- Jump stars
-    [9391468976] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JJK" -- JKK
 }
 
 if Games[game.PlaceId] then
