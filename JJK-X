@@ -29,7 +29,7 @@ TabMovement:AddToggle({
     Default = false,
     Callback = function(val)
         if val then
-            loadModule("https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/obf_cj7o6P7567nEPA1xVqYZcv51ezWc7DOCzS475N108rwGEiEVi9688kJErn1g68ep.lua")
+            loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/XUID")
         end
     end,
 })
@@ -40,7 +40,7 @@ TabMovement:AddToggle({
     Default = false,
     Callback = function(val)
         if val then
-            loadModule("https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/fly.lua")
+            loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PULOP")
         end
     end,
 })
@@ -51,7 +51,7 @@ TabMovement:AddToggle({
     Default = false,
     Callback = function(val)
         if val then
-            loadModule("https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/teleport.lua")
+            loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Kolols")
         end
     end,
 })
@@ -62,7 +62,7 @@ TabMovement:AddToggle({
     Default = false,
     Callback = function(val)
         if val then
-            loadModule("https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/drone")
+            loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/droneee")
         end
     end,
 })
@@ -73,7 +73,7 @@ TabMovement:AddToggle({
     Default = false,
     Callback = function(val)
         if val then
-            loadModule("https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/speedboost")
+            loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/NULOK")
         end
     end,
 })
@@ -84,7 +84,7 @@ TabMovement:AddToggle({
     Default = false,
     Callback = function(val)
         if val then
-            loadModule("https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/sidestep")
+            loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/SIDESPP")
         end
     end,
 })
@@ -99,7 +99,7 @@ TabCombat:AddToggle({
     Default = false,
     Callback = function(val)
         if val then
-            loadModule("https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/lockon")
+            loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/SWW")
         end
     end,
 })
@@ -110,7 +110,7 @@ TabCombat:AddToggle({
     Default = false,
     Callback = function(val)
         if val then
-            loadModule("https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/gubby")
+            loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/GUBB")
         end
     end,
 })
@@ -121,7 +121,7 @@ TabCombat:AddToggle({
     Default = false,
     Callback = function(val)
         if val then
-            loadModule("https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/autoblock")
+            loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/AUTO")
         end
     end,
 })
@@ -132,7 +132,7 @@ TabCombat:AddToggle({
     Default = false,
     Callback = function(val)
         if val then
-            loadModule("https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/anticounter")
+            loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ANTIOSX")
         end
     end,
 })
@@ -144,7 +144,7 @@ TabMain:AddButton({
     Title = "ExeHub",
     Tip = "Execute ExeHub by Kingofexe",
     Callback = function()
-        loadModule("https://raw.githubusercontent.com/tomdagoat-bot/kingofexeHub/refs/heads/main/File")
+        loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/STAR")
     end,
 })
 
@@ -163,7 +163,7 @@ TabAchievements:AddButton({
     Title = "Space Shenanigans",
     Tip = "Unlock Space Shenanigans achievement",
     Callback = function()
-        loadModule("https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/spaceshenanigans")
+        loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/AC-1")
     end,
 })
 
@@ -171,7 +171,7 @@ TabAchievements:AddButton({
     Title = "Betavision",
     Tip = "Unlock Betavision achievement",
     Callback = function()
-        loadModule("https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/betavision")
+        loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/AC-2")
     end,
 })
 
@@ -179,7 +179,7 @@ TabAchievements:AddButton({
     Title = "Sealed",
     Tip = "Unlock Sealed achievement",
     Callback = function()
-        loadModule("https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/sealed")
+        loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/AC-3")
     end,
 })
 
@@ -187,7 +187,7 @@ TabAchievements:AddButton({
     Title = "Committed",
     Tip = "Unlock Committed to the Peace achievement",
     Callback = function()
-        loadModule("https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/committed")
+        loadModule("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/AC-4")
     end,
 })
 
