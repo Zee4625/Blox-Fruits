@@ -1,0 +1,53 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local CHARACTER = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = CHARACTER:WaitForChild("HumanoidRootPart")
+
+local SPEED = 5 
+local INTERVAL = 0.03 
+
+local keysDown = {}
+
+UserInputService.InputBegan:Connect(function(input, processed)
+	if processed then return end
+	if input.KeyCode == Enum.KeyCode.W or input.KeyCode == Enum.KeyCode.A 
+	or input.KeyCode == Enum.KeyCode.S or input.KeyCode == Enum.KeyCode.D then
+		keysDown[input.KeyCode] = true
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.W or input.KeyCode == Enum.KeyCode.A 
+	or input.KeyCode == Enum.KeyCode.S or input.KeyCode == Enum.KeyCode.D then
+		keysDown[input.KeyCode] = nil
+	end
+end)
+
+task.spawn(function()
+	while true do
+		if next(keysDown) ~= nil then
+			local direction = Vector3.zero
+
+			if keysDown[Enum.KeyCode.W] then
+				direction += HRP.CFrame.LookVector
+			end
+			if keysDown[Enum.KeyCode.S] then
+				direction -= HRP.CFrame.LookVector
+			end
+			if keysDown[Enum.KeyCode.A] then
+				direction -= HRP.CFrame.RightVector
+			end
+			if keysDown[Enum.KeyCode.D] then
+				direction += HRP.CFrame.RightVector
+			end
+
+			direction = direction.Unit
+			HRP.CFrame = HRP.CFrame + direction * SPEED
+		end
+
+		task.wait(INTERVAL)
+	end
+end)
