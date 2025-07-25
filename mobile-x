@@ -1,368 +1,317 @@
--- Alone x ZeeHUB V2.3 Simplu & Funcțional
--- Script cu UI nativ Roblox, selectare player, teleport, bring, fly, xray, goku mode
+-- Alone x ZeeHUB GUI V2.21 - ULTIMATE VERSION RGB + MOBILE READY + UTILITIES COMPLETE
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-
 local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
 
--- UI crează simplu cu ScreenGui + Frame + Buttons + Dropdown
+-- Fluent UI cu temă RGB neon
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local Window = Fluent:CreateWindow({
+    Title = "Alone x ZeeHUB",
+    SubTitle = "V2.21 - Mobile & PC Ready",
+    TabWidth = 180,
+    Size = UDim2.fromOffset(700, 540),
+    Theme = "Aqua",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
 
-local ScreenGui = Instance.new("ScreenGui", PlayerGui)
-ScreenGui.Name = "AloneZeeHUBGui"
-ScreenGui.ResetOnSpawn = false
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "layout" }),
+    Movement = Window:AddTab({ Title = "Movement", Icon = "rocket" }),
+    Utility = Window:AddTab({ Title = "Utility", Icon = "settings" }),
+    Mobile = Window:AddTab({ Title = "Mobile", Icon = "smartphone" })
+}
 
-local function CreateFrame(title)
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 600, 0, 450)
-    frame.Position = UDim2.new(0.5, -300, 0.5, -225)
-    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    frame.BorderSizePixel = 0
-    frame.Parent = ScreenGui
-    
-    local uicorner = Instance.new("UICorner", frame)
-    uicorner.CornerRadius = UDim.new(0, 12)
-    
-    local titleLabel = Instance.new("TextLabel", frame)
-    titleLabel.Text = title
-    titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.TextSize = 30
-    titleLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Size = UDim2.new(1, 0, 0, 40)
-    titleLabel.Position = UDim2.new(0, 0, 0, 0)
-    
-    return frame
-end
+local Options = Fluent.Options
 
-local MainFrame = CreateFrame("Alone x ZeeHUB V2.3")
-
--- Dropdown simplu pentru jucători
-local PlayerDropdown = Instance.new("TextButton", MainFrame)
-PlayerDropdown.Size = UDim2.new(0, 200, 0, 30)
-PlayerDropdown.Position = UDim2.new(0, 20, 0, 60)
-PlayerDropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-PlayerDropdown.TextColor3 = Color3.fromRGB(255, 255, 255)
-PlayerDropdown.Font = Enum.Font.Gotham
-PlayerDropdown.TextSize = 18
-PlayerDropdown.Text = "Select Player"
-PlayerDropdown.AutoButtonColor = true
-
-local DropdownFrame = Instance.new("ScrollingFrame", MainFrame)
-DropdownFrame.Position = UDim2.new(0, 20, 0, 90)
-DropdownFrame.Size = UDim2.new(0, 200, 0, 150)
-DropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-DropdownFrame.BorderSizePixel = 0
-DropdownFrame.Visible = false
-DropdownFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-DropdownFrame.ScrollBarThickness = 6
-
-local UIListLayout = Instance.new("UIListLayout", DropdownFrame)
-UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-
-local selectedPlayer = nil
-
-local function RefreshPlayerList()
-    -- curata dropdown
-    for _, child in ipairs(DropdownFrame:GetChildren()) do
-        if child:IsA("TextButton") then
-            child:Destroy()
-        end
-    end
-    
-    for i, plr in pairs(Players:GetPlayers()) do
-        if plr ~= LocalPlayer then
-            local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(1, 0, 0, 30)
-            btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-            btn.Font = Enum.Font.Gotham
-            btn.TextSize = 16
-            btn.Text = plr.Name
-            btn.Parent = DropdownFrame
-            
-            btn.MouseButton1Click:Connect(function()
-                selectedPlayer = plr
-                PlayerDropdown.Text = "Player: " .. plr.Name
-                DropdownFrame.Visible = false
+-- Helper: toggle script loader
+local function AddScriptToggle(tab, id, title, description, scriptURL, defaultState)
+    local toggle = tab:AddToggle(id, {
+        Title = title,
+        Description = description,
+        Default = defaultState or false
+    })
+    Options[id].Args = { scriptURL = scriptURL }
+    toggle:OnChanged(function()
+        if Options[id].Value then
+            task.spawn(function()
+                pcall(function()
+                    loadstring(game:HttpGet(scriptURL))()
+                end)
             end)
         end
-    end
-    local contentSize = #Players:GetPlayers() * 30
-    DropdownFrame.CanvasSize = UDim2.new(0, 0, 0, contentSize)
-end
-
-PlayerDropdown.MouseButton1Click:Connect(function()
-    DropdownFrame.Visible = not DropdownFrame.Visible
-    if DropdownFrame.Visible then
-        RefreshPlayerList()
-    end
-end)
-
-Players.PlayerAdded:Connect(RefreshPlayerList)
-Players.PlayerRemoving:Connect(function(plr)
-    if selectedPlayer == plr then
-        selectedPlayer = nil
-        PlayerDropdown.Text = "Select Player"
-    end
-    RefreshPlayerList()
-end)
-
--- Button Helper Factory
-local function CreateButton(text, posY, parent)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 250, 0, 40)
-    btn.Position = UDim2.new(0, 320, 0, posY)
-    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    btn.BorderSizePixel = 0
-    btn.TextColor3 = Color3.fromRGB(0, 255, 255)
-    btn.Font = Enum.Font.GothamSemibold
-    btn.TextSize = 20
-    btn.Text = text
-    btn.Parent = parent
-    
-    local uicorner = Instance.new("UICorner", btn)
-    uicorner.CornerRadius = UDim.new(0, 8)
-    return btn
-end
-
--- Teleport la jucator
-local TeleportBtn = CreateButton("Teleport to Player", 60, MainFrame)
-TeleportBtn.MouseButton1Click:Connect(function()
-    if not selectedPlayer then return warn("Selectează un jucător!") end
-    if selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            hrp.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,3,3)
-        end
-    end
-end)
-
--- Bring Player (fly & invincibil)
-local flying = false
-local bodyGyro, bodyVelocity
-local function FlyTo(targetCFrame)
-    local character = LocalPlayer.Character
-    if not character then return end
-    local hrp = character:FindFirstChild("HumanoidRootPart")
-    local humanoid = character:FindFirstChild("Humanoid")
-    if not hrp or not humanoid then return end
-
-    flying = true
-    humanoid.PlatformStand = true
-
-    bodyGyro = Instance.new("BodyGyro")
-    bodyGyro.P = 9e4
-    bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-    bodyGyro.CFrame = hrp.CFrame
-    bodyGyro.Parent = hrp
-
-    bodyVelocity = Instance.new("BodyVelocity")
-    bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-    bodyVelocity.Velocity = Vector3.new(0,0,0)
-    bodyVelocity.Parent = hrp
-
-    -- invincibil + noclip
-    for _, part in pairs(character:GetDescendants()) do
-        if part:IsA("BasePart") then
-            part.CanCollide = false
-            part.Transparency = 0.5
-        end
-    end
-
-    local conn
-    conn = RunService.Heartbeat:Connect(function()
-        if not flying then
-            conn:Disconnect()
-            humanoid.PlatformStand = false
-            if bodyGyro then bodyGyro:Destroy() end
-            if bodyVelocity then bodyVelocity:Destroy() end
-            for _, part in pairs(character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = true
-                    part.Transparency = 0
-                end
-            end
-            return
-        end
-
-        local targetPos = targetCFrame.Position + Vector3.new(0, 3, 0)
-        local direction = (targetPos - hrp.Position)
-        local dist = direction.Magnitude
-        local vel = direction.Unit * math.min(100, dist * 10)
-        bodyVelocity.Velocity = vel
-        bodyGyro.CFrame = CFrame.new(hrp.Position, targetPos)
-        if dist < 3 then flying = false end
     end)
 end
 
-local BringBtn = CreateButton("Bring Player (Fly & Invincibil)", 110, MainFrame)
-BringBtn.MouseButton1Click:Connect(function()
-    if not selectedPlayer then return warn("Selectează un jucător!") end
-    if selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        if flying then flying = false end
-        local targetCFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
-        FlyTo(targetCFrame)
-    end
-end)
+-- SCRIPTURI DE BAZĂ
+AddScriptToggle(Tabs.Movement, "Fly", "Fly Basic", "X pentru activare/dezactivare", "https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/fly.lua")
+AddScriptToggle(Tabs.Utility, "Reset", "Reset Character", "Instant Reset", "https://pastebin.com/raw/BL9u7kGw")
+AddScriptToggle(Tabs.Main, "Pose", "Pose", "P pentru poziție animată", "https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/pose")
+AddScriptToggle(Tabs.Main, "Teleport", "Teleport", "C pentru a te teleporta în față", "https://raw.githubusercontent.com/gyyfyu/test2/refs/heads/main/no%20key%20system/teleport.lua")
+AddScriptToggle(Tabs.Utility, "Serverhop", "Server Hop", "Schimbă serverul automat", "https://raw.githubusercontent.com/NotEnoughJack/localplayerscripts/refs/heads/main/serverhop")
 
--- Hyper X-Ray Toggle
-local hyperXray = false
-local HyperXrayBtn = CreateButton("Toggle Hyper X-Ray", 160, MainFrame)
-HyperXrayBtn.MouseButton1Click:Connect(function()
-    hyperXray = not hyperXray
+-- === UTILITĂȚI EXTINSE === --
+
+-- Highlight jucători (Mobile tab)
+Tabs.Mobile:AddToggle("Highlight", {
+    Title = "Highlight Players",
+    Description = "Conturează jucătorii",
+    Default = false
+}):OnChanged(function(val)
     for _, plr in pairs(Players:GetPlayers()) do
-        if plr.Character then
-            for _, part in pairs(plr.Character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.Transparency = hyperXray and 0.85 or 0
-                end
+        if plr ~= LocalPlayer then
+            local char = plr.Character
+            if char then
+                local hl = char:FindFirstChildOfClass("Highlight") or Instance.new("Highlight", char)
+                hl.Enabled = val
+                hl.FillColor = Color3.fromRGB(0, 255, 255)
+                hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
             end
         end
     end
 end)
 
--- Fly PC simplu
-local flyingPC = false
-local flyBodyGyro, flyBodyVelocity
-local FlyBtn = CreateButton("Toggle Fly PC", 210, MainFrame)
-FlyBtn.MouseButton1Click:Connect(function()
-    local character = LocalPlayer.Character
-    if not character then return end
-    local hrp = character:FindFirstChild("HumanoidRootPart")
-    local humanoid = character:FindFirstChild("Humanoid")
-    if not hrp or not humanoid then return end
-
-    flyingPC = not flyingPC
-    if flyingPC then
-        humanoid.PlatformStand = true
-        flyBodyGyro = Instance.new("BodyGyro", hrp)
-        flyBodyGyro.P = 9e4
-        flyBodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-        flyBodyGyro.CFrame = hrp.CFrame
-
-        flyBodyVelocity = Instance.new("BodyVelocity", hrp)
-        flyBodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-        flyBodyVelocity.Velocity = Vector3.new(0, 0, 0)
-        
-        local speed = 100
-        local connection
-        connection = RunService.Heartbeat:Connect(function()
-            if not flyingPC then
-                connection:Disconnect()
-                humanoid.PlatformStand = false
-                flyBodyGyro:Destroy()
-                flyBodyVelocity:Destroy()
-                return
-            end
-            
-            local moveDirection = Vector3.new()
-            if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDirection = moveDirection + workspace.CurrentCamera.CFrame.LookVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDirection = moveDirection - workspace.CurrentCamera.CFrame.LookVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDirection = moveDirection - workspace.CurrentCamera.CFrame.RightVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDirection = moveDirection + workspace.CurrentCamera.CFrame.RightVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDirection = moveDirection + Vector3.new(0,1,0) end
-            if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then moveDirection = moveDirection - Vector3.new(0,1,0) end
-
-            flyBodyVelocity.Velocity = moveDirection.Unit * speed
-            flyBodyGyro.CFrame = workspace.CurrentCamera.CFrame
-        end)
-    else
-        humanoid.PlatformStand = false
-        if flyBodyGyro then flyBodyGyro:Destroy() end
-        if flyBodyVelocity then flyBodyVelocity:Destroy() end
+-- Slider Viteză mers (Mobile tab)
+Tabs.Mobile:AddSlider("MobileSpeed", {
+    Title = "Speed",
+    Description = "Viteză mers",
+    Default = 16,
+    Min = 16,
+    Max = 100,
+    Rounding = 0
+}):OnChanged(function(val)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = val
     end
 end)
 
--- Fly Mobile: toggle simplu (folosește WSAD pe PC, iar pe mobil nu are control, doar toggle sus/jos)
-local flyingMobile = false
-local flyMobileBodyGyro, flyMobileBodyVelocity
-local FlyMobileBtn = CreateButton("Toggle Fly Mobile", 260, MainFrame)
-FlyMobileBtn.MouseButton1Click:Connect(function()
-    local character = LocalPlayer.Character
-    if not character then return end
-    local hrp = character:FindFirstChild("HumanoidRootPart")
-    local humanoid = character:FindFirstChild("Humanoid")
-    if not hrp or not humanoid then return end
+-- Fly Mobile (simple toggle + script)
+Tabs.Mobile:AddToggle("FlyMobile", {
+    Title = "Fly (Mobile)",
+    Description = "Zboară atingând ecranul",
+    Default = false
+}):OnChanged(function(val)
+    if val then
+        loadstring(game:HttpGet("https://pastebin.com/raw/k4y1GSXz"))()
+    end
+end)
 
-    flyingMobile = not flyingMobile
-    if flyingMobile then
-        humanoid.PlatformStand = true
-        flyMobileBodyGyro = Instance.new("BodyGyro", hrp)
-        flyMobileBodyGyro.P = 9e4
-        flyMobileBodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-        flyMobileBodyGyro.CFrame = hrp.CFrame
+-- Goku Mode Button (Mobile tab)
+Tabs.Mobile:AddButton({
+    Title = "Goku Mode",
+    Description = "Activează modul Goku Ultra Instinct",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/STAR"))()
+    end
+})
 
-        flyMobileBodyVelocity = Instance.new("BodyVelocity", hrp)
-        flyMobileBodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-        flyMobileBodyVelocity.Velocity = Vector3.new(0, 0, 0)
-        
-        local speed = 80
-        local connection
-        connection = RunService.Heartbeat:Connect(function()
-            if not flyingMobile then
-                connection:Disconnect()
-                humanoid.PlatformStand = false
-                flyMobileBodyGyro:Destroy()
-                flyMobileBodyVelocity:Destroy()
-                return
-            end
-            
-            local moveDirection = Vector3.new(0,0,0)
-            if UserInputService.TouchEnabled then
-                -- pe mobil doar sus jos (cu jump si crouch)
-                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDirection = moveDirection + Vector3.new(0,1,0) end
-                if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then moveDirection = moveDirection - Vector3.new(0,1,0) end
+-- Fly custom (Movement tab) - WSAD + Space + Ctrl
+do
+    local flying = false
+    local flyBodyGyro, flyBodyVelocity
+    local speed = 100
+
+    local FlyToggle = Tabs.Movement:AddToggle("CustomFly", {
+        Title = "Fly (Custom)",
+        Description = "Fly cu WSAD + Space + Ctrl",
+        Default = false
+    })
+
+    FlyToggle:OnChanged(function(value)
+        local character = LocalPlayer.Character
+        local humanoid = character and character:FindFirstChild("Humanoid")
+        local hrp = character and character:FindFirstChild("HumanoidRootPart")
+        if not humanoid or not hrp then return end
+
+        flying = value
+        if flying then
+            humanoid.PlatformStand = true
+            flyBodyGyro = Instance.new("BodyGyro", hrp)
+            flyBodyGyro.P = 9e4
+            flyBodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+            flyBodyGyro.CFrame = hrp.CFrame
+
+            flyBodyVelocity = Instance.new("BodyVelocity", hrp)
+            flyBodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            flyBodyVelocity.Velocity = Vector3.new(0, 0, 0)
+
+            local conn
+            conn = RunService.Heartbeat:Connect(function()
+                if not flying then
+                    conn:Disconnect()
+                    humanoid.PlatformStand = false
+                    flyBodyGyro:Destroy()
+                    flyBodyVelocity:Destroy()
+                    return
+                end
+
+                local moveDir = Vector3.new()
+                local camCFrame = workspace.CurrentCamera.CFrame
+                if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir += camCFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir -= camCFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir -= camCFrame.RightVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir += camCFrame.RightVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir += Vector3.new(0, 1, 0) end
+                if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then moveDir -= Vector3.new(0, 1, 0) end
+
+                if moveDir.Magnitude > 0 then
+                    flyBodyVelocity.Velocity = moveDir.Unit * speed
+                else
+                    flyBodyVelocity.Velocity = Vector3.new(0, 0, 0)
+                end
+                flyBodyGyro.CFrame = camCFrame
+            end)
+        else
+            humanoid.PlatformStand = false
+            if flyBodyGyro then flyBodyGyro:Destroy() end
+            if flyBodyVelocity then flyBodyVelocity:Destroy() end
+        end
+    end)
+end
+
+-- Hyper X-Ray - transparență 0.85 pe toate parturile (Utility tab)
+local function SetHyperXRay(enabled)
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("BasePart") then
+            if enabled then
+                part.LocalTransparencyModifier = 0.85
             else
-                -- fallback pentru PC
-                if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDirection = moveDirection + workspace.CurrentCamera.CFrame.LookVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDirection = moveDirection - workspace.CurrentCamera.CFrame.LookVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDirection = moveDirection - workspace.CurrentCamera.CFrame.RightVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDirection = moveDirection + workspace.CurrentCamera.CFrame.RightVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDirection = moveDirection + Vector3.new(0,1,0) end
-                if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then moveDirection = moveDirection - Vector3.new(0,1,0) end
+                part.LocalTransparencyModifier = 0
             end
-            
-            flyMobileBodyVelocity.Velocity = moveDirection.Unit * speed
-            flyMobileBodyGyro.CFrame = workspace.CurrentCamera.CFrame
-        end)
-    else
-        humanoid.PlatformStand = false
-        if flyMobileBodyGyro then flyMobileBodyGyro:Destroy() end
-        if flyMobileBodyVelocity then flyMobileBodyVelocity:Destroy() end
+        end
     end
+end
+
+Tabs.Utility:AddToggle("HyperXRay", {
+    Title = "Hyper X-Ray",
+    Description = "Transparență 0.85 pe toate parturile",
+    Default = false
+}):OnChanged(function(val)
+    SetHyperXRay(val)
 end)
 
--- Goku Mode: Invincibilitate + Viteza + JumpBoost
-local gokuMode = false
-local GokuBtn = CreateButton("Toggle Goku Mode", 310, MainFrame)
-GokuBtn.MouseButton1Click:Connect(function()
-    local character = LocalPlayer.Character
-    local humanoid = character and character:FindFirstChild("Humanoid")
-    if not humanoid then return end
+-- TELEPORT & BRING & SPY cu select player (Main tab)
+local selectedPlayer = nil
 
-    gokuMode = not gokuMode
+local playerDropdown = Tabs.Main:AddDropdown("PlayerSelect", {
+    Title = "Select Player",
+    Description = "Selectează un jucător",
+    Options = {},
+    Default = nil
+})
 
-    if gokuMode then
-        -- Invincibilitate
-        humanoid.Health = humanoid.MaxHealth
-        humanoid.MaxHealth = math.huge
-        humanoid.HealthChanged:Connect(function()
-            if humanoid.Health < humanoid.MaxHealth then
-                humanoid.Health = humanoid.MaxHealth
+local function RefreshPlayerList()
+    local names = {}
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            table.insert(names, plr.Name)
+        end
+    end
+    playerDropdown:SetOptions(names)
+end
+
+RefreshPlayerList()
+Players.PlayerAdded:Connect(RefreshPlayerList)
+Players.PlayerRemoving:Connect(RefreshPlayerList)
+
+playerDropdown:OnChanged(function(name)
+    selectedPlayer = Players:FindFirstChild(name)
+end)
+
+Tabs.Main:AddButton({
+    Title = "Teleport to Player",
+    Description = "Te teleportează instant la jucătorul selectat",
+    Callback = function()
+        if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+        end
+    end
+})
+
+Tabs.Main:AddButton({
+    Title = "Bring Player to Me",
+    Description = "Aduce jucătorul selectat la tine cu zbor invincibil și noclip",
+    Callback = function()
+        if not selectedPlayer or not selectedPlayer.Character or not selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+
+        local targetHRP = selectedPlayer.Character.HumanoidRootPart
+        local bodyGyro = Instance.new("BodyGyro", hrp)
+        bodyGyro.P = 9e4
+        bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        local bodyVelocity = Instance.new("BodyVelocity", hrp)
+        bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+
+        local flying = true
+        local speed = 150
+
+        local conn
+        conn = RunService.Heartbeat:Connect(function()
+            if not flying or not targetHRP.Parent then
+                bodyGyro:Destroy()
+                bodyVelocity:Destroy()
+                conn:Disconnect()
+                return
+            end
+
+            -- Set noclip
+            for _, part in pairs(LocalPlayer.Character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+
+            local direction = (targetHRP.Position - hrp.Position).Unit
+            bodyVelocity.Velocity = direction * speed
+            bodyGyro.CFrame = CFrame.new(hrp.Position, targetHRP.Position)
+
+            if (hrp.Position - targetHRP.Position).Magnitude < 5 then
+                flying = false
             end
         end)
+    end
+})
 
-        -- Viteza + Jump
-        humanoid.WalkSpeed = 100
-        humanoid.JumpPower = 100
-    else
-        humanoid.MaxHealth = 100
-        humanoid.Health = 100
-        humanoid.WalkSpeed = 16
-        humanoid.JumpPower = 50
+Tabs.Main:AddButton({
+    Title = "Spy Player",
+    Description = "Urmărește camera jucătorului selectat",
+    Callback = function()
+        if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local cam = workspace.CurrentCamera
+            local hrp = selectedPlayer.Character.HumanoidRootPart
+            cam.CameraSubject = hrp
+            cam.CameraType = Enum.CameraType.Custom
+        end
+    end
+})
+
+-- MINIMAL UI - buton pătrat când minimizat
+local minimizedIcon = Instance.new("ImageButton")
+minimizedIcon.Size = UDim2.new(0, 60, 0, 60)
+minimizedIcon.Position = UDim2.new(0, 12, 1, -72)
+minimizedIcon.Image = "rbxassetid://7743879404"
+minimizedIcon.BackgroundTransparency = 1
+minimizedIcon.Visible = false
+minimizedIcon.Parent = CoreGui
+
+Fluent:OnMinimize(function()
+    minimizedIcon.Visible = true
+end)
+
+minimizedIcon.MouseButton1Click:Connect(function()
+    Fluent:ToggleMinimize()
+    minimizedIcon.Visible = false
+end)
+
+-- Actualizare constantă lista de jucători (refresh 30 sec)
+task.spawn(function()
+    while true do
+        RefreshPlayerList()
+        task.wait(30)
     end
 end)
