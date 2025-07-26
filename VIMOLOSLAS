@@ -10,6 +10,7 @@ local Games = {
     [17323507436] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JUMPs", -- Jump stars
     [9391468976] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JJK", -- JJK
     [15781012611] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/DOLOLOL", -- H VS Z
+    [9103898828] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/XDOGNJ", -- ROGUE DEMON
     [4616652839] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BLOOOL" -- SHINDO
 }
 
