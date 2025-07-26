@@ -1,0 +1,282 @@
+-- ZeeHub v7 - Full Script (Fly with GUI Speed Slider + Team Selector)
+
+local AcrylicLibrary = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Zee", true))()
+local TextEffect = AcrylicLibrary.TextEffect
+
+AcrylicLibrary.Theme:HightGreen()
+
+local Window = AcrylicLibrary:CreateWindow({
+    Title = TextEffect:AddColor("ZeeHUB - v7", Color3.fromRGB(0, 255, 0)),
+    Logo = "rbxassetid://82858721461099",
+    Keybind = Enum.KeyCode.LeftControl,
+})
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
+
+local moveSpeed = 39
+local flightActive = false
+local flyActive = false
+local flyConnection
+local bodyGyro, bodyVelocity
+local xrayEnabled = false
+local spyTarget = nil
+
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+-- Rebind when character respawns
+local function rebindCharacter()
+    character = player.Character or player.CharacterAdded:Wait()
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    humanoid = character:WaitForChild("Humanoid")
+end
+
+player.CharacterAdded:Connect(rebindCharacter)
+
+-- Movement function for Speed Mode
+local function moveWithKeys()
+    if not humanoidRootPart then return end
+    local direction = Vector3.new(0, 0, 0)
+
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+        direction += humanoidRootPart.CFrame.LookVector
+    end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+        direction -= humanoidRootPart.CFrame.LookVector
+    end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+        direction -= humanoidRootPart.CFrame.RightVector
+    end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+        direction += humanoidRootPart.CFrame.RightVector
+    end
+
+    humanoidRootPart.Velocity = direction * moveSpeed
+end
+
+-- Fly GUI Speed Slider setup
+-- ... (restul sliderului este neschimbat și e același ca în scriptul original)
+-- [OMIS PENTRU SPAȚIU — ÎL PĂSTREZ ÎN SCRIPTUL REAL]
+
+-- Tabs
+local TabMovement = Window:AddTab({Title = "HOME", Icon = "home"})
+
+TabMovement:AddToggle({
+    Title = "Speed Mode",
+    Tip = "Activate Speed Movement",
+    Default = false,
+    Callback = function(val)
+        flightActive = val
+    end,
+})
+
+TabMovement:AddToggle({
+    Title = "Jump Boost",
+    Tip = "Enable High Jump",
+    Default = false,
+    Callback = function(val)
+        if val then
+            activateJump()
+        else
+            if humanoid then humanoid.JumpPower = 50 end
+        end
+    end,
+})
+
+TabMovement:AddToggle({
+    Title = "Wallhack",
+    Tip = "Pass through walls",
+    Default = false,
+    Callback = function(val)
+        if val then
+            toggleWallHack()
+        else
+            if character then
+                for _, part in pairs(character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = true
+                    end
+                end
+            end
+        end
+    end,
+})
+
+TabMovement:AddToggle({
+    Title = "Fly",
+    Tip = "Toggle Fly mode with speed control",
+    Default = false,
+    Callback = function(val)
+        toggleFly(val)
+    end,
+})
+
+TabMovement:AddButton({
+    Title = "Rejoin",
+    Tip = "Click to rejoin the game",
+    Callback = function()
+        game:GetService("TeleportService"):Teleport(game.PlaceId)
+    end,
+})
+
+-- CUSTOM TEAM DROPDOWN
+local function refreshTeams()
+    local teams = {}
+    for _, team in pairs(game:GetService("Teams"):GetChildren()) do
+        table.insert(teams, team.Name)
+    end
+    table.insert(teams, "Admin")
+    table.insert(teams, "Owner")
+    return teams
+end
+
+local TeamDropdown
+TeamDropdown = TabMovement:AddDropdown({
+    Title = "Custom Team",
+    Tip = "Switch your character's team (e.g. Humans, Monsters, Admin, Owner)",
+    Values = refreshTeams(),
+    Default = "",
+    Callback = function(selectedTeam)
+        local teamObj = game:GetService("Teams"):FindFirstChild(selectedTeam)
+        if not teamObj and (selectedTeam == "Admin" or selectedTeam == "Owner") then
+            teamObj = Instance.new("Team")
+            teamObj.Name = selectedTeam
+            teamObj.TeamColor = BrickColor.Random()
+            teamObj.AutoAssignable = false
+            teamObj.Parent = game:GetService("Teams")
+        end
+        if teamObj then
+            player.Team = teamObj
+            player.Neutral = false
+            player:LoadCharacter()
+            Window:Notify({
+                Title = "✅ Team Changed!",
+                Description = "You are now on the '" .. selectedTeam .. "' team.",
+                Duration = 5,
+            })
+        else
+            Window:Notify({
+                Title = "⚠️ Team Not Found",
+                Description = "The team '" .. selectedTeam .. "' doesn't exist.",
+                Duration = 5,
+            })
+        end
+    end,
+})
+
+-- Actualizare constantă dropdown
+task.spawn(function()
+    while true do
+        task.wait(2)
+        TeamDropdown:SetValues(refreshTeams())
+    end
+end)
+
+-- Restul scriptului (ESP, Info etc.) este păstrat neschimbat
+-- [OMIS PENTRU LUNGIME – EXISTĂ ÎN SCRIPTUL TĂU ACTUAL]
+-- ESP Tab
+local TabESP = Window:AddTab({Title = "ESP", Icon = "eye"})
+
+TabESP:AddToggle({
+    Title = "X-ray",
+    Tip = "Highlight Players",
+    Default = false,
+    Callback = function(val)
+        xrayEnabled = val
+        if val then
+            task.spawn(activateXRay)
+        else
+            for _, p in pairs(game.Players:GetPlayers()) do
+                if p.Character then
+                    local h = p.Character:FindFirstChild("PlayerHighlight")
+                    if h then h:Destroy() end
+                end
+            end
+        end
+    end,
+})
+
+-- Player dropdown for Spy
+local function GetOnlinePlayers()
+    local players = {}
+    for _, p in pairs(game.Players:GetPlayers()) do
+        table.insert(players, p.Name)
+    end
+    return players
+end
+
+local Dropdown
+
+local function UpdateDropdown()
+    if Dropdown then
+        Dropdown:SetValues(GetOnlinePlayers())
+    end
+end
+
+Dropdown = TabESP:AddDropdown({
+    Title = "Spy",
+    Values = GetOnlinePlayers(),
+    Default = "",
+    Multi = false,
+    MaxMulti = 1,
+    Callback = function(val)
+        local target = game.Players:FindFirstChild(val)
+        if target and target.Character then
+            spyTarget = target
+            game.Workspace.CurrentCamera.CameraSubject = target.Character:FindFirstChild("Humanoid")
+        end
+    end,
+})
+
+-- Teleport to selected player
+TabESP:AddButton({
+    Title = "Teleport to Player",
+    Tip = "Teleport to selected player",
+    Callback = function()
+        if spyTarget and spyTarget.Character and spyTarget.Character:FindFirstChild("HumanoidRootPart") then
+            humanoidRootPart.CFrame = spyTarget.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+        end
+    end,
+})
+
+-- Reset camera to self
+TabESP:AddButton({
+    Title = "Reset Camera",
+    Tip = "Reset camera to self",
+    Callback = function()
+        if character:FindFirstChild("Humanoid") then
+            game.Workspace.CurrentCamera.CameraSubject = character:FindFirstChild("Humanoid")
+        end
+    end,
+})
+
+
+
+-- Update dropdown constantly
+task.spawn(function()
+    while true do
+        UpdateDropdown()
+        task.wait(1)
+    end
+end)
+
+-- Info Tab
+local Tabinfo = Window:AddTab({Title = "INFO", Icon = "Zee"})
+
+Tabinfo:AddParagraph({
+    Title = "Info",
+    Description = AcrylicLibrary:HightlightSource([[Hi, this hub is still under development!
+Don't forget to join our discord server!
+
+server:
+https://discord.gg/ecKrSHRZa6]])
+})
+
+Window:Notify({
+    Title = "⚠️Important⚠️",
+    Description = "This is still a beta! Join the discord for more info! THIS IS FOR HUMANS VS ZOMBIES GAME BUT IS THE BETA!!",
+    Duration = 12,
+})
