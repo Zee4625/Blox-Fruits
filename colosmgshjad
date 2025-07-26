@@ -390,6 +390,18 @@ task.spawn(function()
     end
 end)
 
+-- Collab Tab
+local TabCollab = Window:AddTab({Title = "COLLAB", Icon = "users"})
+
+TabCollab:AddButton({
+    Title = "Zee and CooKID",
+    Tip = "Run collaborative script by Zee and CooKID",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/COOLKID", true))()
+    end,
+})
+
+
 -- Info Tab
 local Tabinfo = Window:AddTab({Title = "INFO", Icon = "Zee"})
 
