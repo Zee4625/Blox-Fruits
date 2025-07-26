@@ -57,9 +57,86 @@ local function moveWithKeys()
     humanoidRootPart.Velocity = direction * moveSpeed
 end
 
--- Fly GUI Speed Slider setup
--- ... (restul sliderului este neschimbat și e același ca în scriptul original)
--- [OMIS PENTRU SPAȚIU — ÎL PĂSTREZ ÎN SCRIPTUL REAL]
+-- Fly functions
+local function toggleFly(enable)
+    if enable then
+        if flyActive then return end
+        flyActive = true
+
+        local root = humanoidRootPart
+        bodyGyro = Instance.new("BodyGyro")
+        bodyGyro.P = 9e4
+        bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bodyGyro.CFrame = root.CFrame
+        bodyGyro.Parent = root
+
+        bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Velocity = Vector3.new(0,0,0)
+        bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        bodyVelocity.Parent = root
+
+        flyConnection = RunService.Heartbeat:Connect(function()
+            local camCF = workspace.CurrentCamera.CFrame
+            bodyVelocity.Velocity = Vector3.new(0,0,0)
+            bodyGyro.CFrame = camCF
+
+            local moveVec = Vector3.new()
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                moveVec = moveVec + camCF.LookVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                moveVec = moveVec - camCF.LookVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                moveVec = moveVec - camCF.RightVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                moveVec = moveVec + camCF.RightVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                moveVec = moveVec + Vector3.new(0,1,0)
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                moveVec = moveVec - Vector3.new(0,1,0)
+            end
+
+            bodyVelocity.Velocity = moveVec.Unit * moveSpeed
+        end)
+    else
+        if not flyActive then return end
+        flyActive = false
+        if bodyGyro then
+            bodyGyro:Destroy()
+            bodyGyro = nil
+        end
+        if bodyVelocity then
+            bodyVelocity:Destroy()
+            bodyVelocity = nil
+        end
+        if flyConnection then
+            flyConnection:Disconnect()
+            flyConnection = nil
+        end
+    end
+end
+
+-- Jump Boost function
+local function activateJump()
+    if humanoid then
+        humanoid.JumpPower = 100
+    end
+end
+
+-- Wallhack function
+local function toggleWallHack()
+    if not character then return end
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+            part.Transparency = 0.5
+        end
+    end
+end
 
 -- Tabs
 local TabMovement = Window:AddTab({Title = "HOME", Icon = "home"})
@@ -70,6 +147,14 @@ TabMovement:AddToggle({
     Default = false,
     Callback = function(val)
         flightActive = val
+        if val then
+            RunService:BindToRenderStep("SpeedMove", 201, moveWithKeys)
+        else
+            RunService:UnbindFromRenderStep("SpeedMove")
+            if humanoidRootPart then
+                humanoidRootPart.Velocity = Vector3.new(0,0,0)
+            end
+        end
     end,
 })
 
@@ -98,6 +183,7 @@ TabMovement:AddToggle({
                 for _, part in pairs(character:GetDescendants()) do
                     if part:IsA("BasePart") then
                         part.CanCollide = true
+                        part.Transparency = 0
                     end
                 end
             end
@@ -114,19 +200,27 @@ TabMovement:AddToggle({
     end,
 })
 
-TabMovement:AddButton({
-    Title = "Rejoin",
-    Tip = "Click to rejoin the game",
-    Callback = function()
-        game:GetService("TeleportService"):Teleport(game.PlaceId)
-    end,
-})
 
 -- CUSTOM TEAM DROPDOWN
 local function refreshTeams()
     local teams = {}
     for _, team in pairs(game:GetService("Teams"):GetChildren()) do
         table.insert(teams, team.Name)
+    end
+    -- Add custom teams if not present
+    if not game:GetService("Teams"):FindFirstChild("Admin") then
+        local adminTeam = Instance.new("Team")
+        adminTeam.Name = "Admin"
+        adminTeam.TeamColor = BrickColor.new("Really red")
+        adminTeam.AutoAssignable = false
+        adminTeam.Parent = game:GetService("Teams")
+    end
+    if not game:GetService("Teams"):FindFirstChild("Owner") then
+        local ownerTeam = Instance.new("Team")
+        ownerTeam.Name = "Owner"
+        ownerTeam.TeamColor = BrickColor.new("Really blue")
+        ownerTeam.AutoAssignable = false
+        ownerTeam.Parent = game:GetService("Teams")
     end
     table.insert(teams, "Admin")
     table.insert(teams, "Owner")
@@ -141,13 +235,6 @@ TeamDropdown = TabMovement:AddDropdown({
     Default = "",
     Callback = function(selectedTeam)
         local teamObj = game:GetService("Teams"):FindFirstChild(selectedTeam)
-        if not teamObj and (selectedTeam == "Admin" or selectedTeam == "Owner") then
-            teamObj = Instance.new("Team")
-            teamObj.Name = selectedTeam
-            teamObj.TeamColor = BrickColor.Random()
-            teamObj.AutoAssignable = false
-            teamObj.Parent = game:GetService("Teams")
-        end
         if teamObj then
             player.Team = teamObj
             player.Neutral = false
@@ -167,7 +254,7 @@ TeamDropdown = TabMovement:AddDropdown({
     end,
 })
 
--- Actualizare constantă dropdown
+-- Update dropdown values periodically
 task.spawn(function()
     while true do
         task.wait(2)
@@ -175,8 +262,14 @@ task.spawn(function()
     end
 end)
 
--- Restul scriptului (ESP, Info etc.) este păstrat neschimbat
--- [OMIS PENTRU LUNGIME – EXISTĂ ÎN SCRIPTUL TĂU ACTUAL]
+TabMovement:AddButton({
+    Title = "Rejoin",
+    Tip = "Click to rejoin the game",
+    Callback = function()
+        game:GetService("TeleportService"):Teleport(game.PlaceId)
+    end,
+})
+
 -- ESP Tab
 local TabESP = Window:AddTab({Title = "ESP", Icon = "eye"})
 
@@ -187,12 +280,19 @@ TabESP:AddToggle({
     Callback = function(val)
         xrayEnabled = val
         if val then
-            task.spawn(activateXRay)
+            for _, p in pairs(game.Players:GetPlayers()) do
+                if p.Character and not p.Character:FindFirstChild("PlayerHighlight") then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Name = "PlayerHighlight"
+                    highlight.Adornee = p.Character
+                    highlight.Parent = p.Character
+                end
+            end
         else
             for _, p in pairs(game.Players:GetPlayers()) do
                 if p.Character then
-                    local h = p.Character:FindFirstChild("PlayerHighlight")
-                    if h then h:Destroy() end
+                    local highlight = p.Character:FindFirstChild("PlayerHighlight")
+                    if highlight then highlight:Destroy() end
                 end
             end
         end
@@ -226,7 +326,7 @@ Dropdown = TabESP:AddDropdown({
         local target = game.Players:FindFirstChild(val)
         if target and target.Character then
             spyTarget = target
-            game.Workspace.CurrentCamera.CameraSubject = target.Character:FindFirstChild("Humanoid")
+            game.Workspace.CurrentCamera.CameraSubject = target.Character:FindFirstChild("Humanoid") or target.Character:FindFirstChildWhichIsA("Humanoid")
         end
     end,
 })
@@ -247,13 +347,11 @@ TabESP:AddButton({
     Title = "Reset Camera",
     Tip = "Reset camera to self",
     Callback = function()
-        if character:FindFirstChild("Humanoid") then
-            game.Workspace.CurrentCamera.CameraSubject = character:FindFirstChild("Humanoid")
+        if character and character:FindFirstChild("Humanoid") then
+            game.Workspace.CurrentCamera.CameraSubject = character.Humanoid
         end
     end,
 })
-
-
 
 -- Update dropdown constantly
 task.spawn(function()
