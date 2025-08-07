@@ -445,7 +445,7 @@ TabCollab1:AddButton({
     end,
 })
 
-TabCollab:AddButton({
+TabCollab1:AddButton({
     Title = "Zee and Zombie.Anim",
     Tip = "Run collaborative script by Zee and Zombie.Anim",
     Callback = function()
@@ -453,7 +453,7 @@ TabCollab:AddButton({
     end,
 })
 
-TabCollab:AddButton({
+TabCollab1:AddButton({
     Title = "Zee and CoolKID.HUBs",
     Tip = "Run collaborative script by Zee and CooKID",
     Callback = function()
