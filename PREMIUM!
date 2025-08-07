@@ -397,13 +397,7 @@ end)
 -- Collab Tab
 local TabCollab = Window:AddTab({Title = "COLLAB", Icon = "users"})
 
-TabCollab:AddButton({
-    Title = "Zee and CoolKID.HUBs",
-    Tip = "Run collaborative script by Zee and CooKID",
-    Callback = function()
-loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/COOLKID", true))()
-    end,
-})
+
 
 TabCollab:AddButton({
     Title = "Zee and Cars.HB",
@@ -421,13 +415,7 @@ TabCollab:AddButton({
     end,
 })
 
-TabCollab:AddButton({
-    Title = "Zee and Zombie.Anim",
-    Tip = "Run collaborative script by Zee and Zombie.Anim",
-    Callback = function()
-        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZOMBIUUU", true))()
-    end,
-})
+
 
 TabCollab:AddButton({
     Title = "Zee and Jerk.ANIM",
@@ -445,11 +433,31 @@ TabCollab:AddButton({
     end,
 })
 
-TabCollab:AddButton({
+
+-- Collab Tab
+local TabCollab1 = Window:AddTab({Title = "COLLAB-Ui", Icon = "table"})
+
+TabCollab1:AddButton({
     Title = "Zee and Piano",
     Tip = "Run collaborative script by Zee and Piano",
     Callback = function()
         loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Piano", true))()
+    end,
+})
+
+TabCollab:AddButton({
+    Title = "Zee and Zombie.Anim",
+    Tip = "Run collaborative script by Zee and Zombie.Anim",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZOMBIUUU", true))()
+    end,
+})
+
+TabCollab:AddButton({
+    Title = "Zee and CoolKID.HUBs",
+    Tip = "Run collaborative script by Zee and CooKID",
+    Callback = function()
+loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/COOLKID", true))()
     end,
 })
 
