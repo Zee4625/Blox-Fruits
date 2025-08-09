@@ -454,6 +454,14 @@ TabCollab1:AddButton({
 })
 
 TabCollab1:AddButton({
+    Title = "Zee and R15.ANIM",
+    Tip = "Run collaborative script by Zee and R15.ANIM",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/r154", true))()
+    end,
+})
+
+TabCollab1:AddButton({
     Title = "Zee and CoolKID.HUBs",
     Tip = "Run collaborative script by Zee and CooKID",
     Callback = function()
@@ -479,4 +487,3 @@ Window:Notify({
     Description = "This is still a beta! Join the discord for more info! THIS IS FOR ANY GAME BUT IS THE BETA!!",
     Duration = 12,
 })
-
