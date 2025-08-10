@@ -15,13 +15,13 @@ if success and le then
     le.LISTEN_FOR_INPUT = false
 end
 
--- Rayfield Loader (ZeeHUB V8)
+-- Rayfield Loader (Alone x ZeeHUB v8)
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "ZeeHUB V8",
+    Name = "Alone x ZeeHUB v8",
     Icon = 107904589783906,
-    LoadingTitle = "ZeeHUB V8",
+    LoadingTitle = "Alone x ZeeHUB v8",
     LoadingSubtitle = "All-in-One",
     Theme = "Default",
     DisableRayfieldPrompts = true,
