@@ -1,0 +1,446 @@
+-- ZeeHUB V8 + ZeeHUB v7 tabs (Rayfield combined)
+-- Copy-paste ready
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TeleportService = game:GetService("TeleportService")
+
+-- Limb Extender (opțional)
+local success, le = pcall(function()
+    return loadstring(game:HttpGet('https://raw.githubusercontent.com/AAPVdev/scripts/refs/heads/main/LimbExtender.lua'))()
+end)
+if success and le then
+    le.LISTEN_FOR_INPUT = false
+end
+
+-- Rayfield Loader (ZeeHUB V8)
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "ZeeHUB V8",
+    Icon = 107904589783906,
+    LoadingTitle = "ZeeHUB V8",
+    LoadingSubtitle = "All-in-One",
+    Theme = "Default",
+    DisableRayfieldPrompts = true,
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "ZeeHubConfigs",
+        FileName = "Configuration"
+    },
+})
+
+-- === Character bind & rebind ===
+local character, humanoid, humanoidRootPart
+local function bindCharacter()
+    character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    humanoid = character:WaitForChild("Humanoid")
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+end
+bindCharacter()
+LocalPlayer.CharacterAdded:Connect(bindCharacter)
+
+-- === Shared vars ===
+-- movement/speed
+local speedMode = false
+local speedValue = 39
+
+-- fly
+local flyActive = false
+local flySpeed = 39
+local bodyGyro, bodyVelocity, flyConn
+
+-- xray / esp / spy
+local xrayEnabled = false
+local spyTarget = nil
+
+-- helper: clamp
+local function clamp(n, a, b) return math.clamp(n, a, b) end
+
+-- === Speed movement (Heartbeat) ===
+RunService.Heartbeat:Connect(function()
+    if speedMode and humanoidRootPart and humanoid then
+        local dir = Vector3.new()
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir += humanoidRootPart.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir -= humanoidRootPart.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir -= humanoidRootPart.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir += humanoidRootPart.CFrame.RightVector end
+        if dir.Magnitude > 0 then
+            humanoidRootPart.Velocity = dir.Unit * speedValue
+        else
+            -- optional: zero horizontal velocity (preserve Y)
+            humanoidRootPart.Velocity = Vector3.new(0, humanoidRootPart.Velocity.Y, 0)
+        end
+    end
+end)
+
+-- === Fly implementation (uses BodyGyro/BodyVelocity) ===
+local function enableFly(state)
+    flyActive = state
+    -- cleanup existing
+    if flyConn then
+        pcall(function() flyConn:Disconnect() end)
+        flyConn = nil
+    end
+    if not flyActive then
+        if bodyGyro then pcall(function() bodyGyro:Destroy() end) end
+        if bodyVelocity then pcall(function() bodyVelocity:Destroy() end) end
+        return
+    end
+
+    if not humanoidRootPart then return end
+
+    bodyGyro = Instance.new("BodyGyro")
+    bodyGyro.P = 9e4
+    bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    bodyGyro.CFrame = humanoidRootPart.CFrame
+    bodyGyro.Parent = humanoidRootPart
+
+    bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+    bodyVelocity.Velocity = Vector3.new(0,0,0)
+    bodyVelocity.Parent = humanoidRootPart
+
+    flyConn = RunService.Heartbeat:Connect(function()
+        if not flyActive then return end
+        if workspace.CurrentCamera then
+            bodyGyro.CFrame = workspace.CurrentCamera.CFrame
+        end
+
+        local mv = Vector3.new()
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then mv += workspace.CurrentCamera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then mv -= workspace.CurrentCamera.CFrame.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then mv -= workspace.CurrentCamera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then mv += workspace.CurrentCamera.CFrame.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then mv += Vector3.new(0,1,0) end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then mv -= Vector3.new(0,1,0) end
+
+        if mv.Magnitude > 0 then
+            bodyVelocity.Velocity = mv.Unit * flySpeed
+        else
+            bodyVelocity.Velocity = Vector3.new(0,0,0)
+        end
+    end)
+end
+
+-- === Jump Boost toggle helper ===
+local function setJumpBoost(enabled)
+    if humanoid then
+        humanoid.JumpPower = enabled and 200 or 50
+    end
+end
+
+-- === Wallhack (toggle CanCollide) ===
+local function setWallHack(enabled)
+    if not character then return end
+    for _, p in ipairs(character:GetDescendants()) do
+        if p:IsA("BasePart") then
+            -- store original CanCollide in an attribute if turning off later
+            if enabled then
+                p:SetAttribute("__Zee_orig_canCollide", p.CanCollide)
+                p.CanCollide = false
+            else
+                local orig = p:GetAttribute("__Zee_orig_canCollide")
+                if orig ~= nil then
+                    p.CanCollide = orig
+                    p:SetAttribute("__Zee_orig_canCollide", nil)
+                else
+                    p.CanCollide = true
+                end
+            end
+        end
+    end
+end
+
+-- === X-Ray ESP ===
+local function doXrayOnce()
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            if not p.Character:FindFirstChild("PlayerHighlight") then
+                local h = Instance.new("Highlight")
+                h.Name = "PlayerHighlight"
+                h.FillColor = Color3.fromRGB(255,255,255)
+                h.FillTransparency = 0.3
+                h.OutlineColor = Color3.fromRGB(255,255,255)
+                h.Parent = p.Character
+            end
+        end
+    end
+end
+
+local function stopXray()
+    for _, p in ipairs(Players:GetPlayers()) do
+        local h = p.Character and p.Character:FindFirstChild("PlayerHighlight")
+        if h then pcall(function() h:Destroy() end) end
+    end
+end
+
+-- manage background loop for xray
+local xrayLoop
+local function setXray(enabled)
+    xrayEnabled = enabled
+    if enabled then
+        -- spawn loop
+        if xrayLoop then xrayLoop = nil end
+        task.spawn(function()
+            while xrayEnabled do
+                doXrayOnce()
+                task.wait(4)
+            end
+        end)
+    else
+        stopXray()
+    end
+end
+
+-- === Spy dropdown helpers ===
+local function getPlayerNames()
+    local list = {}
+    for _, p in ipairs(Players:GetPlayers()) do
+        table.insert(list, p.Name)
+    end
+    return list
+end
+
+-- === Create Tabs (Rayfield) ===
+
+-- HOME tab (Movement / Fly / Jump / Wallhack / Rejoin)
+local HomeTab = Window:CreateTab("HOME", "home")
+
+HomeTab:CreateToggle({
+    Name = "Speed Mode",
+    CurrentValue = false,
+    Callback = function(v)
+        speedMode = v
+    end,
+})
+HomeTab:CreateSlider({
+    Name = "Speed Value",
+    Range = {1, 100},
+    Increment = 1,
+    CurrentValue = speedValue,
+    Callback = function(v)
+        speedValue = v
+    end,
+})
+
+HomeTab:CreateToggle({
+    Name = "Jump Boost",
+    CurrentValue = false,
+    Callback = function(v)
+        setJumpBoost(v)
+    end,
+})
+
+HomeTab:CreateToggle({
+    Name = "Wallhack",
+    CurrentValue = false,
+    Callback = function(v)
+        setWallHack(v)
+    end,
+})
+
+HomeTab:CreateToggle({
+    Name = "Fly Mode",
+    CurrentValue = false,
+    Callback = function(v)
+        enableFly(v)
+    end,
+})
+HomeTab:CreateSlider({
+    Name = "Fly Speed",
+    Range = {1, 300},
+    Increment = 1,
+    CurrentValue = flySpeed,
+    Callback = function(v)
+        flySpeed = v
+    end,
+})
+
+HomeTab:CreateButton({
+    Name = "Rejoin",
+    Callback = function()
+        TeleportService:Teleport(game.PlaceId)
+    end,
+})
+
+-- ESP tab (X-Ray, Spy, Teleport to Spy, Reset Camera)
+local EspTab = Window:CreateTab("ESP", "eye")
+
+EspTab:CreateToggle({
+    Name = "X-Ray ESP",
+    CurrentValue = false,
+    Callback = function(v)
+        setXray(v)
+    end,
+})
+
+-- Spy dropdown, update dynamically
+local SpyDropdown = EspTab:CreateDropdown({
+    Name = "Spy Player",
+    Options = getPlayerNames(),
+    CurrentOption = {},
+    Multi = false,
+    Callback = function(opt)
+        if opt and opt[1] then
+            local target = Players:FindFirstChild(opt[1])
+            if target and target.Character and target.Character:FindFirstChild("Humanoid") then
+                spyTarget = target
+                workspace.CurrentCamera.CameraSubject = target.Character:FindFirstChild("Humanoid")
+            end
+        end
+    end,
+})
+
+-- refresh dropdown every second
+task.spawn(function()
+    while task.wait(1) do
+        local opts = getPlayerNames()
+        pcall(function() SpyDropdown:Refresh(opts) end)
+    end
+end)
+
+EspTab:CreateButton({
+    Name = "Teleport to Spy Target",
+    Callback = function()
+        if spyTarget and spyTarget.Character and spyTarget.Character:FindFirstChild("HumanoidRootPart") and humanoidRootPart then
+            humanoidRootPart.CFrame = spyTarget.Character.HumanoidRootPart.CFrame + Vector3.new(0,3,0)
+        end
+    end,
+})
+
+EspTab:CreateButton({
+    Name = "Reset Camera",
+    Callback = function()
+        if humanoid then
+            workspace.CurrentCamera.CameraSubject = humanoid
+        else
+            -- fallback
+            workspace.CurrentCamera.CameraSubject = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+        end
+    end,
+})
+
+-- COLLAB tab (buttons to load remote scripts from V7)
+local CollabTab = Window:CreateTab("COLLAB", "users")
+
+CollabTab:CreateButton({
+    Name = "Zee and Cars.HB",
+    Callback = function()
+        pcall(function()
+            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/car", true))()
+        end)
+    end,
+})
+CollabTab:CreateButton({
+    Name = "Zee and Invincible.Fly",
+    Callback = function()
+        pcall(function()
+            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FLY", true))()
+        end)
+    end,
+})
+CollabTab:CreateButton({
+    Name = "Zee and Jerk.ANIM",
+    Callback = function()
+        pcall(function()
+            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JERCCC", true))()
+        end)
+    end,
+})
+CollabTab:CreateButton({
+    Name = "Zee and Wally",
+    Callback = function()
+        pcall(function()
+            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WALLY", true))()
+        end)
+    end,
+})
+
+-- COLLAB-Ui tab (more collabs)
+local CollabUiTab = Window:CreateTab("COLLAB-Ui", "table")
+
+CollabUiTab:CreateButton({
+    Name = "Zee and Piano",
+    Callback = function()
+        pcall(function()
+            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Piano", true))()
+        end)
+    end,
+})
+CollabUiTab:CreateButton({
+    Name = "Zee and Zombie.Anim",
+    Callback = function()
+        pcall(function()
+            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZOMBIUUU", true))()
+        end)
+    end,
+})
+CollabUiTab:CreateButton({
+    Name = "Zee and R15.ANIM",
+    Callback = function()
+        pcall(function()
+            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/r154", true))()
+        end)
+    end,
+})
+CollabUiTab:CreateButton({
+    Name = "Zee and CoolKID.HUBs",
+    Callback = function()
+        pcall(function()
+            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/COOLKID", true))()
+        end)
+    end,
+})
+
+-- INFO tab (paragraph + notify)
+local InfoTab = Window:CreateTab("INFO", "Zee")
+
+InfoTab:CreateParagraph({
+    Title = "Info",
+    Content = [[Hi, this hub is still under development!
+Don't forget to join our discord server!
+
+server:
+https://discord.gg/ecKrSHRZa6]]
+})
+
+-- Try to show a notification (if Rayfield supports it)
+pcall(function()
+    if Window.Notify then
+        Window:Notify({
+            Title = "⚠️⚠️⚠️Important⚠️⚠️⚠️",
+            Content = "This is still a beta! Join the discord for more info! THIS IS FOR ANY GAME BUT IS THE BETA!!",
+            Duration = 10
+        })
+    else
+        -- fallback using StarterGui
+        pcall(function()
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "⚠️ ZeeHUB",
+                Text = "This is still a beta! Join the discord for more info!",
+                Duration = 8
+            })
+        end)
+    end
+end)
+
+-- === Cleanup on unload (optional) ===
+local function cleanup()
+    -- destroy highlights
+    stopXray()
+    -- destroy body movers
+    if flyConn then pcall(function() flyConn:Disconnect() end) end
+    if bodyGyro then pcall(function() bodyGyro:Destroy() end) end
+    if bodyVelocity then pcall(function() bodyVelocity:Destroy() end) end
+end
+
+-- When script is unloaded (if supported)
+if getsenv then
+    -- no-op: mostly admin only. keep cleanup callable.
+end
+
+-- End of combined script
+Rayfield:LoadConfiguration()
