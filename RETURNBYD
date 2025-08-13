@@ -10,160 +10,132 @@ local lastDeathCFrame = nil
 
 -- Salvează poziția la moarte
 local function onHumanoidDied(humanoid)
-    if humanoid and humanoid.RootPart then
-        lastDeathCFrame = humanoid.RootPart.CFrame
-    elseif player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        lastDeathCFrame = player.Character.HumanoidRootPart.CFrame
-    end
+	if humanoid and humanoid.RootPart then
+		lastDeathCFrame = humanoid.RootPart.CFrame
+	elseif player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+		lastDeathCFrame = player.Character.HumanoidRootPart.CFrame
+	end
 end
 
--- Sunet cu fade in/out
+-- Sunet instant
 local function playReviveSound()
-    local sound = Instance.new("Sound")
-    sound.SoundId = REVIVE_SOUND_ID
-    sound.Volume = 0
-    sound.Parent = workspace.CurrentCamera
-    sound:Play()
-    
-    -- Fade in volumul
-    for i = 0, 1, 0.1 do
-        sound.Volume = i * 4
-        task.wait(0.05)
-    end
-
-    -- După 2 secunde fade out
-    task.delay(2, function()
-        for i = 1, 0, -0.1 do
-            sound.Volume = i * 4
-            task.wait(0.05)
-        end
-        sound:Stop()
-        sound:Destroy()
-    end)
+	local sound = Instance.new("Sound")
+	sound.SoundId = REVIVE_SOUND_ID
+	sound.Volume = 4
+	sound.Parent = workspace.CurrentCamera
+	sound:Play()
+	sound.Ended:Connect(function()
+		sound:Destroy()
+	end)
 end
 
--- Glow pe caracter
-local function addGlowEffect()
-    local char = player.Character
-    if not char then return end
-    for _, part in pairs(char:GetChildren()) do
-        if part:IsA("BasePart") then
-            local glow = Instance.new("SelectionBox")
-            glow.Adornee = part
-            glow.LineThickness = 0.05
-            glow.Color3 = Color3.fromRGB(70, 130, 255)
-            glow.Transparency = 0
-            glow.Name = "ReviveGlow"
-            glow.Parent = char
-            task.delay(4, function()
-                if glow and glow.Parent then glow:Destroy() end
-            end)
-        end
-    end
+-- Efect glitch + scanlines + fade pe ecran
+local function showGlitchEffect()
+	local gui = player:WaitForChild("PlayerGui")
+
+	-- Layer negru
+	local blackFrame = Instance.new("Frame")
+	blackFrame.Size = UDim2.new(1,0,1,0)
+	blackFrame.BackgroundColor3 = Color3.new(0,0,0)
+	blackFrame.BackgroundTransparency = 1
+	blackFrame.ZIndex = 10
+	blackFrame.Parent = gui
+
+	-- Efect albastru
+	local blueFrame = Instance.new("Frame")
+	blueFrame.Size = UDim2.new(1,0,1,0)
+	blueFrame.BackgroundColor3 = Color3.fromRGB(40, 120, 255)
+	blueFrame.BackgroundTransparency = 1
+	blueFrame.ZIndex = 11
+	blueFrame.Parent = gui
+
+	-- Scanlines
+	local scan = Instance.new("ImageLabel")
+	scan.Size = UDim2.new(1,0,1,0)
+	scan.BackgroundTransparency = 1
+	scan.Image = "rbxassetid://6066014630"
+	scan.ImageTransparency = 0.6
+	scan.ZIndex = 12
+	scan.Parent = gui
+
+	-- Noise
+	local noise = Instance.new("ImageLabel")
+	noise.Size = UDim2.new(1,0,1,0)
+	noise.BackgroundTransparency = 1
+	noise.Image = "rbxassetid://7532274665"
+	noise.ImageTransparency = 0.7
+	noise.ZIndex = 13
+	noise.Parent = gui
+
+	-- Blur
+	local blur = Instance.new("BlurEffect")
+	blur.Size = 0
+	blur.Parent = Lighting
+
+	-- Fade in rapid
+	TweenService:Create(blackFrame, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+	TweenService:Create(blueFrame, TweenInfo.new(0.3), {BackgroundTransparency = 0.4}):Play()
+	TweenService:Create(blur, TweenInfo.new(0.3), {Size = 12}):Play()
+
+	-- Mic shake imagine
+	local cam = workspace.CurrentCamera
+	local startCF = cam.CFrame
+	local elapsed = 0
+	local conn
+	conn = RunService.RenderStepped:Connect(function(dt)
+		elapsed += dt
+		if elapsed > 0.5 then
+			conn:Disconnect()
+			cam.CFrame = startCF
+		else
+			local offset = Vector3.new(
+				(math.random() - 0.5) * 0.2,
+				(math.random() - 0.5) * 0.2,
+				0
+			)
+			cam.CFrame = startCF * CFrame.new(offset)
+		end
+	end)
+
+	-- Fade out rapid
+	task.delay(0.6, function()
+		TweenService:Create(blackFrame, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
+		TweenService:Create(blueFrame, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
+		TweenService:Create(blur, TweenInfo.new(0.3), {Size = 0}):Play()
+		task.delay(0.4, function()
+			blackFrame:Destroy()
+			blueFrame:Destroy()
+			scan:Destroy()
+			noise:Destroy()
+			blur:Destroy()
+		end)
+	end)
 end
 
--- Efect particule la respawn
-local function createRespawnParticles()
-    local char = player.Character
-    if not char then return end
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-
-    local particleEmitter = Instance.new("ParticleEmitter")
-    particleEmitter.Color = ColorSequence.new(Color3.fromRGB(100, 150, 255), Color3.fromRGB(50, 100, 255))
-    particleEmitter.LightEmission = 0.7
-    particleEmitter.Size = NumberSequence.new(0.5, 1)
-    particleEmitter.Rate = 100
-    particleEmitter.Speed = NumberRange.new(1, 3)
-    particleEmitter.Lifetime = NumberRange.new(1, 1.5)
-    particleEmitter.Parent = root
-
-    task.delay(1.5, function()
-        particleEmitter.Enabled = false
-        task.delay(2, function()
-            particleEmitter:Destroy()
-        end)
-    end)
-end
-
--- Efect vizual albastru subtil
-local function showReturnByDeathEffect()
-    local playerGui = player:WaitForChild("PlayerGui")
-
-    local blueFrame = Instance.new("Frame")
-    blueFrame.Size = UDim2.new(1, 0, 1, 0)
-    blueFrame.BackgroundColor3 = Color3.fromRGB(40, 120, 255)
-    blueFrame.BackgroundTransparency = 1
-    blueFrame.ZIndex = 10
-    blueFrame.Parent = playerGui
-
-    local tweenIn = TweenService:Create(blueFrame, TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundTransparency = 0.3})
-    tweenIn:Play()
-    tweenIn.Completed:Wait()
-
-    task.wait(1)
-
-    local tweenOut = TweenService:Create(blueFrame, TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {BackgroundTransparency = 1})
-    tweenOut:Play()
-    tweenOut.Completed:Wait()
-
-    blueFrame:Destroy()
-end
-
--- Camera shake subtil
-local function cameraShake(duration, magnitude)
-    local cam = workspace.CurrentCamera
-    local startCF = cam.CFrame
-    local elapsed = 0
-    local dt = RunService.RenderStepped
-
-    local conn
-    conn = dt:Connect(function(step)
-        elapsed = elapsed + step
-        if elapsed > duration then
-            cam.CFrame = startCF
-            conn:Disconnect()
-            return
-        end
-        local offset = Vector3.new(
-            (math.random() - 0.5) * 2 * magnitude,
-            (math.random() - 0.5) * 2 * magnitude,
-            (math.random() - 0.5) * 2 * magnitude
-        )
-        cam.CFrame = startCF * CFrame.new(offset)
-    end)
-end
-
--- Respawn cu delay si efecte
+-- Respawn instant
 local function respawnAtLastDeath()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and lastDeathCFrame then
-        -- Pauza de 0.7 secunde înainte să revii
-        task.wait(0.1)
-        
-        player.Character.HumanoidRootPart.CFrame = lastDeathCFrame
-        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid.Health = humanoid.MaxHealth
-        end
+	if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and lastDeathCFrame then
+		player.Character.HumanoidRootPart.CFrame = lastDeathCFrame
+		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid.Health = humanoid.MaxHealth
+		end
 
-        playReviveSound()
-        showReturnByDeathEffect()
-        addGlowEffect()
-        createRespawnParticles()
-        cameraShake(0.5, 0.15)
-    end
+		playReviveSound()
+		showGlitchEffect()
+	end
 end
 
 local function onCharacterAdded(char)
-    local humanoid = char:WaitForChild("Humanoid")
-    humanoid.Died:Connect(function()
-        onHumanoidDied(humanoid)
-    end)
-    respawnAtLastDeath()
+	local humanoid = char:WaitForChild("Humanoid")
+	humanoid.Died:Connect(function()
+		onHumanoidDied(humanoid)
+	end)
+	respawnAtLastDeath()
 end
 
 player.CharacterAdded:Connect(onCharacterAdded)
 
 if player.Character then
-    onCharacterAdded(player.Character)
+	onCharacterAdded(player.Character)
 end
