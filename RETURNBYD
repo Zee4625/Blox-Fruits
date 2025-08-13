@@ -5,7 +5,6 @@ local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 local REVIVE_SOUND_ID = "rbxassetid://18597544476"
-
 local lastDeathCFrame = nil
 
 -- Salvează poziția la moarte
@@ -17,115 +16,132 @@ local function onHumanoidDied(humanoid)
 	end
 end
 
--- Sunet instant
+-- Sunet epic de revive
 local function playReviveSound()
 	local sound = Instance.new("Sound")
 	sound.SoundId = REVIVE_SOUND_ID
-	sound.Volume = 4
+	sound.Volume = 0
 	sound.Parent = workspace.CurrentCamera
 	sound:Play()
-	sound.Ended:Connect(function()
+	for i = 0, 1, 0.1 do
+		sound.Volume = i * 4
+		task.wait(0.03)
+	end
+	task.delay(2, function()
+		for i = 1, 0, -0.1 do
+			sound.Volume = i * 4
+			task.wait(0.03)
+		end
+		sound:Stop()
 		sound:Destroy()
 	end)
 end
 
--- Efect glitch + scanlines + fade pe ecran
-local function showGlitchEffect()
+-- Time rewind efect vizual
+local function timeRewindEffect()
 	local gui = player:WaitForChild("PlayerGui")
+	local rewindFrame = Instance.new("Frame")
+	rewindFrame.Size = UDim2.new(1,0,1,0)
+	rewindFrame.BackgroundColor3 = Color3.new(1,1,1)
+	rewindFrame.BackgroundTransparency = 1
+	rewindFrame.ZIndex = 20
+	rewindFrame.Parent = gui
 
-	-- Layer negru
-	local blackFrame = Instance.new("Frame")
-	blackFrame.Size = UDim2.new(1,0,1,0)
-	blackFrame.BackgroundColor3 = Color3.new(0,0,0)
-	blackFrame.BackgroundTransparency = 1
-	blackFrame.ZIndex = 10
-	blackFrame.Parent = gui
-
-	-- Efect albastru
-	local blueFrame = Instance.new("Frame")
-	blueFrame.Size = UDim2.new(1,0,1,0)
-	blueFrame.BackgroundColor3 = Color3.fromRGB(40, 120, 255)
-	blueFrame.BackgroundTransparency = 1
-	blueFrame.ZIndex = 11
-	blueFrame.Parent = gui
-
-	-- Scanlines
-	local scan = Instance.new("ImageLabel")
-	scan.Size = UDim2.new(1,0,1,0)
-	scan.BackgroundTransparency = 1
-	scan.Image = "rbxassetid://6066014630"
-	scan.ImageTransparency = 0.6
-	scan.ZIndex = 12
-	scan.Parent = gui
-
-	-- Noise
-	local noise = Instance.new("ImageLabel")
-	noise.Size = UDim2.new(1,0,1,0)
-	noise.BackgroundTransparency = 1
-	noise.Image = "rbxassetid://7532274665"
-	noise.ImageTransparency = 0.7
-	noise.ZIndex = 13
-	noise.Parent = gui
-
-	-- Blur
 	local blur = Instance.new("BlurEffect")
 	blur.Size = 0
 	blur.Parent = Lighting
 
-	-- Fade in rapid
-	TweenService:Create(blackFrame, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
-	TweenService:Create(blueFrame, TweenInfo.new(0.3), {BackgroundTransparency = 0.4}):Play()
-	TweenService:Create(blur, TweenInfo.new(0.3), {Size = 12}):Play()
+	local tweenIn = TweenService:Create(rewindFrame, TweenInfo.new(0.2), {BackgroundTransparency = 0.6})
+	local blurIn = TweenService:Create(blur, TweenInfo.new(0.2), {Size = 15})
+	tweenIn:Play()
+	blurIn:Play()
 
-	-- Mic shake imagine
 	local cam = workspace.CurrentCamera
 	local startCF = cam.CFrame
 	local elapsed = 0
 	local conn
 	conn = RunService.RenderStepped:Connect(function(dt)
 		elapsed += dt
-		if elapsed > 0.5 then
+		if elapsed > 0.3 then
 			conn:Disconnect()
 			cam.CFrame = startCF
 		else
-			local offset = Vector3.new(
-				(math.random() - 0.5) * 0.2,
-				(math.random() - 0.5) * 0.2,
-				0
-			)
+			local offset = Vector3.new((math.random()-0.5)*0.15, (math.random()-0.5)*0.15, 0)
 			cam.CFrame = startCF * CFrame.new(offset)
 		end
 	end)
 
-	-- Fade out rapid
-	task.delay(0.6, function()
-		TweenService:Create(blackFrame, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
-		TweenService:Create(blueFrame, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
-		TweenService:Create(blur, TweenInfo.new(0.3), {Size = 0}):Play()
-		task.delay(0.4, function()
-			blackFrame:Destroy()
-			blueFrame:Destroy()
-			scan:Destroy()
-			noise:Destroy()
+	task.delay(0.3, function()
+		local tweenOut = TweenService:Create(rewindFrame, TweenInfo.new(0.2), {BackgroundTransparency = 1})
+		local blurOut = TweenService:Create(blur, TweenInfo.new(0.2), {Size = 0})
+		tweenOut:Play()
+		blurOut:Play()
+		task.delay(0.25, function()
+			rewindFrame:Destroy()
 			blur:Destroy()
 		end)
 	end)
 end
 
--- Respawn instant
+-- Efect cinematic pe ecran
+local function showScreenEffect()
+	local gui = player:WaitForChild("PlayerGui")
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(1,0,1,0)
+	frame.BackgroundColor3 = Color3.fromRGB(40,120,255)
+	frame.BackgroundTransparency = 1
+	frame.ZIndex = 15
+	frame.Parent = gui
+
+	-- Text cinematic
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Text = "Return by Death"
+	textLabel.TextColor3 = Color3.fromRGB(255,255,255)
+	textLabel.Font = Enum.Font.Bangers
+	textLabel.TextScaled = true
+	textLabel.BackgroundTransparency = 1
+	textLabel.Size = UDim2.new(1,0,0.2,0)
+	textLabel.Position = UDim2.new(0,0,0.4,0)
+	textLabel.ZIndex = 16
+	textLabel.Parent = gui
+
+	local tweenIn = TweenService:Create(frame, TweenInfo.new(0.3), {BackgroundTransparency = 0.3})
+	local tweenOut = TweenService:Create(frame, TweenInfo.new(0.5), {BackgroundTransparency = 1})
+	tweenIn:Play()
+	tweenIn.Completed:Wait()
+
+	-- Puls text
+	for i = 1,0,-0.05 do
+		textLabel.TextTransparency = i
+		task.wait(0.03)
+	end
+	for i = 0,1,0.05 do
+		textLabel.TextTransparency = i
+		task.wait(0.03)
+	end
+
+	tweenOut:Play()
+	tweenOut.Completed:Wait()
+	frame:Destroy()
+	textLabel:Destroy()
+end
+
+-- Respawn instant cinematic
 local function respawnAtLastDeath()
 	if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and lastDeathCFrame then
-		player.Character.HumanoidRootPart.CFrame = lastDeathCFrame
 		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
-		if humanoid then
-			humanoid.Health = humanoid.MaxHealth
-		end
+		player.Character.HumanoidRootPart.CFrame = lastDeathCFrame
+		if humanoid then humanoid.Health = humanoid.MaxHealth end
 
 		playReviveSound()
-		showGlitchEffect()
+		timeRewindEffect()
+		showScreenEffect()
+
+		task.wait(0.2) -- mic wait cinematic
 	end
 end
 
+-- Conectare character
 local function onCharacterAdded(char)
 	local humanoid = char:WaitForChild("Humanoid")
 	humanoid.Died:Connect(function()
@@ -135,7 +151,6 @@ local function onCharacterAdded(char)
 end
 
 player.CharacterAdded:Connect(onCharacterAdded)
-
 if player.Character then
 	onCharacterAdded(player.Character)
 end
