@@ -415,7 +415,13 @@ TabCollab:AddButton({
     end,
 })
 
-
+TabCollab:AddButton({
+    Title = "Zee and RETURN BY DEATH!",
+    Tip = "Run collaborative script by Zee and RETURN BY DEATH!",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/RETURNBYD", true))()
+    end,
+})
 
 TabCollab:AddButton({
     Title = "Zee and Jerk.ANIM",
