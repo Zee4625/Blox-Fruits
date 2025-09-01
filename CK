@@ -1,5 +1,3 @@
-Normal Key → ZEE-HUB-ACCESS-8X9Q-2025
-
-Mobile Key → ZEE-MOBILE-KEY-5LMN-4625
-
-Premium Key → DM IN DISCORD!
+ NormalKey = "ZEEHH222"
+ MobileKey = "MOBILE9888"
+ PremiumKey = "VIP012Dff"
