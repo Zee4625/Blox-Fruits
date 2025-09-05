@@ -440,6 +440,17 @@ TabCollab:AddButton({
 })
 
 
+TabCollab:AddButton({
+    Title = "Zee and NarX",
+    Tip = "Run collaborative script by Zee and NarX",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/NARUTo", true))()
+    end,
+})
+
+
+
+
 -- Collab Tab
 local TabCollab1 = Window:AddTab({Title = "COLLAB-Ui", Icon = "table"})
 
