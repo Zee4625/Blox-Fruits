@@ -1,0 +1,942 @@
+-- Kamui
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+
+local player = Players.LocalPlayer
+
+local DIMENSION_ORIGIN = Vector3.new(0, 1000000, 0)
+local RETURN_POSITION = nil
+local IN_KAMUI = false
+local WARP_TIME = 0.1
+local WINDUP_TIME = 0.87
+local COOLDOWN = 2
+local lastWarpTime = 0
+
+local kamuiMusic = Instance.new("Sound")
+kamuiMusic.SoundId = "rbxassetid://9039981149"
+kamuiMusic.Looped = true
+kamuiMusic.Volume = 0.5
+
+local function applyKamuiLighting()
+	Lighting.Ambient = Color3.new(0,0,0)
+	Lighting.OutdoorAmbient = Color3.new(0,0,0)
+	Lighting.FogColor = Color3.new(0,0,0)
+	Lighting.FogStart = 20
+	Lighting.FogEnd = 180
+end
+
+local function restoreNormalLighting()
+	Lighting.Ambient = Color3.fromRGB(127,127,127)
+	Lighting.OutdoorAmbient = Color3.fromRGB(127,127,127)
+	Lighting.FogEnd = 100000
+end
+
+local dimensionFolder = Instance.new("Folder")
+dimensionFolder.Name = "KamuiDimension"
+dimensionFolder.Parent = workspace
+
+local AREA_SIZE, WALL_HEIGHT = 300, 150
+local spawnPositions = {}
+local centralStructurePosition
+
+local floor = Instance.new("Part")
+floor.Size = Vector3.new(AREA_SIZE,1,AREA_SIZE)
+floor.Anchored = true
+floor.Position = DIMENSION_ORIGIN
+floor.Color = Color3.new(0,0,0)
+floor.Material = Enum.Material.SmoothPlastic
+floor.Parent = dimensionFolder
+
+local wallData = {
+	{Vector3.new(AREA_SIZE/2,WALL_HEIGHT/2,0), Vector3.new(1,WALL_HEIGHT,AREA_SIZE)},
+	{Vector3.new(-AREA_SIZE/2,WALL_HEIGHT/2,0), Vector3.new(1,WALL_HEIGHT,AREA_SIZE)},
+	{Vector3.new(0,WALL_HEIGHT/2,AREA_SIZE/2), Vector3.new(AREA_SIZE,WALL_HEIGHT,1)},
+	{Vector3.new(0,WALL_HEIGHT/2,-AREA_SIZE/2), Vector3.new(AREA_SIZE,WALL_HEIGHT,1)}
+}
+
+for _, data in ipairs(wallData) do
+	local wall = Instance.new("Part")
+	wall.Position = DIMENSION_ORIGIN + data[1]
+	wall.Size = data[2]
+	wall.Anchored = true
+	wall.Color = Color3.new(0,0,0)
+	wall.Material = Enum.Material.SmoothPlastic
+	wall.Parent = dimensionFolder
+end
+
+local ceiling = Instance.new("Part")
+ceiling.Size = Vector3.new(AREA_SIZE,1,AREA_SIZE)
+ceiling.Position = DIMENSION_ORIGIN + Vector3.new(0,WALL_HEIGHT,0)
+ceiling.Anchored = true
+ceiling.Color = Color3.new(0,0,0)
+ceiling.Material = Enum.Material.SmoothPlastic
+ceiling.Parent = dimensionFolder
+
+local function createStructures()
+	spawnPositions = {}
+	local structureCount = 130
+	local seed = 12345
+
+	local function deterministicRandom(a, b)
+		seed = (seed * 9301 + 49297) % 233280
+		local rnd = seed / 233280
+		return a + rnd * (b - a)
+	end
+
+	for i = 1, structureCount do
+		local block = Instance.new("Part")
+		block.Anchored = true
+		block.Material = Enum.Material.SmoothPlastic
+		block.Color = Color3.new(1,1,1)
+
+		local sizeX = deterministicRandom(10, 20)
+		local sizeY = deterministicRandom(18, 30)
+		local sizeZ = deterministicRandom(10, 20)
+		if i == 1 then sizeX, sizeY, sizeZ = 30, 25, 30 end
+		block.Size = Vector3.new(sizeX, sizeY, sizeZ)
+
+		local offsetX, offsetZ
+		if i == 1 then
+			offsetX, offsetZ = 0, 0
+		else
+			offsetX = deterministicRandom(-AREA_SIZE/2 + 8, AREA_SIZE/2 - 8)
+			offsetZ = deterministicRandom(-AREA_SIZE/2 + 8, AREA_SIZE/2 - 8)
+		end
+		local baseY = sizeY / 2
+		block.Position = DIMENSION_ORIGIN + Vector3.new(offsetX, baseY, offsetZ)
+		block.Parent = dimensionFolder
+
+		local glow = Instance.new("PointLight")
+		glow.Brightness = 2
+		glow.Range = 18
+		glow.Color = Color3.new(1,1,1)
+		glow.Parent = block
+
+		local spawnPos = block.Position + Vector3.new(0, sizeY/2 + 3, 0)
+		table.insert(spawnPositions, spawnPos)
+		if i == 1 then centralStructurePosition = spawnPos end
+	end
+end
+createStructures()
+
+local function warpEffect(callback)
+	local blur = Instance.new("BlurEffect")
+	blur.Size = 0
+	blur.Parent = Lighting
+
+	local tweenIn = TweenService:Create(blur,TweenInfo.new(WARP_TIME,Enum.EasingStyle.Sine,Enum.EasingDirection.Out),{Size=24})
+	tweenIn:Play()
+	tweenIn.Completed:Wait()
+
+	callback()
+
+	local tweenOut = TweenService:Create(blur,TweenInfo.new(WARP_TIME,Enum.EasingStyle.Sine,Enum.EasingDirection.In),{Size=0})
+	tweenOut:Play()
+	tweenOut.Completed:Wait()
+
+	blur:Destroy()
+end
+
+local function playWindup(char, humanoid, hrp, callback)
+	local originalWalkSpeed = humanoid.WalkSpeed
+	humanoid.WalkSpeed = 0
+	hrp.Anchored = true
+
+	local windupAnim = Instance.new("Animation")
+	windupAnim.AnimationId = "rbxassetid://32729592"
+	local animTrack = humanoid:LoadAnimation(windupAnim)
+	animTrack:Play()
+
+	local partsToFade = {}
+	for _, obj in ipairs(char:GetDescendants()) do
+		if obj:IsA("BasePart") and obj ~= hrp then
+			table.insert(partsToFade, obj)
+		elseif obj:IsA("Accessory") then
+			local handle = obj:FindFirstChild("Handle")
+			if handle then table.insert(partsToFade, handle) end
+		elseif obj:IsA("Decal") or obj:IsA("Texture") then
+			table.insert(partsToFade, obj)
+		end
+	end
+
+	for _, part in ipairs(partsToFade) do
+		if part:IsA("BasePart") then
+			TweenService:Create(part, TweenInfo.new(WINDUP_TIME), {Transparency=1}):Play()
+		elseif part:IsA("Decal") or part:IsA("Texture") then
+			TweenService:Create(part, TweenInfo.new(WINDUP_TIME), {Transparency=1}):Play()
+		end
+	end
+
+	task.wait(WINDUP_TIME)
+
+	for _, part in ipairs(partsToFade) do
+		if part:IsA("BasePart") then
+			part.Transparency = 0
+		elseif part:IsA("Decal") or part:IsA("Texture") then
+			part.Transparency = 0
+		end
+	end
+
+	animTrack:Stop()
+	humanoid.WalkSpeed = originalWalkSpeed
+	hrp.Anchored = false
+
+	callback()
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.DisplayOrder = 100
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local bg = Instance.new("ImageLabel")
+bg.Parent = screenGui
+bg.BackgroundTransparency = 1
+bg.Size = UDim2.new(0,700,0,700)
+bg.Position = UDim2.new(0.5,0,0.5,0)
+bg.AnchorPoint = Vector2.new(0.5,0.5)
+bg.Image = "rbxassetid://135542686675252"
+bg.ImageTransparency = 1
+
+local flash = Instance.new("Frame")
+flash.Size = UDim2.new(1,0,1,0)
+flash.Position = UDim2.new(0,0,0,0)
+flash.BackgroundColor3 = Color3.new(0,0,0)
+flash.BackgroundTransparency = 1
+flash.BorderSizePixel = 0
+flash.ZIndex = 2
+flash.Parent = screenGui
+
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://132492029022208"
+sound.Volume = 1
+sound.Parent = screenGui
+
+local tweenInfo = TweenInfo.new(0.7,Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+local function kamuisharingan()
+	flash.BackgroundTransparency = 0.5
+	bg.ImageTransparency = 0
+	TweenService:Create(flash,tweenInfo,{BackgroundTransparency=1}):Play()
+	TweenService:Create(bg,tweenInfo,{ImageTransparency=1}):Play()
+	sound:Play()
+end
+
+local function goToKamui(char, humanoid, hrp)
+	if _G.InPose then return end  
+	RETURN_POSITION = hrp.CFrame
+	playWindup(char, humanoid, hrp, function()
+		warpEffect(function()
+			applyKamuiLighting()
+			hrp.CFrame = CFrame.new(centralStructurePosition)
+			kamuiMusic:Play()
+			kamuisharingan()
+		end)
+		IN_KAMUI = true
+	end)
+end
+
+local function leaveKamui(char, humanoid, hrp)
+	if _G.InPose then return end  
+	playWindup(char, humanoid, hrp, function()
+		warpEffect(function()
+			restoreNormalLighting()
+			if RETURN_POSITION then hrp.CFrame = RETURN_POSITION end
+			kamuiMusic:Stop()
+			kamuisharingan()
+		end)
+		IN_KAMUI = false
+	end)
+end
+
+local function setupCharacter(char)
+	local hrp = char:WaitForChild("HumanoidRootPart")
+	local humanoid = char:WaitForChild("Humanoid")
+
+	hrp.Transparency = 1
+	hrp.CanCollide = false
+	kamuiMusic.Parent = hrp
+
+	UserInputService.InputBegan:Connect(function(input, processed)
+		if processed then return end
+		if input.KeyCode == Enum.KeyCode.R then
+			if tick() - lastWarpTime >= COOLDOWN then
+				lastWarpTime = tick()
+				if IN_KAMUI then
+					leaveKamui(char, humanoid, hrp)
+				else
+					goToKamui(char, humanoid, hrp)
+				end
+			end
+		end
+	end)
+end
+
+if player.Character then
+	setupCharacter(player.Character)
+end
+
+player.CharacterAdded:Connect(setupCharacter)
+
+-- Fireball
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local function loadAnimation(animationId)
+	local anim = Instance.new("Animation")
+	anim.AnimationId = animationId
+	return humanoid:LoadAnimation(anim)
+end
+
+local animTrack1 = loadAnimation("rbxassetid://73177702")
+local animTrack2 = loadAnimation("rbxassetid://74909528")
+
+local function createSound(id)
+	local sound = Instance.new("Sound")
+	sound.SoundId = id
+	sound.Parent = rootPart
+	return sound
+end
+
+local sound1 = createSound("rbxassetid://484293505")
+local sound2 = createSound("rbxassetid://79475957308532")
+
+local isPlaying = false
+local lastUsed = 0
+local COOLDOWN = 4
+
+local function fadeOut(part, duration)
+	if not part or not part.Parent then return end
+	local tween = TweenService:Create(part, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Transparency = 1})
+	tween:Play()
+	for _, child in ipairs(part:GetChildren()) do
+		if child:IsA("ParticleEmitter") then
+			child.Enabled = false
+		end
+	end
+	tween.Completed:Connect(function()
+		if part then part:Destroy() end
+	end)
+end
+
+local function playSequence()
+	if _G.InPose then return end  
+	if isPlaying or tick() - lastUsed < COOLDOWN then return end
+	isPlaying = true
+	lastUsed = tick()
+
+	animTrack1:Play()
+	sound1:Play()
+	wait(1)
+	animTrack1:Stop()
+	sound1:Stop()
+
+	animTrack2:Play()
+	sound2:Play()
+
+	local hitbox = Instance.new("Part")
+	hitbox.Size = Vector3.new(10, 10, 15)
+	hitbox.Anchored = true
+	hitbox.CanCollide = false
+	hitbox.Transparency = 1
+	hitbox.CFrame = rootPart.CFrame * CFrame.new(0, 0, -10)
+	hitbox.Parent = workspace
+
+	local fire = Instance.new("ParticleEmitter")
+	fire.Texture = "rbxassetid://241594419"
+	fire.Lifetime = NumberRange.new(0.5, 1)
+	fire.Rate = 200
+	fire.Speed = NumberRange.new(5, 15)
+	fire.SpreadAngle = Vector2.new(360, 360)
+	fire.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 2), NumberSequenceKeypoint.new(1, 5)})
+	fire.Color = ColorSequence.new(Color3.fromRGB(255, 100, 0), Color3.fromRGB(255, 95, 2))
+	fire.LightEmission = 0.7
+	fire.Parent = hitbox
+
+	local smoke = Instance.new("ParticleEmitter")
+	smoke.Texture = "rbxassetid://258128463"
+	smoke.Lifetime = NumberRange.new(1, 2)
+	smoke.Rate = 50
+	smoke.Speed = NumberRange.new(2, 5)
+	smoke.SpreadAngle = Vector2.new(360, 360)
+	smoke.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 3), NumberSequenceKeypoint.new(1, 6)})
+	smoke.Color = ColorSequence.new(Color3.fromRGB(50, 50, 50), Color3.fromRGB(150, 150, 150))
+	smoke.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.3), NumberSequenceKeypoint.new(1, 1)})
+	smoke.Parent = hitbox
+
+	local damaged = {}
+
+	local connection
+	connection = RunService.RenderStepped:Connect(function()
+		if not hitbox or not hitbox.Parent then
+			connection:Disconnect()
+			return
+		end
+		hitbox.CFrame = rootPart.CFrame * CFrame.new(0, 0, -10)
+
+		for _, npc in ipairs(workspace:GetChildren()) do
+			if npc:IsA("Model") and npc ~= character and npc:FindFirstChild("Humanoid") and npc:FindFirstChild("HumanoidRootPart") then
+				local npcHum = npc.Humanoid
+				local npcRoot = npc.HumanoidRootPart
+				if (npcRoot.Position - hitbox.Position).Magnitude <= 10 and not damaged[npc] then
+					npcHum:TakeDamage(30)
+					damaged[npc] = true
+				end
+			end
+		end
+	end)
+
+	wait(1.2)
+	fadeOut(hitbox, 1)
+	wait(1.8)
+	isPlaying = false
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.E then
+		playSequence()
+	end
+end)
+
+
+
+-- Sharingan
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+local hitbox = nil
+local mimicActive = false
+local targetPlayer = nil
+local canUse = true
+local cooldownTime = 3
+local toggleOn = false
+
+
+local function spawnHitbox()
+	if hitbox then
+		hitbox:Destroy()
+		hitbox = nil
+	end
+
+	hitbox = Instance.new("Part")
+	hitbox.Size = Vector3.new(4, 4, 4)
+	hitbox.Anchored = false
+	hitbox.CanCollide = false
+	hitbox.Transparency = 0.9
+	hitbox.BrickColor = BrickColor.new("Bright red")
+	hitbox.Name = "MimicHitbox"
+	hitbox.Parent = workspace
+
+	hitbox.CFrame = humanoidRootPart.CFrame
+
+	local weld = Instance.new("Weld")
+	weld.Part0 = humanoidRootPart
+	weld.Part1 = hitbox
+	weld.C0 = CFrame.new(0, 0, 0)
+	weld.Parent = hitbox
+
+	hitbox.Touched:Connect(function(hit)
+		local touchedPlayer = Players:GetPlayerFromCharacter(hit.Parent)
+		if touchedPlayer and touchedPlayer ~= player then
+			if hitbox then
+				hitbox:Destroy()
+				hitbox = nil
+			end
+			targetPlayer = touchedPlayer
+			mimicActive = true
+		end
+	end)
+end
+
+
+local function mimic()
+	if not targetPlayer or not targetPlayer.Character then
+		mimicActive = false
+		targetPlayer = nil
+		return
+	end
+
+	local targetHumanoid = targetPlayer.Character:FindFirstChild("Humanoid")
+	if not targetHumanoid then
+		mimicActive = false
+		targetPlayer = nil
+		return
+	end
+
+	humanoid:Move(Vector3.new(
+		targetHumanoid.MoveDirection.X,
+		0,
+		targetHumanoid.MoveDirection.Z
+		), false)
+
+	humanoid.Jump = targetHumanoid.Jump
+	humanoid.PlatformStand = targetHumanoid.PlatformStand
+end
+
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.DisplayOrder = 100
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local bg = Instance.new("ImageLabel")
+bg.Parent = screenGui
+bg.BackgroundTransparency = 1
+bg.Size = UDim2.new(0, 700, 0, 700)
+bg.Position = UDim2.new(0.5, 0, 0.5, 0)
+bg.AnchorPoint = Vector2.new(0.5, 0.5)
+bg.Image = "rbxassetid://15882970220"
+bg.ImageTransparency = 1
+
+local flash = Instance.new("Frame")
+flash.Size = UDim2.new(1,0,1,0)
+flash.Position = UDim2.new(0,0,0,0)
+flash.BackgroundColor3 = Color3.new(0, 0, 0)
+flash.BackgroundTransparency = 1
+flash.BorderSizePixel = 0
+flash.ZIndex = 2
+flash.Parent = screenGui
+
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://86549404404274"
+sound.Volume = 1
+sound.Parent = screenGui
+
+local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+local function screenflash()
+	flash.BackgroundTransparency = 0
+	bg.ImageTransparency = 0
+	TweenService:Create(flash, tweenInfo, {BackgroundTransparency = 1}):Play()
+	TweenService:Create(bg, tweenInfo, {ImageTransparency = 1}):Play()
+	sound:Play()
+end
+
+
+local function toggleAbility()
+	if _G.InPose then return end  
+	if not canUse then return end
+	canUse = false
+
+	if toggleOn then
+		toggleOn = false
+		mimicActive = false
+		targetPlayer = nil
+		if hitbox then
+			hitbox:Destroy()
+			hitbox = nil
+		end
+	else
+		toggleOn = true
+		spawnHitbox()
+	end
+
+	screenflash()
+
+	task.delay(cooldownTime, function()
+		canUse = true
+	end)
+end
+
+
+RunService.RenderStepped:Connect(function()
+	if mimicActive and targetPlayer then
+		mimic()
+	end
+end)
+
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.Q then
+		toggleAbility()
+	end
+end)
+
+
+-- Amaterasu
+
+local player = game.Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.DisplayOrder = 100
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local bg = Instance.new("ImageLabel")
+bg.Parent = screenGui
+bg.BackgroundTransparency = 1
+bg.Size = UDim2.new(0, 700, 0, 700)
+bg.Position = UDim2.new(0.5, 0, 0.5, 0)
+bg.AnchorPoint = Vector2.new(0.5, 0.5)
+bg.Image = "rbxassetid://7292869449"
+bg.ImageTransparency = 1
+
+local flash = Instance.new("Frame")
+flash.Size = UDim2.new(1, 0, 1, 0)
+flash.Position = UDim2.new(0, 0, 0, 0)
+flash.BackgroundColor3 = Color3.new(0, 0, 0)
+flash.BackgroundTransparency = 1
+flash.BorderSizePixel = 0
+flash.ZIndex = 2
+flash.Parent = screenGui
+
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://112302529570553"
+sound.Volume = 1
+sound.Parent = screenGui
+
+local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+local function thescreenflash()
+	flash.BackgroundTransparency = 0
+	bg.ImageTransparency = 0
+	TweenService:Create(flash, tweenInfo, {BackgroundTransparency = 1}):Play()
+	TweenService:Create(bg, tweenInfo, {ImageTransparency = 1}):Play()
+	sound:Play()
+
+	task.delay(10, function()
+		sound:Stop()
+	end)
+end
+
+local function createBlackFire(character)
+	local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+	local humanoid = character:FindFirstChild("Humanoid")
+	if torso and humanoid and not torso:FindFirstChild("BlackFire") then
+		local fire = Instance.new("Fire")
+		fire.Name = "BlackFire"
+		fire.Color = Color3.new(0, 0, 0)
+		fire.SecondaryColor = Color3.new(0, 0, 0)
+		fire.Heat = 10
+		fire.Size = 15
+		fire.Parent = torso
+
+		local fireSound = Instance.new("Sound")
+		fireSound.SoundId = "rbxassetid://9068935533"
+		fireSound.Volume = 0.3
+		fireSound.Parent = fire
+		fireSound:Play()
+
+		local totalTime = 8
+		local damagePerTick = humanoid.Health / totalTime / 10 
+		spawn(function()
+			for i = 1, totalTime * 10 do
+				if humanoid.Health > 0 then
+					humanoid:TakeDamage(damagePerTick)
+				end
+				task.wait(0.1)
+			end
+		end)
+
+		local heatTween = TweenService:Create(fire, TweenInfo.new(totalTime, Enum.EasingStyle.Linear), {Heat = 0})
+		heatTween:Play()
+
+		task.delay(totalTime, function()
+			local sizeTween = TweenService:Create(fire, TweenInfo.new(2, Enum.EasingStyle.Linear), {Size = 0})
+			sizeTween:Play()
+			local startVolume = fireSound.Volume
+			for i = 1, 20 do
+				fireSound.Volume = startVolume * (1 - i/20)
+				task.wait(0.1)
+			end
+			fireSound:Stop()
+			fire:Destroy()
+		end)
+	end
+end
+
+
+
+
+
+local function applyBlackFire(originPosition, radius)
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+			local dist = (plr.Character.HumanoidRootPart.Position - originPosition).Magnitude
+			if dist <= radius then
+				createBlackFire(plr.Character)
+			end
+		end
+	end
+
+	for _, npc in ipairs(Workspace:GetDescendants()) do
+		if npc:IsA("Model") and npc:FindFirstChild("Humanoid") and npc:FindFirstChild("HumanoidRootPart") then
+			if npc ~= player.Character then
+				local dist = (npc.HumanoidRootPart.Position - originPosition).Magnitude
+				if dist <= radius then
+					createBlackFire(npc)
+				end
+			end
+		end
+	end
+end
+
+local onCooldown = false
+
+UserInputService.InputBegan:Connect(function(input, processed)
+	if processed then return end
+	if _G.InPose then return end  
+	if input.KeyCode == Enum.KeyCode.F and not onCooldown then
+		onCooldown = true
+
+		local character = player.Character
+		if character and character:FindFirstChild("Humanoid") then
+			local humanoid = character.Humanoid
+			local animation = Instance.new("Animation")
+			animation.AnimationId = "rbxassetid://29517689"
+			local animTrack = humanoid:LoadAnimation(animation)
+			animTrack:Play()
+
+			task.delay(0.6, thescreenflash)
+			task.wait(1)
+			animTrack:Stop()
+
+			if character:FindFirstChild("HumanoidRootPart") then
+				applyBlackFire(character.HumanoidRootPart.Position, 30)
+			end
+		end
+
+		task.delay(5, function()
+			onCooldown = false
+		end)
+	end
+end)
+
+
+-- Pose
+_G.InPose = false
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local key = Enum.KeyCode.P
+local cd = 5
+local itachisound = "rbxassetid://7437785043"
+
+local toggled = false
+local debounce = false
+local throneModel
+local throneSeat
+local sound
+local oldWalkSpeed = humanoid.WalkSpeed
+local oldJumpPower = humanoid.JumpPower
+
+sound = Instance.new("Sound")
+sound.SoundId = itachisound
+sound.Volume = 1
+sound.Parent = rootPart
+
+local function createThrone()
+	local model = Instance.new("Model")
+	model.Name = "Throne"
+
+	local baseColor = Color3.fromRGB(35, 35, 35)
+	local rootCFrame = rootPart.CFrame * CFrame.Angles(0, math.rad(180), 0)
+
+	throneSeat = Instance.new("Seat")
+	throneSeat.Name = "ThroneSeat"
+	throneSeat.Size = Vector3.new(4, 2, 4)
+	throneSeat.Anchored = true
+	throneSeat.Color = baseColor
+	throneSeat.Material = Enum.Material.Slate
+	throneSeat.CFrame = rootCFrame * CFrame.new(0, -2.5, 0)
+	throneSeat.Parent = model
+
+	local back = Instance.new("Part")
+	back.Size = Vector3.new(4, 7, 1.5)
+	back.Anchored = true
+	back.Color = baseColor
+	back.Material = Enum.Material.Slate
+	back.CFrame = throneSeat.CFrame * CFrame.new(0, 4, -1.75)
+	back.Parent = model
+
+	for _, offset in ipairs({-2, 2}) do
+		local arm = Instance.new("Part")
+		arm.Size = Vector3.new(1.5, 3.5, 4)
+		arm.Anchored = true
+		arm.Color = baseColor
+		arm.Material = Enum.Material.Slate
+		arm.CFrame = throneSeat.CFrame * CFrame.new(offset, 1.5, 0)
+		arm.Parent = model
+	end
+
+	for _, offset in ipairs({-1.8, 1.8}) do
+		local pillar = Instance.new("Part")
+		pillar.Size = Vector3.new(1.5, 3, 1.5)
+		pillar.Anchored = true
+		pillar.Color = Color3.fromRGB(25, 25, 25)
+		pillar.Material = Enum.Material.Slate
+		pillar.CFrame = back.CFrame * CFrame.new(offset, 4, 0)
+		pillar.Parent = model
+	end
+
+	model.Parent = workspace
+	return model
+end
+
+local function toggle()
+	if debounce then return end
+	debounce = true
+
+	if not toggled then
+		toggled = true
+		oldWalkSpeed = humanoid.WalkSpeed
+		oldJumpPower = humanoid.JumpPower
+		_G.InPose = true
+
+
+		humanoid.WalkSpeed = 0
+		humanoid.JumpPower = 0
+		humanoid.Sit = true
+
+		throneModel = createThrone()
+		sound:Play()
+	else
+		toggled = false
+		humanoid.Sit = false
+		humanoid.WalkSpeed = oldWalkSpeed
+		humanoid.JumpPower = oldJumpPower
+		_G.InPose = false
+
+		if throneModel then
+			throneModel:Destroy()
+			throneModel = nil
+			throneSeat = nil
+		end
+
+		sound:Stop()
+	end
+
+	task.delay(cd, function()
+		debounce = false
+	end)
+end
+
+UserInputService.InputBegan:Connect(function(input, gpe)
+	if gpe then return end
+	if input.KeyCode == key then
+		toggle()
+	end
+end)
+
+-- 📱 Abilities Toolbar HUD (de pus la FINALUL scriptului tău cu abilități)
+local player = game:GetService("Players").LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- GUI principal
+local toolbarGui = Instance.new("ScreenGui")
+toolbarGui.Name = "AbilitiesToolbar"
+toolbarGui.ResetOnSpawn = false
+toolbarGui.IgnoreGuiInset = true
+toolbarGui.DisplayOrder = 200
+toolbarGui.Parent = playerGui
+
+-- Frame pentru bara de abilități
+local toolbar = Instance.new("Frame")
+toolbar.Name = "ToolbarFrame"
+toolbar.Size = UDim2.new(0.7,0,0.13,0)
+toolbar.Position = UDim2.new(0.15,0,0.83,0)
+toolbar.BackgroundTransparency = 0.3
+toolbar.BackgroundColor3 = Color3.fromRGB(25,25,25)
+toolbar.BorderSizePixel = 0
+toolbar.Parent = toolbarGui
+
+-- Funcție pentru butoane
+local function createButton(name, imageId, offset, callback)
+	local btn = Instance.new("ImageButton")
+	btn.Name = name
+	btn.Size = UDim2.new(0.18,0,0.8,0)
+	btn.Position = UDim2.new(offset,0,0.1,0)
+	btn.BackgroundTransparency = 0.15
+	btn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	btn.BorderSizePixel = 0
+	btn.Image = imageId
+	btn.ScaleType = Enum.ScaleType.Fit
+	btn.Parent = toolbar
+
+	-- efect hover mic
+	btn.MouseEnter:Connect(function()
+		btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+	end)
+	btn.MouseLeave:Connect(function()
+		btn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	end)
+
+	btn.Activated:Connect(callback)
+	return btn
+end
+
+-- 🔘 Butoane pentru abilități
+-- 🔑 Schimbă ID-urile imaginilor cu ce vrei tu pentru fiecare abilitate
+
+-- Kamui (apelează direct goToKamui / leaveKamui)
+createButton("KamuiButton","rbxassetid://135542686675252",0.02,function()
+	local char = player.Character
+	if not char then return end
+	local humanoid = char:FindFirstChild("Humanoid")
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	if humanoid and hrp then
+		if IN_KAMUI then
+			leaveKamui(char, humanoid, hrp)
+		else
+			goToKamui(char, humanoid, hrp)
+		end
+	end
+end)
+
+-- Fireball (apelează direct playSequence)
+createButton("FireballButton","rbxassetid://241594419",0.22,function()
+	if typeof(playSequence) == "function" then
+		playSequence()
+	end
+end)
+
+-- Sharingan (apelează direct toggleAbility)
+createButton("SharinganButton","rbxassetid://15882970220",0.42,function()
+	if typeof(toggleAbility) == "function" then
+		toggleAbility()
+	end
+end)
+
+-- Amaterasu (apelează direct logica ta pe F – dacă ai funcție separată, pune-o aici)
+createButton("AmaterasuButton","rbxassetid://258128463",0.62,function()
+	-- aici apelezi funcția Amaterasu dacă ai una
+	print("Amaterasu activat")
+end)
+
+-- Pose (apelează direct logica ta pe P – dacă ai funcție separată, pune-o aici)
+createButton("PoseButton","rbxassetid://86549404404274",0.82,function()
+	-- aici apelezi funcția Pose dacă ai una
+	print("Pose activat")
+end)
