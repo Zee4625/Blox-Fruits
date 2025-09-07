@@ -1,0 +1,133 @@
+-- FULL SCRIPT: Alone x ZeeHUB + Movement + COLLAB (Cleaned)
+
+-- Required services
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+
+-- Load Fluent UI
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local Window = Fluent:CreateWindow({
+    Title = "Alone x ZeeHUB",
+    SubTitle = "V2.21 - Mobile & PC",
+    TabWidth = 180,
+    Size = UDim2.fromOffset(700, 540),
+    Theme = "Aqua",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+-- Tabs
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "layout" }),
+    Movement = Window:AddTab({ Title = "Movement", Icon = "rocket" }),
+    Collab = Window:AddTab({ Title = "COLLAB", Icon = "users" }),
+    CollabUI = Window:AddTab({ Title = "COLLAB-Ui", Icon = "table" })
+}
+
+-- States
+local flightActive = false
+local moveSpeed = 275
+local wallhackEnabled = false
+
+-- Character references
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Flight control
+local function moveWithKeys()
+    local direction = Vector3.new()
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then direction += humanoidRootPart.CFrame.LookVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then direction -= humanoidRootPart.CFrame.LookVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then direction -= humanoidRootPart.CFrame.RightVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then direction += humanoidRootPart.CFrame.RightVector end
+    humanoidRootPart.Velocity = direction * moveSpeed
+end
+
+RunService.Heartbeat:Connect(function()
+    if flightActive then
+        moveWithKeys()
+    end
+end)
+
+-- Movement tab toggles
+Tabs.Movement:AddToggle("SpeedMode", {
+    Title = "Speed Mode",
+    Description = "Fly using WSAD",
+    Default = false
+}):OnChanged(function(val)
+    flightActive = val
+end)
+
+Tabs.Movement:AddToggle("Wallhack", {
+    Title = "Wallhack",
+    Description = "Go through walls",
+    Default = false
+}):OnChanged(function()
+    wallhackEnabled = not wallhackEnabled
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = not wallhackEnabled
+        end
+    end
+end)
+
+Tabs.Movement:AddToggle("JumpBoost", {
+    Title = "Jump Boost",
+    Description = "High jump power",
+    Default = false
+}):OnChanged(function(val)
+    humanoid.JumpPower = val and 200 or 50
+end)
+
+-- Collab Tab
+Tabs.Collab:AddButton({Title = "Zee and Cars.HB", Tip = "Run collaborative script by Zee and Cars.HB", Callback = function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/car", true))()
+end})
+
+Tabs.Collab:AddButton({Title = "Zee and Invincible.Fly", Tip = "Run collaborative script by Zee and Invincible.Fly", Callback = function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FLY", true))()
+end})
+
+Tabs.Collab:AddButton({Title = "Zee and RETURN BY DEATH!", Tip = "Run collaborative script by Zee and RETURN BY DEATH!", Callback = function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/RETURNBYD", true))()
+end})
+
+Tabs.Collab:AddButton({Title = "Zee and Jerk.ANIM", Tip = "Run collaborative script by Zee and Jerk.ANIM", Callback = function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JERCCC", true))()
+end})
+
+Tabs.Collab:AddButton({Title = "Zee and Wally", Tip = "Run collaborative script by Zee and Wally Hold Q", Callback = function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WALLY", true))()
+end})
+
+Tabs.Collab:AddButton({Title = "Zee and NarX", Tip = "Run collaborative script by Zee and NarX", Callback = function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/NARUTo", true))()
+end})
+
+-- Collab-UI Tab
+Tabs.CollabUI:AddButton({Title = "Zee and Piano", Tip = "Run collaborative script by Zee and Piano", Callback = function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Piano", true))()
+end})
+
+Tabs.CollabUI:AddButton({Title = "Zee and Zombie.Anim", Tip = "Run collaborative script by Zee and Zombie.Anim", Callback = function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZOMBIUUU", true))()
+end})
+
+Tabs.CollabUI:AddButton({Title = "Zee and R15.ANIM", Tip = "Run collaborative script by Zee and R15.ANIM", Callback = function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/r154", true))()
+end})
+
+Tabs.CollabUI:AddButton({Title = "Zee and CoolKID.HUBs", Tip = "Run collaborative script by Zee and CoolKID", Callback = function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/COOLKID", true))()
+end})
+
+-- Notification
+Window:Notify({
+    Title = "ZeeHUB + Alone Fusion",
+    Description = "Full script loaded with Movement, COLLAB, and COLLAB-UI tabs only.",
+    Duration = 10
+})
