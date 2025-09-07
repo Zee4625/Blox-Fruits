@@ -111,7 +111,7 @@ end)
 
 MobileButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/M22ain.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/prmmm"))()
 end)
 
 -- Smooth Pop-up Animation
