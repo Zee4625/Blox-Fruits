@@ -1,0 +1,121 @@
+-- // Device Selector UI (Cool Version) \\ --
+-- Made with ❤️ by ChatGPT
+
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DeviceSelector"
+ScreenGui.Parent = game:GetService("CoreGui")
+
+-- Main Frame (Center Box)
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 350, 0, 200)
+Frame.Position = UDim2.new(0.5, -175, 0.5, -100)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Frame.BorderSizePixel = 0
+Frame.BackgroundTransparency = 0.05
+Frame.Parent = ScreenGui
+
+-- Round corners
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = Frame
+
+-- Drop Shadow Effect
+local Shadow = Instance.new("ImageLabel")
+Shadow.Parent = Frame
+Shadow.BackgroundTransparency = 1
+Shadow.Position = UDim2.new(0, -15, 0, -15)
+Shadow.Size = UDim2.new(1, 30, 1, 30)
+Shadow.Image = "rbxassetid://5028857084"
+Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+Shadow.ImageTransparency = 0.5
+Shadow.ZIndex = 0
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 50)
+Title.BackgroundTransparency = 1
+Title.Text = "🌐 Choose Your Device"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 26
+Title.Parent = Frame
+
+-- Description
+local Desc = Instance.new("TextLabel")
+Desc.Size = UDim2.new(1, -20, 0, 30)
+Desc.Position = UDim2.new(0, 10, 0, 55)
+Desc.BackgroundTransparency = 1
+Desc.Text = "Select your platform to load the right version."
+Desc.TextColor3 = Color3.fromRGB(200, 200, 200)
+Desc.Font = Enum.Font.Gotham
+Desc.TextSize = 16
+Desc.TextWrapped = true
+Desc.Parent = Frame
+
+-- Create UIListLayout for buttons
+local ButtonHolder = Instance.new("Frame")
+ButtonHolder.Size = UDim2.new(1, -40, 0, 60)
+ButtonHolder.Position = UDim2.new(0, 20, 0, 110)
+ButtonHolder.BackgroundTransparency = 1
+ButtonHolder.Parent = Frame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout.Padding = UDim.new(0, 20)
+UIListLayout.Parent = ButtonHolder
+
+-- Function to create buttons
+local function CreateButton(text, color)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(0.4, 0, 1, 0)
+    Button.BackgroundColor3 = color
+    Button.Text = text
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.Font = Enum.Font.GothamBold
+    Button.TextSize = 20
+    Button.AutoButtonColor = true
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 10)
+    Corner.Parent = Button
+
+    -- Hover Effect
+    Button.MouseEnter:Connect(function()
+        game:GetService("TweenService"):Create(Button, TweenInfo.new(0.2), {
+            BackgroundColor3 = color:Lerp(Color3.fromRGB(255, 255, 255), 0.2)
+        }):Play()
+    end)
+
+    Button.MouseLeave:Connect(function()
+        game:GetService("TweenService"):Create(Button, TweenInfo.new(0.2), {
+            BackgroundColor3 = color
+        }):Play()
+    end)
+
+    Button.Parent = ButtonHolder
+    return Button
+end
+
+-- Buttons
+local PCButton = CreateButton("💻 PC", Color3.fromRGB(70, 130, 180))
+local MobileButton = CreateButton("📱 Mobile", Color3.fromRGB(34, 139, 34))
+
+-- Button Actions
+PCButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"))()
+end)
+
+MobileButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/M22ain.lua"))()
+end)
+
+-- Smooth Pop-up Animation
+Frame.Position = UDim2.new(0.5, -175, 1.5, 0)
+game:GetService("TweenService"):Create(Frame, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+    Position = UDim2.new(0.5, -175, 0.5, -100)
+}):Play()
