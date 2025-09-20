@@ -505,7 +505,7 @@ local TabGamm = Window:AddTab({Title = "Games", Icon = "infinity"})
 
 TabGamm:AddButton({
     Title = "Hunty Zombies",
-    Tip = "Run collaborative script by Zee for Zombies",
+    Tip = "Run collaborative script Hunty Zombies",
     Callback = function()
         loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZMBO", true))()
     end,
@@ -513,7 +513,7 @@ TabGamm:AddButton({
 
 TabGamm:AddButton({
     Title = "BlueLock Rivals",
-    Tip = "Run collaborative script by Zee for BlueLock Rivals",
+    Tip = "Run collaborative script BlueLock Rivals",
     Callback = function()
         loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BBQ", true))()
     end,
@@ -521,7 +521,7 @@ TabGamm:AddButton({
 
 TabGamm:AddButton({
     Title = "Grow A Garden",
-    Tip = "Run collaborative script by Grow A Garden",
+    Tip = "Run collaborative script Grow A Garden",
     Callback = function()
         loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/GRO", true))()
     end,
@@ -530,7 +530,7 @@ TabGamm:AddButton({
 
 TabGamm:AddButton({
     Title = "JJK",
-    Tip = "Run collaborative script by JJK",
+    Tip = "Run collaborative script JJK",
     Callback = function()
         loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JJK-X", true))()
     end,
@@ -538,13 +538,19 @@ TabGamm:AddButton({
 
 TabGamm:AddButton({
     Title = "MM2",
-    Tip = "Run collaborative script by MM2",
+    Tip = "Run collaborative script MM2",
     Callback = function()
         loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/M2FS", true))()
     end,
 })
 
-
+TabGamm:AddButton({
+    Title = "Blox Fruits",
+    Tip = "Run collaborative script Blox Fruits",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Xz0", true))()
+    end,
+})
 
 -- Info Tab
 local Tabinfo = Window:AddTab({Title = "INFO", Icon = "Zee"})
