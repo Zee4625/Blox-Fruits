@@ -1,3 +1,3 @@
- NormalKey = "ZRO1881"
- MobileKey = "MOBILZRO1"
+ NormalKey = "ZEEHH22322"
+ MobileKey = "MOBILE98848"
  PremiumKey = Dm in discord
