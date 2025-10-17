@@ -566,7 +566,7 @@ TabGamm:AddButton({
 
 TabGamm:AddButton({
     Title = "MM2",
-    Tip = "Run collaborative script MM2",
+    Tip = "Run collaborative script 99 Nights",
     Callback = function()
         loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR", true))()
     end,
