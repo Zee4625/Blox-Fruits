@@ -416,6 +416,17 @@ TabCollab:AddButton({
 })
 
 TabCollab:AddButton({
+    Title = "Zee and Invincible.FlyV2",
+    Tip = "Run collaborative script by Zee and Invincible.FlyV2",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/INVFLY2", true))()
+    end,
+})
+
+
+
+
+TabCollab:AddButton({
     Title = "Zee and Invisible.y",
     Tip = "Run collaborative script by Zee and Invisible.y",
     Callback = function()
@@ -550,6 +561,14 @@ TabGamm:AddButton({
     Tip = "Run collaborative script MM2",
     Callback = function()
         loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/M2FS", true))()
+    end,
+})
+
+TabGamm:AddButton({
+    Title = "MM2",
+    Tip = "Run collaborative script MM2",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR", true))()
     end,
 })
 
