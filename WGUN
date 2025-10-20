@@ -1,0 +1,227 @@
+-- GUI Setup (With OP Mods, ESP, Crosshair, Hitbox Changer)
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local Workspace = game:GetService("Workspace")
+local Camera = workspace.CurrentCamera
+
+--// Main GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "TheWeirdGunGame"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.Parent = PlayerGui
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 250, 0, 400)
+Frame.Position = UDim2.new(0.4, 0, 0.4, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
+
+local Title = Instance.new("TextLabel")
+Title.Text = "The Weird Gun Game"
+Title.Font = Enum.Font.Cartoon
+Title.TextSize = 24
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Position = UDim2.new(0, 0, 0, 10)
+Title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+Title.TextStrokeTransparency = 0.5
+Title.Parent = Frame
+
+-- Button Helper
+local function createButton(name, text, positionY)
+    local btn = Instance.new("TextButton")
+    btn.Name = name
+    btn.Text = text
+    btn.Size = UDim2.new(0, 200, 0, 40)
+    btn.Position = UDim2.new(0.5, -100, 0, positionY)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 16
+    btn.Parent = Frame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    return btn
+end
+
+-- Close Button
+local CloseButton = Instance.new("TextButton")
+CloseButton.Text = "X"
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -35, 0, 5)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+CloseButton.TextColor3 = Color3.fromRGB(255,255,255)
+CloseButton.Parent = Frame
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Buttons
+local OPButton = createButton("OPButton", "Activate OP Gun Mods", 60)
+local ESPButton = createButton("ESPButton", "Toggle ESP", 110)
+local CrosshairButton = createButton("CrosshairButton", "Toggle Crosshair", 160)
+local HitboxInput = Instance.new("TextBox")
+HitboxInput.Size = UDim2.new(0, 80, 0, 25)
+HitboxInput.Position = UDim2.new(0.5, -40, 0, 210)
+HitboxInput.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+HitboxInput.TextColor3 = Color3.new(1,1,1)
+HitboxInput.PlaceholderText = "Head Size"
+HitboxInput.Text = ""
+HitboxInput.Font = Enum.Font.Gotham
+HitboxInput.TextSize = 13
+HitboxInput.ClearTextOnFocus = false
+HitboxInput.Parent = Frame
+local ApplyHitboxBtn = createButton("ApplyHitboxBtn", "Apply Head Size", 250)
+local AutoHitboxBtn = createButton("AutoHitboxBtn", "Auto Apply: OFF", 290)
+
+-- ================================
+-- OP Gun Mods (working version)
+-- ================================
+OPButton.MouseButton1Click:Connect(function()
+    local Attributes = {
+        ["_ammo"] = 999999999,
+        ["rateOfFire"] = 9999,
+        ["recoilAimReduction"] = Vector2.new(0,0),
+        ["recoilMax"] = Vector2.new(0,0),
+        ["recoilMin"] = Vector2.new(0,0),
+        ["spread"] = 0,
+        ["reloadTime"] = 1,
+        ["zoom"] = 1,
+        ["magazineSize"] = 999999999
+    }
+
+    local function applyToTool(tool)
+        for k,v in pairs(Attributes) do
+            tool:SetAttribute(k,v)
+        end
+    end
+
+    local function onToolAdded(tool)
+        if tool:IsA("Tool") then
+            applyToTool(tool)
+        end
+    end
+
+    local function checkCharacter(char)
+        char.ChildAdded:Connect(onToolAdded)
+        for _, tool in pairs(char:GetChildren()) do
+            if tool:IsA("Tool") then
+                applyToTool(tool)
+            end
+        end
+    end
+
+    if LocalPlayer.Character then
+        checkCharacter(LocalPlayer.Character)
+    end
+    LocalPlayer.CharacterAdded:Connect(checkCharacter)
+end)
+
+-- ================================
+-- ESP
+-- ================================
+local ESPEnabled = false
+local function isEnemy(player)
+    return LocalPlayer.Team and player.Team and player.Team ~= LocalPlayer.Team
+end
+
+local function createESP(player)
+    if player == LocalPlayer then return end
+    if player.Character and not player.Character:FindFirstChild("ESP_Highlight") then
+        local h = Instance.new("Highlight")
+        h.Name = "ESP_Highlight"
+        h.FillColor = isEnemy(player) and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 0)
+        h.OutlineColor = Color3.fromRGB(255, 255, 255)
+        h.FillTransparency = 0.5
+        h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        h.Parent = player.Character
+    end
+end
+
+local function removeESP(player)
+    if player.Character then
+        local h = player.Character:FindFirstChild("ESP_Highlight")
+        if h then h:Destroy() end
+    end
+end
+
+ESPButton.MouseButton1Click:Connect(function()
+    ESPEnabled = not ESPEnabled
+    ESPButton.Text = ESPEnabled and "ESP: ON" or "ESP: OFF"
+    for _, plr in pairs(Players:GetPlayers()) do
+        if ESPEnabled then createESP(plr) else removeESP(plr) end
+    end
+end)
+
+Players.PlayerAdded:Connect(function(plr)
+    plr.CharacterAdded:Connect(function()
+        task.wait(1)
+        if ESPEnabled then createESP(plr) end
+    end)
+end)
+
+-- ================================
+-- Crosshair
+-- ================================
+local crossEnabled = false
+local crossV = Instance.new("Frame")
+crossV.Size = UDim2.new(0,2,0,20)
+crossV.Position = UDim2.new(0.5,-1,0.5,-10)
+crossV.BackgroundColor3 = Color3.new(1,1,1)
+crossV.BorderSizePixel = 0
+crossV.Visible = false
+crossV.Parent = ScreenGui
+
+local crossH = crossV:Clone()
+crossH.Size = UDim2.new(0,20,0,2)
+crossH.Position = UDim2.new(0.5,-10,0.5,-1)
+crossH.Parent = ScreenGui
+
+CrosshairButton.MouseButton1Click:Connect(function()
+    crossEnabled = not crossEnabled
+    crossV.Visible = crossEnabled
+    crossH.Visible = crossEnabled
+    CrosshairButton.Text = crossEnabled and "Crosshair: ON" or "Crosshair: OFF"
+end)
+
+-- ================================
+-- Hitbox Changer (Auto Apply Every 5s, skips teammates)
+-- ================================
+local autoHitboxEnabled = false
+
+local function applyHitbox()
+    local size = tonumber(HitboxInput.Text)
+    if not size or size <= 0 then return end
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and (not LocalPlayer.Team or player.Team ~= LocalPlayer.Team) then
+            local head = player.Character:FindFirstChild("Head")
+            if head and head:IsA("BasePart") then
+                head.Size = Vector3.new(size,size,size)
+                head.CanCollide = false
+                head.Massless = true
+            end
+        end
+    end
+end
+
+ApplyHitboxBtn.MouseButton1Click:Connect(applyHitbox)
+
+AutoHitboxBtn.MouseButton1Click:Connect(function()
+    autoHitboxEnabled = not autoHitboxEnabled
+    AutoHitboxBtn.Text = autoHitboxEnabled and "Auto Apply: ON" or "Auto Apply: OFF"
+    task.spawn(function()
+        while autoHitboxEnabled do
+            applyHitbox()
+            task.wait(5)
+        end
+    end)
+end)
+
+print("✅ Fully Updated Weird Gun Game Loaded!")
