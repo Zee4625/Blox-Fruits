@@ -573,6 +573,14 @@ TabGamm:AddButton({
 })
 
 TabGamm:AddButton({
+    Title = "Wierd Gun Game",
+    Tip = "Run collaborative script Wierd Gun Game",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WGUN", true))()
+    end,
+})
+
+TabGamm:AddButton({
     Title = "Blox Fruits",
     Tip = "Run collaborative script Blox Fruits",
     Callback = function()
