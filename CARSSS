@@ -7,7 +7,7 @@ local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
---== CORE VARIABLES ==--
+--== VARIABLES ==--
 local speedActive = false
 local bodyVelocity
 local currentSpeed = 0
@@ -20,17 +20,26 @@ local shifting = false
 local rpm = 0
 
 --== VEHICLE SETTINGS ==--
+local accelRate = 1.02
 local naturalDecel = 0.97
 local brakeRate = 0.9
 local handBrakeRate = 0.65
 local turnSpeed = 3
 local gearUpDelay = 0.15
 local gearDownDelay = 0.25
-local maxGear = 8
+local maxGear = 8 -- gearul maxim implicit
 
---== GEAR DATA ==--
-local gearSpeeds = { 30, 60, 110, 180, 270, 380, 470, 570 } -- viteze maxime per gear
-local gearAccel = { 1.25, 1.20, 1.15, 1.10, 1.06, 1.04, 1.02, 1.01 } -- accelerație mai mică la gear mare
+--== GEAR SPEEDS (setabile manual) ==--
+local gearSpeeds = {
+	30,   -- Gear 1
+	60,   -- Gear 2
+	110,  -- Gear 3
+	180,  -- Gear 4
+	270,  -- Gear 5
+	380,  -- Gear 6
+	470,  -- Gear 7
+	570   -- Gear 8
+}
 
 --== GUI SETUP ==--
 local screenGui = Instance.new("ScreenGui")
@@ -58,10 +67,10 @@ titleLabel.BackgroundTransparency = 1
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextSize = 18
-titleLabel.Text = "⚙️ Zee MODS – Real Auto Gear System"
+titleLabel.Text = "⚙️ Zee MODS – Ultimate Gear Selector"
 titleLabel.Parent = titleBar
 
---== BUTTONS ==--
+--== TOGGLE SPEED BUTTON ==--
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(1, -20, 0, 30)
 toggleButton.Position = UDim2.new(0, 10, 0, 40)
@@ -72,6 +81,7 @@ toggleButton.TextSize = 16
 toggleButton.Text = "Speed OFF"
 toggleButton.Parent = mainFrame
 
+--== HANDBRAKE BUTTON ==--
 local handBrakeButton = Instance.new("TextButton")
 handBrakeButton.Size = UDim2.new(1, -20, 0, 30)
 handBrakeButton.Position = UDim2.new(0, 10, 0, 75)
@@ -82,6 +92,7 @@ handBrakeButton.TextSize = 16
 handBrakeButton.Text = "Handbrake OFF"
 handBrakeButton.Parent = mainFrame
 
+--== GEAR SELECTOR ==--
 local gearSelectLabel = Instance.new("TextLabel")
 gearSelectLabel.Size = UDim2.new(1, -20, 0, 20)
 gearSelectLabel.Position = UDim2.new(0, 10, 0, 115)
@@ -112,6 +123,7 @@ gearMinus.TextSize = 16
 gearMinus.Text = "-"
 gearMinus.Parent = mainFrame
 
+--== SPEED + GEAR DISPLAY ==--
 local speedLabel = Instance.new("TextLabel")
 speedLabel.Size = UDim2.new(1, 0, 0, 25)
 speedLabel.Position = UDim2.new(0, 0, 0, 145)
@@ -132,6 +144,7 @@ gearLabel.TextSize = 20
 gearLabel.Text = "Gear: 1"
 gearLabel.Parent = mainFrame
 
+--== RPM BAR ==--
 local rpmBarBg = Instance.new("Frame")
 rpmBarBg.Size = UDim2.new(1, -40, 0, 20)
 rpmBarBg.Position = UDim2.new(0, 20, 0, 200)
@@ -145,7 +158,7 @@ rpmBar.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
 rpmBar.BorderSizePixel = 0
 rpmBar.Parent = rpmBarBg
 
---== BUTTON ACTIONS ==--
+--== GEAR SELECT BUTTONS ==--
 gearPlus.MouseButton1Click:Connect(function()
 	if maxGear < 8 then
 		maxGear += 1
@@ -160,22 +173,40 @@ gearMinus.MouseButton1Click:Connect(function()
 	end
 end)
 
+--== FUNCTIONS ==--
+local function startSpeed()
+	if not bodyVelocity then
+		bodyVelocity = Instance.new("BodyVelocity")
+		bodyVelocity.MaxForce = Vector3.new(9e9, 0, 9e9)
+		bodyVelocity.Velocity = Vector3.zero
+		bodyVelocity.Parent = humanoidRootPart
+	end
+	currentSpeed = 0
+	targetSpeed = 0
+	currentGear = 1
+end
+
+local function stopSpeed()
+	if bodyVelocity then
+		bodyVelocity:Destroy()
+		bodyVelocity = nil
+	end
+	currentSpeed = 0
+	targetSpeed = 0
+	currentGear = 1
+	fakeW = false
+	speedLabel.Text = "Speed: 0 km/h"
+	gearLabel.Text = "Gear: 1"
+	rpmBar.Size = UDim2.new(0, 0, 1, 0)
+end
+
 toggleButton.MouseButton1Click:Connect(function()
 	speedActive = not speedActive
 	toggleButton.Text = speedActive and "Speed ON" or "Speed OFF"
 	if speedActive then
-		if not bodyVelocity then
-			bodyVelocity = Instance.new("BodyVelocity")
-			bodyVelocity.MaxForce = Vector3.new(9e9, 0, 9e9)
-			bodyVelocity.Velocity = Vector3.zero
-			bodyVelocity.Parent = humanoidRootPart
-		end
+		startSpeed()
 	else
-		if bodyVelocity then bodyVelocity:Destroy() end
-		bodyVelocity = nil
-		currentSpeed = 0
-		targetSpeed = 0
-		fakeW = false
+		stopSpeed()
 	end
 end)
 
@@ -184,6 +215,7 @@ handBrakeButton.MouseButton1Click:Connect(function()
 	handBrakeButton.Text = handBrakeActive and "Handbrake ON" or "Handbrake OFF"
 end)
 
+--== INPUT ==--
 UserInputService.InputBegan:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.W and speedActive then
 		fakeW = true
@@ -192,7 +224,7 @@ end)
 
 UserInputService.InputEnded:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.W and speedActive then
-		fakeW = true -- cruise continuu
+		fakeW = true -- fake W activ când iei mâna
 	end
 end)
 
@@ -221,17 +253,16 @@ RunService.Heartbeat:Connect(function()
 	local pressingW = UserInputService:IsKeyDown(Enum.KeyCode.W)
 	local pressingS = UserInputService:IsKeyDown(Enum.KeyCode.S)
 
-	-- accelerație dependentă de gear
-	local accelMultiplier = gearAccel[currentGear] or 1.0
-
+	-- accelerează
 	if pressingW and not handBrakeActive then
-		targetSpeed = math.min(targetSpeed * accelMultiplier + 1, gearSpeeds[maxGear])
+		targetSpeed = math.min(targetSpeed * accelRate + 1, gearSpeeds[maxGear])
 	elseif fakeW and not pressingS then
 		targetSpeed = math.max(targetSpeed * naturalDecel, 0)
 	else
 		targetSpeed = targetSpeed * naturalDecel
 	end
 
+	-- frâne
 	if pressingS then
 		targetSpeed = targetSpeed * brakeRate
 		fakeW = false
@@ -242,6 +273,7 @@ RunService.Heartbeat:Connect(function()
 		fakeW = false
 	end
 
+	-- auto gears
 	local gearMax = gearSpeeds[currentGear]
 	if targetSpeed > gearMax * 0.95 and currentGear < maxGear then
 		shiftUp()
