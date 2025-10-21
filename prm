@@ -588,6 +588,14 @@ TabGamm:AddButton({
     end,
 })
 
+TabGamm:AddButton({
+    Title = "Driving Empire",
+    Tip = "Run collaborative script Driving Empire",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CARSSS", true))()
+    end,
+})
+
 -- Info Tab
 local Tabinfo = Window:AddTab({Title = "INFO", Icon = "Zee"})
 
