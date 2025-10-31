@@ -1,0 +1,120 @@
+--// Services
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+
+--// Load Fluent UI
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "Alone x ZeeHUB",
+    SubTitle = "Mobile Edition - Games & Collabs",
+    TabWidth = 180,
+    Size = UDim2.fromOffset(620, 520),
+    Theme = "Aqua",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+--// Helper Safe Loader
+local function SafeLoad(url)
+    local success, err = pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+    if not success then
+        Window:Notify({
+            Title = "❌ Load Failed",
+            Description = "Error loading script:\n" .. tostring(err),
+            Duration = 8
+        })
+    else
+        Window:Notify({
+            Title = "✅ Script Loaded",
+            Description = "Script executed successfully!",
+            Duration = 5
+        })
+    end
+end
+
+-----------------------------------------------------
+-- 🕹️ GAMES TAB
+-----------------------------------------------------
+local TabGamm = Window:AddTab({ Title = "Games", Icon = "infinity" })
+
+TabGamm:AddButton({ Title = "Hunty Zombies", Tip = "Run collaborative script Hunty Zombies", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZMBO") end })
+TabGamm:AddButton({ Title = "BlueLock Rivals", Tip = "Run collaborative script BlueLock Rivals", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BBQ") end })
+TabGamm:AddButton({ Title = "Grow A Garden", Tip = "Run collaborative script Grow A Garden", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/GRO") end })
+TabGamm:AddButton({ Title = "JJK", Tip = "Run collaborative script JJK", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JJK-X") end })
+TabGamm:AddButton({ Title = "MM2", Tip = "Run collaborative script MM2", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/M2FS") end })
+TabGamm:AddButton({ Title = "99 Nights", Tip = "Run collaborative script 99 Nights", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR") end })
+TabGamm:AddButton({ Title = "Weird Gun Game", Tip = "Run collaborative script Weird Gun Game", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WGUN") end })
+TabGamm:AddButton({ Title = "Blox Fruits", Tip = "Run collaborative script Blox Fruits", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Xz0") end })
+TabGamm:AddButton({ Title = "Driving Empire", Tip = "Run collaborative script Driving Empire", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CARSSS") end })
+
+-----------------------------------------------------
+-- 🤝 COLLAB TAB
+-----------------------------------------------------
+local TabCollab = Window:AddTab({ Title = "Collabs", Icon = "users" })
+
+TabCollab:AddButton({ Title = "Zee and Cars.HB", Tip = "Run collaborative script by Zee and Cars.HB", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/car") end })
+TabCollab:AddButton({ Title = "Zee and Invincible.Fly", Tip = "Run collaborative script by Zee and Invincible.Fly", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FLY") end })
+TabCollab:AddButton({ Title = "Zee and Invincible.FlyV2", Tip = "Run collaborative script by Zee and Invincible.FlyV2", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/INVFLY2") end })
+TabCollab:AddButton({ Title = "Zee and Invisible.y", Tip = "Run collaborative script by Zee and Invisible.y", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/SPYME") end })
+TabCollab:AddButton({ Title = "Zee and RETURN BY DEATH!", Tip = "Run collaborative script by Zee and RETURN BY DEATH!", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/RETURNBYD") end })
+TabCollab:AddButton({ Title = "Zee and Altar", Tip = "Run collaborative script by Zee and Altar", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ALT") end })
+TabCollab:AddButton({ Title = "Zee and Jerk.ANIM", Tip = "Run collaborative script by Zee and Jerk.ANIM", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JERCCC") end })
+TabCollab:AddButton({ Title = "Zee and Wally", Tip = "Run collaborative script by Zee and Wally Hold Q", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WALLY") end })
+TabCollab:AddButton({ Title = "Zee and NarX", Tip = "Run collaborative script by Zee and NarX", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/NARUTo") end })
+
+-----------------------------------------------------
+-- 🎵 COLLAB-UI TAB
+-----------------------------------------------------
+local TabCollabUI = Window:AddTab({ Title = "Collab-UI", Icon = "table" })
+
+TabCollabUI:AddButton({ Title = "Zee and Piano", Tip = "Run collaborative script by Zee and Piano", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Piano") end })
+TabCollabUI:AddButton({ Title = "Zee and Zombie.Anim", Tip = "Run collaborative script by Zee and Zombie.Anim", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZOMBIUUU") end })
+TabCollabUI:AddButton({ Title = "Zee and R15.ANIM", Tip = "Run collaborative script by Zee and R15.ANIM", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/r154") end })
+TabCollabUI:AddButton({ Title = "Zee and CoolKID.HUBs", Tip = "Run collaborative script by Zee and CoolKID", Callback = function() SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/COOLKID") end })
+
+-----------------------------------------------------
+-- ✅ Load Notification
+-----------------------------------------------------
+Window:Notify({
+    Title = "Alone x ZeeHUB",
+    Description = "✅ All Games and Collabs loaded successfully!",
+    Duration = 8
+})
+
+-----------------------------------------------------
+-- 📱 Mobile Drag Support
+-----------------------------------------------------
+local gui = CoreGui:FindFirstChild("Fluent_UI")
+if gui then
+    local dragging, dragInput, dragStart, startPos
+    local function update(input)
+        local delta = input.Position - dragStart
+        gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+    gui.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = gui.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    gui.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            update(input)
+        end
+    end)
+end
