@@ -1,310 +1,164 @@
--- Alone x ZeeHUB - Mobile Friendly Games Only UI
--- Single-file client script (paste into StarterPlayerScripts or run with executor)
-
--- Services
+--// Services
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
-local LocalPlayer = Players.LocalPlayer
 
--- Helper: safely get character
-local function getCharacter()
-    return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-end
+--// Load Fluent UI
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 
--- Remote loader with error handling
-local function loadRemote(url)
-    local ok, res = pcall(function()
-        return game:HttpGetAsync(url, true)
+local Window = Fluent:CreateWindow({
+    Title = "Alone x ZeeHUB",
+    SubTitle = "Collab Games - Mobile Edition",
+    TabWidth = 180,
+    Size = UDim2.fromOffset(620, 520),
+    Theme = "Aqua",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+--// Create Games Tab
+local TabGamm = Window:AddTab({
+    Title = "Games",
+    Icon = "infinity"
+})
+
+--// Safe Script Loader
+local function SafeLoad(url)
+    local success, err = pcall(function()
+        loadstring(game:HttpGet(url))()
     end)
-    if not ok then
-        warn("[AloneZeeHub] Failed to fetch:", url, res)
-        return false, res
+    if not success then
+        Window:Notify({
+            Title = "❌ Load Failed",
+            Description = "Error loading script:\n" .. tostring(err),
+            Duration = 8
+        })
+    else
+        Window:Notify({
+            Title = "✅ Script Loaded",
+            Description = "Script from " .. url .. " executed successfully!",
+            Duration = 6
+        })
     end
-    if not res or res == "" then
-        warn("[AloneZeeHub] Empty response from:", url)
-        return false, "empty"
-    end
-    local fn, err = loadstring(res)
-    if not fn then
-        warn("[AloneZeeHub] loadstring error:", err)
-        return false, err
-    end
-    local succ, e = pcall(fn)
-    if not succ then
-        warn("[AloneZeeHub] runtime error:", e)
-        return false, e
-    end
-    return true
 end
 
--- Collab games list
-local collabGames = {
-    {Title = "Hunty Zombies", Url = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZMBO"},
-    {Title = "BlueLock Rivals", Url = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BBQ"},
-    {Title = "Grow A Garden", Url = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/GRO"},
-    {Title = "JJK", Url = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JJK-X"},
-    {Title = "MM2", Url = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/M2FS"},
-    {Title = "99 Nights", Url = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR"},
-    {Title = "Wierd Gun Game", Url = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WGUN"},
-    {Title = "Blox Fruits", Url = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Xz0"},
-    {Title = "Driving Empire", Url = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CARSSS"}
-}
+--// Add Buttons for Collab Scripts
+TabGamm:AddButton({
+    Title = "Hunty Zombies",
+    Tip = "Run collaborative script Hunty Zombies",
+    Callback = function()
+        SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZMBO")
+    end,
+})
 
--- Create/replace GUI
-local function createGamesUI()
-    -- Remove old
-    local existing = CoreGui:FindFirstChild("AloneZeeHub_GamesUI")
-    if existing then existing:Destroy() end
+TabGamm:AddButton({
+    Title = "BlueLock Rivals",
+    Tip = "Run collaborative script BlueLock Rivals",
+    Callback = function()
+        SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BBQ")
+    end,
+})
 
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "AloneZeeHub_GamesUI"
-    screenGui.ResetOnSpawn = false
-    screenGui.Parent = CoreGui
+TabGamm:AddButton({
+    Title = "Grow A Garden",
+    Tip = "Run collaborative script Grow A Garden",
+    Callback = function()
+        SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/GRO")
+    end,
+})
 
-    -- Main container (centered)
-    local container = Instance.new("Frame")
-    container.Name = "Container"
-    container.AnchorPoint = Vector2.new(0.5, 0.5)
-    container.Position = UDim2.new(0.5, 0, 0.5, 0)
-    container.Size = UDim2.new(0.92, 0, 0.88, 0)
-    container.BackgroundColor3 = Color3.fromRGB(18, 24, 30)
-    container.BorderSizePixel = 0
-    container.Parent = screenGui
+TabGamm:AddButton({
+    Title = "JJK",
+    Tip = "Run collaborative script JJK",
+    Callback = function()
+        SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JJK-X")
+    end,
+})
 
-    local corner = Instance.new("UICorner", container)
-    corner.CornerRadius = UDim.new(0, 18)
+TabGamm:AddButton({
+    Title = "MM2",
+    Tip = "Run collaborative script MM2",
+    Callback = function()
+        SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/M2FS")
+    end,
+})
 
-    -- Top bar
-    local topBar = Instance.new("Frame")
-    topBar.Name = "TopBar"
-    topBar.Size = UDim2.new(1, 0, 0, 64)
-    topBar.BackgroundTransparency = 1
-    topBar.Parent = container
+TabGamm:AddButton({
+    Title = "99 Nights",
+    Tip = "Run collaborative script 99 Nights",
+    Callback = function()
+        SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR")
+    end,
+})
 
-    local title = Instance.new("TextLabel")
-    title.Name = "Title"
-    title.Size = UDim2.new(0.7, 0, 1, 0)
-    title.Position = UDim2.new(0.04, 0, 0, 0)
-    title.BackgroundTransparency = 1
-    title.Text = "Alone x ZeeHUB — Games"
-    title.TextColor3 = Color3.fromRGB(235, 235, 235)
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 20
-    title.TextXAlignment = Enum.TextXAlignment.Left
-    title.Parent = topBar
+TabGamm:AddButton({
+    Title = "Weird Gun Game",
+    Tip = "Run collaborative script Weird Gun Game",
+    Callback = function()
+        SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WGUN")
+    end,
+})
 
-    -- Buttons container
-    local btnBox = Instance.new("Frame")
-    btnBox.Name = "BtnBox"
-    btnBox.Size = UDim2.new(0.34, 0, 1, 0)
-    btnBox.Position = UDim2.new(0.66, 0, 0, 0)
-    btnBox.BackgroundTransparency = 1
-    btnBox.Parent = topBar
+TabGamm:AddButton({
+    Title = "Blox Fruits",
+    Tip = "Run collaborative script Blox Fruits",
+    Callback = function()
+        SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Xz0")
+    end,
+})
 
-    local closeBtn = Instance.new("TextButton")
-    closeBtn.Name = "Close"
-    closeBtn.Size = UDim2.new(0, 86, 0, 40)
-    closeBtn.AnchorPoint = Vector2.new(1, 0.5)
-    closeBtn.Position = UDim2.new(1, -12, 0.5, 0)
-    closeBtn.BackgroundColor3 = Color3.fromRGB(40, 46, 52)
-    closeBtn.Text = "Close"
-    closeBtn.Font = Enum.Font.GothamBold
-    closeBtn.TextSize = 16
-    closeBtn.TextColor3 = Color3.fromRGB(240,240,240)
-    closeBtn.Parent = btnBox
-    Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 10)
+TabGamm:AddButton({
+    Title = "Driving Empire",
+    Tip = "Run collaborative script Driving Empire",
+    Callback = function()
+        SafeLoad("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CARSSS")
+    end,
+})
 
-    local minBtn = Instance.new("TextButton")
-    minBtn.Name = "Minimize"
-    minBtn.Size = UDim2.new(0, 86, 0, 40)
-    minBtn.AnchorPoint = Vector2.new(1, 0.5)
-    minBtn.Position = UDim2.new(1, -108, 0.5, 0)
-    minBtn.BackgroundColor3 = Color3.fromRGB(40, 46, 52)
-    minBtn.Text = "Min"
-    minBtn.Font = Enum.Font.GothamBold
-    minBtn.TextSize = 16
-    minBtn.TextColor3 = Color3.fromRGB(240,240,240)
-    minBtn.Parent = btnBox
-    Instance.new("UICorner", minBtn).CornerRadius = UDim.new(0, 10)
+--// Notification
+Window:Notify({
+    Title = "Alone x ZeeHUB",
+    Description = "✅ Collab Games loaded successfully for Mobile & PC!",
+    Duration = 8
+})
 
-    -- Content area: scrollable list of big buttons
-    local content = Instance.new("ScrollingFrame")
-    content.Name = "Content"
-    content.Size = UDim2.new(1, -28, 1, -86)
-    content.Position = UDim2.new(0, 14, 0, 72)
-    content.BackgroundTransparency = 1
-    content.ScrollBarThickness = 10
-    content.Parent = container
+--// Mobile Drag Support
+local gui = CoreGui:FindFirstChild("Fluent_UI")
+if gui then
+    local dragging, dragInput, dragStart, startPos
 
-    local layout = Instance.new("UIListLayout", content)
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 14)
-
-    local padding = Instance.new("UIPadding", content)
-    padding.PaddingLeft = UDim.new(0, 8)
-    padding.PaddingRight = UDim.new(0, 8)
-    padding.PaddingTop = UDim.new(0, 8)
-
-    -- Helper: create a large touch-friendly button
-    local function makeGameButton(titleText, tip)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, 0, 0, 86)
-        btn.BackgroundColor3 = Color3.fromRGB(36, 46, 56)
-        btn.Text = titleText
-        btn.Font = Enum.Font.GothamBold
-        btn.TextSize = 20
-        btn.TextColor3 = Color3.fromRGB(245,245,245)
-        btn.AutoButtonColor = true
-        btn.RichText = false
-        btn.Parent = content
-        local btnCorner = Instance.new("UICorner", btn)
-        btnCorner.CornerRadius = UDim.new(0, 14)
-
-        -- subtitle / tip
-        local subtitle = Instance.new("TextLabel")
-        subtitle.Size = UDim2.new(0.95, -8, 0, 28)
-        subtitle.Position = UDim2.new(0.025, 0, 0.64, 0)
-        subtitle.BackgroundTransparency = 1
-        subtitle.Text = tip or ""
-        subtitle.Font = Enum.Font.Gotham
-        subtitle.TextSize = 14
-        subtitle.TextColor3 = Color3.fromRGB(200,200,200)
-        subtitle.TextXAlignment = Enum.TextXAlignment.Left
-        subtitle.Parent = btn
-
-        return btn
+    local function update(input)
+        local delta = input.Position - dragStart
+        gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                 startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 
-    -- Fill with game buttons
-    for _, g in ipairs(collabGames) do
-        local b = makeGameButton(g.Title, "Run collaborative script")
-        b.MouseButton1Click:Connect(function()
-            -- feedback: small animation + loader
-            local orig = b.BackgroundColor3
-            local blink = TweenService:Create(b, TweenInfo.new(0.12, Enum.EasingStyle.Sine), {BackgroundColor3 = Color3.fromRGB(60,160,140)})
-            local back = TweenService:Create(b, TweenInfo.new(0.12, Enum.EasingStyle.Sine), {BackgroundColor3 = orig})
-            blink:Play()
-            blink.Completed:Wait()
-            back:Play()
+    gui.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = gui.Position
 
-            -- attempt to load
-            spawn(function()
-                local ok, err = loadRemote(g.Url)
-                if not ok then
-                    -- show inline transient error label
-                    local errLabel = Instance.new("TextLabel", b)
-                    errLabel.Size = UDim2.new(1, -16, 0, 28)
-                    errLabel.Position = UDim2.new(0, 8, 1, -36)
-                    errLabel.BackgroundTransparency = 0.2
-                    errLabel.BackgroundColor3 = Color3.fromRGB(40, 20, 20)
-                    errLabel.Text = "Failed to load: " .. (tostring(err) or "error")
-                    errLabel.Font = Enum.Font.Gotham
-                    errLabel.TextSize = 13
-                    errLabel.TextColor3 = Color3.fromRGB(255,200,200)
-                    errLabel.RichText = false
-                    local c = Instance.new("UICorner", errLabel)
-                    c.CornerRadius = UDim.new(0,8)
-                    task.delay(4, function()
-                        if errLabel and errLabel.Parent then pcall(function() errLabel:Destroy() end) end
-                    end)
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
                 end
             end)
-        end)
-    end
-
-    -- Minimize behavior: collapse into small pill
-    local minimized = false
-    local savedSize = container.Size
-    minBtn.MouseButton1Click:Connect(function()
-        minimized = not minimized
-        if minimized then
-            savedSize = container.Size
-            local tween = TweenService:Create(container, TweenInfo.new(0.18, Enum.EasingStyle.Quad), {Size = UDim2.new(0.6, 0, 0.08, 0)})
-            tween:Play()
-            -- hide content except topbar
-            for _, child in pairs(container:GetChildren()) do
-                if child.Name ~= "TopBar" then
-                    child.Visible = false
-                end
-            end
-        else
-            local tween = TweenService:Create(container, TweenInfo.new(0.18, Enum.EasingStyle.Quad), {Size = savedSize})
-            tween:Play()
-            for _, child in pairs(container:GetChildren()) do
-                child.Visible = true
-            end
         end
     end)
 
-    closeBtn.MouseButton1Click:Connect(function()
-        screenGui:Destroy()
-    end)
-
-    -- Make draggable for touch: simple offset based
-    local dragging = false
-    local dragStartPos
-    local guiStartPos
-    topBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStartPos = input.Position
-            guiStartPos = container.Position
-        end
-    end)
-    topBar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
-    end)
-    screenGui.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.Touch then
-            local delta = input.Position - dragStartPos
-            local newX = math.clamp(guiStartPos.X.Offset + delta.X, -workspace.CurrentCamera.ViewportSize.X*0.4, workspace.CurrentCamera.ViewportSize.X*0.4)
-            local newY = math.clamp(guiStartPos.Y.Offset + delta.Y, -workspace.CurrentCamera.ViewportSize.Y*0.4, workspace.CurrentCamera.ViewportSize.Y*0.4)
-            container.Position = UDim2.new(0.5, newX, 0.5, newY)
+    gui.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement 
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
         end
     end)
 
-    -- Responsiveness: adjust sizes on viewport change
-    local function onResize()
-        local vs = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1280,720)
-        if vs.X < 600 then
-            container.Size = UDim2.new(0.98,0,0.94,0)
-            container.AnchorPoint = Vector2.new(0.5,0.5)
-            container.Position = UDim2.new(0.5,0,0.5,0)
-        else
-            container.Size = UDim2.new(0.92,0,0.88,0)
-            container.Position = UDim2.new(0.5,0,0.5,0)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            update(input)
         end
-    end
-    onResize()
-    -- Connect to viewport changes
-    RunService:GetPropertyChangedSignal("RenderStepped"):Connect(function() end) -- no-op keep RunService referenced
-    if workspace.CurrentCamera then
-        workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(onResize)
-    end
-
-    -- initial small toast
-    local toast = Instance.new("TextLabel", container)
-    toast.Size = UDim2.new(0.6,0,0,34)
-    toast.Position = UDim2.new(0.2,0,0.02,0)
-    toast.BackgroundTransparency = 0.15
-    toast.BackgroundColor3 = Color3.fromRGB(30,40,50)
-    toast.Text = "Games only UI loaded — tap a button to run a script"
-    toast.TextColor3 = Color3.fromRGB(230,230,230)
-    toast.Font = Enum.Font.Gotham
-    toast.TextSize = 14
-    toast.AutoLocalize = false
-    Instance.new("UICorner", toast).CornerRadius = UDim.new(0,8)
-    task.delay(4, function() pcall(function() toast:Destroy() end) end)
-
-    return screenGui
+    end)
 end
-
--- Build the UI
-createGamesUI()
-
--- End of file
