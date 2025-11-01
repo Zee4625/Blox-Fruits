@@ -1,0 +1,41 @@
+-- 🔹 Teleport Script by ZeeHUB AI 8.0
+-- Teleports the player randomly 50–100 studs around them when pressing "T"
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local UserInputService = game:GetService("UserInputService")
+
+local teleportCooldown = false
+local cooldownTime = 5 -- seconds
+
+-- Function to teleport player randomly in a 50-100 stud radius
+local function randomTeleport()
+	if teleportCooldown then return end
+	teleportCooldown = true
+
+	local root = character:WaitForChild("HumanoidRootPart")
+	local randomDistance = math.random(50, 100)
+	local randomAngle = math.rad(math.random(0, 360))
+	local offset = Vector3.new(math.cos(randomAngle), 0, math.sin(randomAngle)) * randomDistance
+	local newPosition = root.Position + offset + Vector3.new(0, 3, 0) -- add a bit of height to avoid clipping
+
+	-- Teleport safely
+	root.CFrame = CFrame.new(newPosition)
+	
+	-- Small feedback
+	game.StarterGui:SetCore("ChatMakeSystemMessage", {
+		Text = "[ZeeHUB AI]: Teleported " .. math.floor(randomDistance) .. " studs away!";
+		Color = Color3.fromRGB(0, 255, 150);
+	})
+
+	task.wait(cooldownTime)
+	teleportCooldown = false
+end
+
+-- Bind teleport to key "T"
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.T then
+		randomTeleport()
+	end
+end)
