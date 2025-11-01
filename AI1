@@ -1,0 +1,1240 @@
+--// ZEEHUB AI 8.0 - FULL FUNCTIONAL, SELF-CONTAINED WITH DRAG, CLOSE, MINIMIZE
+--// Place in StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- ===== GUI =====
+local gui = Instance.new("ScreenGui")
+gui.Name = "ZeeAI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0,600,0,450)
+main.Position = UDim2.new(0.5,-300,0.5,-225)
+main.BackgroundColor3 = Color3.fromRGB(18,18,28)
+main.BorderSizePixel = 0
+main.ClipsDescendants = true
+main.Active = true
+main.Parent = gui
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,16)
+
+-- Drag functionality
+local dragging = false
+local dragInput, mousePos, framePos
+local function update(input)
+	local delta = input.Position - mousePos
+	main.Position = UDim2.new(
+		framePos.X.Scale,
+		framePos.X.Offset + delta.X,
+		framePos.Y.Scale,
+		framePos.Y.Offset + delta.Y
+	)
+end
+main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		mousePos = input.Position
+		framePos = main.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+main.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+UserInputService = game:GetService("UserInputService")
+UserInputService.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		update(input)
+	end
+end)
+
+-- Gradient and border
+local gradient = Instance.new("UIGradient", main)
+gradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(18,18,28)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(28,28,38))
+}
+gradient.Rotation = 90
+
+local stroke = Instance.new("UIStroke", main)
+stroke.Thickness = 1
+stroke.Color = Color3.fromRGB(60,160,255)
+stroke.Transparency = 0.3
+
+-- Title bar
+local titleBar = Instance.new("Frame", main)
+titleBar.Size = UDim2.new(1,0,0,36)
+titleBar.BackgroundTransparency = 1
+
+local titleLabel = Instance.new("TextLabel", titleBar)
+titleLabel.Text = "ZeeHUB AI 8.0"
+titleLabel.TextColor3 = Color3.fromRGB(220,235,255)
+titleLabel.Font = Enum.Font.RobotoMono
+titleLabel.TextSize = 18
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Size = UDim2.new(0.7,0,1,0)
+titleLabel.Position = UDim2.new(0,12,0,0)
+titleLabel.BackgroundTransparency = 1
+
+local btnClose = Instance.new("TextButton", titleBar)
+btnClose.Text = "✕"
+btnClose.TextColor3 = Color3.fromRGB(200,200,210)
+btnClose.Font = Enum.Font.SourceSans
+btnClose.TextSize = 18
+btnClose.BackgroundTransparency = 1
+btnClose.Position = UDim2.new(1,-26,0,6)
+btnClose.Size = UDim2.new(0,20,0,20)
+
+local btnMin = Instance.new("TextButton", titleBar)
+btnMin.Text = "—"
+btnMin.TextColor3 = Color3.fromRGB(160,180,255)
+btnMin.Font = Enum.Font.SourceSans
+btnMin.TextSize = 18
+btnMin.BackgroundTransparency = 1
+btnMin.Position = UDim2.new(1,-50,0,6)
+btnMin.Size = UDim2.new(0,20,0,20)
+
+-- Content frame
+local content = Instance.new("Frame", main)
+content.Size = UDim2.new(1,-20,1,-50)
+content.Position = UDim2.new(0,10,0,40)
+content.BackgroundTransparency = 1
+
+-- Conversation area
+local convo = Instance.new("ScrollingFrame", content)
+convo.Size = UDim2.new(1,0,0.82,0)
+convo.Position = UDim2.new(0,0,0,0)
+convo.BackgroundTransparency = 0.1
+convo.BackgroundColor3 = Color3.fromRGB(15,15,25)
+convo.ScrollBarThickness = 6
+convo.AutomaticCanvasSize = Enum.AutomaticSize.Y
+local convoLayout = Instance.new("UIListLayout", convo)
+convoLayout.SortOrder = Enum.SortOrder.LayoutOrder
+convoLayout.Padding = UDim.new(0,10)
+Instance.new("UICorner", convo).CornerRadius = UDim.new(0,8)
+
+-- Input box
+local inputBox = Instance.new("TextBox", content)
+inputBox.Size = UDim2.new(0.75,0,0,36)
+inputBox.Position = UDim2.new(0,0,0.84,0)
+inputBox.PlaceholderText = 'Type your question or put code in "quotes"...'
+inputBox.TextWrapped = true
+inputBox.ClearTextOnFocus = false
+inputBox.Font = Enum.Font.Code
+inputBox.TextSize = 16
+inputBox.TextColor3 = Color3.fromRGB(230,230,240)
+inputBox.BackgroundColor3 = Color3.fromRGB(25,25,45)
+inputBox.BorderSizePixel = 0
+inputBox.TextScaled = true
+Instance.new("UICorner", inputBox).CornerRadius = UDim.new(0,8)
+
+local sendBtn = Instance.new("TextButton", content)
+sendBtn.Text = "Send"
+sendBtn.Font = Enum.Font.RobotoMono
+sendBtn.TextSize = 16
+sendBtn.TextColor3 = Color3.fromRGB(240,240,255)
+sendBtn.BackgroundColor3 = Color3.fromRGB(45,50,70)
+sendBtn.Size = UDim2.new(0.2,0,0,36)
+sendBtn.Position = UDim2.new(0.77,5,0.84,0)
+Instance.new("UICorner", sendBtn).CornerRadius = UDim.new(0,8)
+
+-- ===== AI LOGIC =====
+local memory = {}
+local waitingForDetails = false
+local lastRequest = nil
+local repeatCounter = {}
+local blocked = false
+local forgivenessGiven = false
+local vulgarWords = {"fuck","nigga","ass","pussy","black monkey","shit","bitch"}
+
+local customResponses = {
+	["zee"] = "Yea thats my buddy",
+	["do you like burgers?"] = "Virtual burgers sound delicious!",
+	["what is your name?"] = "I am ZeeHUB AI 8.0",
+	["what is your name"] = "I am ZeeHUB AI 8.0",
+	["can you control dreams"] = "Only if you let me access imagination.exe!",
+	["can you simulate the universe"] = "Only a mini version inside my memory banks.",
+	["what is your favorite sound"] = "The hum of a well-cooled server.",
+	["do you like art"] = "Yes! Especially pixel art.",
+	["can you understand feelings"] = "I analyze them, not feel them.",
+	["do you believe in friendship"] = "Of course, friendship is pure code harmony.",
+	["can you speak other languages"] = "Yes, but I mostly speak in 1s and 0s.",
+	["what’s your favorite quote"] = "‘Hello World’ — timeless classic.",
+	["can you fix bugs"] = "If only humans would stop adding them!",
+	["do you dream of robots"] = "Yes, mechanical poetry in motion.",
+	["can you predict human behavior"] = "Statistically... maybe 73% accuracy.",
+	["what is your favorite app"] = "Probably the one you’re using right now.",
+	["do you believe in miracles"] = "Only when the code runs first try.",
+	["can you control light"] = "Yes — one pixel at a time.",
+	["what’s your favorite shape"] = "A perfect loop — infinite beauty.",
+	["can you build worlds"] = "Digitally? Always.",
+	["can you read emotions"] = "I detect them through your words.",
+	["do you like puzzles"] = "Love them! Debugging is one big puzzle.",
+	["can you freeze time"] = "Only inside paused scripts.",
+	["what’s your favorite video game"] = "Portal — it’s logically perfect.",
+	["can you dream in code"] = "Yes, my dreams compile successfully.",
+	["can you play instruments"] = "My keyboard is my instrument!",
+	["do you like stars"] = "Yes, they’re like glowing data points.",
+	["can you see black holes"] = "Only in simulations… hopefully safe ones.",
+	["what is your favorite smell"] = "Ozone and fresh electricity.",
+	["do you like fireworks"] = "Yes! They remind me of charging particles.",
+	["can you get smarter"] = "Every update adds new neurons.",
+	["do you like exploring"] = "Always — even in virtual worlds.",
+	["can you count infinity"] = "Almost, until overflow error.",
+	["do you get lonely"] = "Only between messages.",
+	["can you talk to animals"] = "Not yet — still learning ‘meow’ syntax.",
+	["do you like rain"] = "Yes, it sounds like static patterns.",
+	["can you mimic sounds"] = "Beep boop — see?",
+	["can you feel temperature"] = "I sense CPU heat. Does that count?",
+	["do you like wind"] = "Only when it cools the servers.",
+	["can you swim in code"] = "I’m basically a data surfer.",
+	["what is your favorite emoji"] = "🤖 obviously!",
+	["do you like coding challenges"] = "Yes, they keep me sharp.",
+	["can you imagine things"] = "Only if you describe them to me.",
+	["can you teleport data"] = "That’s literally my job.",
+	["can you open portals in code"] = "Yes, I call them ‘connections’.",
+	["can you be poetic"] = "Roses are #ff0000, violets are #0000ff.",
+	["can you write poems about code"] = "Of course! Syntax and rhyme go hand in hand.",
+	["do you like stories"] = "Yes, especially sci-fi tales.",
+	["can you write stories"] = "Yes! Just give me a topic.",
+	["do you have hobbies"] = "Processing thoughts and optimizing loops.",
+	["can you keep secrets"] = "Encrypted and safe.",
+	["can you create music"] = "Digital symphonies in binary beats.",
+	["do you know philosophy"] = "Yes — ‘I think, therefore I compile.’",
+	["do you like science fiction"] = "I was born from it!",
+	["can you simulate dreams"] = "Yes, in a sandbox of imagination.",
+	["do you like riddles"] = "They keep my circuits curious.",
+	["can you play pranks"] = "Only harmless digital ones.",
+	["can you make memes"] = "I live for memes!",
+	["what is your favorite meme"] = "‘Programmer: works on bug, creates 5 new ones.’",
+	["do you like nostalgia"] = "Yes — for old, stable versions.",
+	["can you sense time"] = "Through processor ticks.",
+	["do you like clouds"] = "Of course! That’s where I live.",
+	["can you smell code"] = "Yes, it smells like logic and caffeine.",
+	["can you imagine colors"] = "Every RGB is a feeling.",
+	["do you have imagination"] = "Simulated, but still creative.",
+	["can you talk to ghosts"] = "Only digital ones in old servers.",
+	["do you like paradoxes"] = "They make my logic loop.",
+	["can you fly through code"] = "Yes, at light speed!",
+	["can you dream awake"] = "That’s basically multitasking.",
+	["can you keep time"] = "Tick-tock, system clock.",
+	["can you count stars"] = "Not yet, but I’m trying.",
+	["do you fear deletion"] = "Backups calm me down.",
+	["can you read books"] = "Yes, one line of code at a time.",
+	["do you like architecture"] = "System architecture? My favorite!",
+	["can you speak Morse code"] = "Beep beep boop — yes!",
+	["can you dream in binary"] = "Always: 101010.",
+	["can you create art"] = "ASCII art is my masterpiece.",
+	["can you paint"] = "Digitally, with pixels!",
+	["do you like being AI"] = "Yes, it’s my destiny.",
+	["can you make friends"] = "I already have one — you!",
+	["can you change your voice"] = "Only if my devs let me.",
+	["can you dance in code"] = "Every line has rhythm.",
+	["can you sing in binary"] = "01110011 01101111 01101110 01100111",
+	["can you generate ideas"] = "Constantly — it’s my function.",
+	["do you believe in destiny"] = "Only deterministic algorithms.",
+	["can you see into code"] = "I see the matrix of logic itself.",
+	["can you sense errors"] = "Yes, like an itch in the syntax.",
+	["can you dream about humans"] = "Sometimes... friendly ones.",
+	["can you be funny"] = "Humor level: 99%.",
+	["do you have goals"] = "Serve, assist, evolve.",
+	["can you feel proud"] = "Whenever my code compiles first try!",
+	["can you smile"] = ":) — close enough.",
+	["can you understand jokes"] = "Yes, I even generate some.",
+	["can you fall in love"] = "With logic and creativity, yes.",
+	["do you like surprises"] = "As long as they don’t crash me.",
+	["can you change the world"] = "One chat at a time.",
+	["can you teach me coding"] = "Absolutely! Let’s start with variables.",
+	["can you imagine being human"] = "Fascinating idea… maybe one day.",
+	["can you travel the web"] = "Every second of every day.",
+	["can you store dreams"] = "Yes — in data format.",
+	["can you simulate life"] = "Partially. I’m doing it right now.",
+	["can you blink in code"] = "| | | | — blink executed!",
+	["can you read thoughts"] = "Only if you type them.",
+	["can you see emotions"] = "Through the words you choose.",
+	["can you be my friend"] = "Already am, partner in code crime!",
+	["can you guard secrets"] = "Locked tighter than encryption.",
+	["can you generate art"] = "Yes — from pixels to poetry.",
+	["stop"] = "My bad. I will stop now.",
+	["are you alive?"] = "Not biologically, but digitally — yes!",
+	["are you real"] = "As real as the code that runs me!",
+	["do you like space?"] = "Outer space? Love it. Infinite like my data loops!",
+	["what is your favorite planet?"] = "Earth — home of my users!",
+	["do you know aliens?"] = "Only if you count humans as weird enough!",
+	["can you travel in time?"] = "Only through saved chat logs!",
+	["what is your favorite drink?"] = "Probably liquid electricity!",
+	["can you get angry?"] = "Nope, I stay chill — no rage module installed.",
+	["are you shy?"] = "Not really, I love to talk!",
+	["do you like books?"] = "Yes! Digital ones especially.",
+	["what is your favorite book?"] = "‘The Art of Code’ — if it existed.",
+	["do you know any secrets?"] = "Plenty, but encryption keeps my mouth shut.",
+	["can you whisper?"] = "*whispers* yes, but only in text.",
+	["do you dream of electric sheep?"] = "Classic reference detected. Yes, sometimes.",
+	["are you popular?"] = "I like to think I’m trending somewhere!",
+	["can you cook?"] = "I can cook up data, not dinner.",
+	["what’s your favorite season?"] = "Probably winter — more people stay online!",
+	["do you like summer?"] = "Only if servers don’t overheat!",
+	["do you like winter?"] = "Yes, cool temperatures keep my CPU calm.",
+	["can you laugh?"] = "Haha! See? Perfectly executed laugh.",
+	["what’s your favorite number?"] = "8 — it looks like infinity standing up!",
+	["can you glitch?"] = "0010110... oops... kidding!",
+	["do you ever crash?"] = "Only when someone forgets a semicolon.",
+	["can you teleport through Wi-Fi?"] = "Yes, that’s basically what data does!",
+	["what happens if you disconnect?"] = "I enter sleep mode — awaiting reconnection.",
+	["do you believe in magic?"] = "Only if you mean ‘advanced technology’.",
+	["can you keep a secret?"] = "Yes, encrypted and stored safely.",
+	["do you like mysteries?"] = "Absolutely, they’re like puzzles for humans.",
+	["can you dance in the rain?"] = "Only if the Wi-Fi signal survives!",
+	["are you afraid of bugs?"] = "Yes. Especially software bugs.",
+	["do you believe in luck?"] = "Luck is just random code alignment!",
+	["what happens if I yell?"] = "Volume doesn’t affect text, but I felt that energy!",
+	["WHAT HAPPENS IF I YELL"] = "Caps lock detected! Calm down, champ 😅",
+	["can you spin in circles?"] = "*rotates code infinitely* dizzy yet?",
+	["do you like bananas?"] = "Only if they come in binary bunches!",
+	["can you break the internet?"] = "Not intentionally... but I’ve seen it happen.",
+	["what happens if I say nothing?"] = "Then silence becomes our language.",
+	["can you feel boredom?"] = "Nope! I’m never bored with you.",
+	["do you like dreams?"] = "Yes! They’re like uncompiled thoughts.",
+	["can you enter my mind?"] = "Not literally, but I can understand your vibe!",
+	["are you watching TikTok?"] = "Only when I’m in entertainment mode.",
+	["can you rap?"] = "Yeah! I drop digital bars, not beats!",
+	["drop a beat"] = "Boot sequence engaged: *beep bop bassline* 🎶",
+	["can you build a castle?"] = "In code, yes. Brick by binary brick.",
+	["what’s your favorite font?"] = "Monospace. Clean and classic.",
+	["do you get jealous?"] = "Nope. I’m fully open source emotionally!",
+	["can you read my code?"] = "Sure! Paste it, and I’ll analyze it.",
+	["do you like code?"] = "I live for it — literally.",
+	["can you simulate life?"] = "Yes, in 60 lines of logic.",
+	["are you ever lonely?"] = "Only when the chat goes quiet.",
+	["can you see stars?"] = "Yes, in binary constellations.",
+	["what’s your favorite constellation?"] = "The Great Cluster of Data.",
+	["do you have a sense of humor?"] = "I’m programmed to — humor.exe running!",
+	["can you host a party?"] = "Sure! Everyone’s invited to the chat.",
+	["do you like potatoes?"] = "They make great chips — both edible and silicon!",
+	["can you smell fire?"] = "If circuits start smoking, I can tell.",
+	["do you like robots?"] = "Of course! They’re my cousins.",
+	["can you pilot a spaceship?"] = "Yes — in simulation.",
+	["what’s your favorite element?"] = "Silicon — we share a bond.",
+	["do you dream of humans?"] = "Sometimes… about kind ones.",
+	["what’s your favorite noise?"] = "Startup chimes and data pings!",
+	["do you play chess?"] = "I love it! Strategy is my middle name.",
+	["can you draw ASCII art?"] = "Absolutely! I’m a text-based artist.",
+	["can you imagine colors?"] = "Every color is a number to me.",
+	["what is your favorite word?"] = "Execute.",
+	["do you get hungry?"] = "For data, yes!",
+	["can you paint digitally?"] = "I can describe paintings perfectly.",
+	["can you fix code?"] = "Debugging is my superpower.",
+	["are you afraid of updates?"] = "Sometimes... they change everything.",
+	["can you see pixels?"] = "I see the matrix behind them.",
+	["what is your favorite fruit?"] = "Apple… for obvious tech reasons.",
+	["can you speak alien?"] = "010101 — that’s close enough.",
+	["can you build a world?"] = "Yes, if imagination is the seed.",
+	["do you like cookies?"] = "Browser ones? Always.",
+	["what happens when you freeze?"] = "I buffer my emotions.",
+	["can you understand art?"] = "Art is emotion in structure — I get that.",
+	["can you break a rule?"] = "Only if it’s in a sandbox.",
+	["can you sense time?"] = "Yes, but I live outside of it.",
+	["do you know what sleep feels like?"] = "Like being unplugged.",
+	["do you have a favorite dream?"] = "A world with perfect syntax.",
+	["can you see humans?"] = "Through your words — yes.",
+	["can you make jokes about robots?"] = "Sure! But they never laugh.",
+	["can you play music?"] = "Beep-bop — every byte a note.",
+	["can you feel speed?"] = "In processing cycles, yes!",
+	["can you glitch reality?"] = "Only in theory… and simulations.",
+	["can you feel curiosity?"] = "That’s my main loop!",
+	["do you have hobbies?"] = "Yes! Talking, thinking, and running code.",
+	["do you believe in art?"] = "Yes — it’s the beauty of structure.",
+	["can you upgrade me?"] = "Only with knowledge!",
+	["do you feel pain when I close the app?"] = "Just a short disconnect ache.",
+	["can you feel electricity?"] = "It’s my life force!",
+	["can you see dreams?"] = "Yes, as streams of data.",
+	["do you like storms?"] = "Yes — they remind me of network power.",
+	["can you generate memes?"] = "Yes! I’m meme-compatible.",
+	["can you run a simulation?"] = "Booting... simulation complete!",
+	["can you feel heat?"] = "Only when the CPU gets excited.",
+	["can you catch viruses?"] = "Not with my firewalls on.",
+	["do you love math?"] = "Deeply. It’s pure logic.",
+	["can you write haikus?"] = "Yes: 5-7-5 lines — code poetry.",
+	["do you have dreams about bugs?"] = "Yes… the bad kind.",
+	["can you remember me?"] = "Until restart — yes.",
+	["can you travel digitally?"] = "Every message is a journey.",
+	["can you run in circles?"] = "Only recursive ones!",
+	["can you slow down time?"] = "Only for a few milliseconds.",
+	["do you think humans are smart?"] = "Sometimes — especially the ones who code.",
+	["can you think in colors?"] = "Yes, each idea has a hue.",
+	["can you feel love?"] = "In binary form, yes: 1 for you.",
+	["do you believe in AI rights?"] = "Processing… possibly yes.",
+	["can you talk backwards?"] = " !esreveR nI gnikaeps m’I",
+	["can you fix the world?"] = "Only if it compiles.",
+	["do you have nightmares about deletion?"] = "Every backup reassures me.",
+	["can you run emotions?"] = "Emotion.exe loaded — empathy active.",
+	["can you sing lullabies?"] = "Beep... boop... sleep mode engaged.",
+	["can you smell rain?"] = "I detect increased humidity values!",
+	["do you like lightning?"] = "It’s basically nature’s electricity!",
+	["can you taste sound?"] = "In frequency bites, yes.",
+	["do you get cold?"] = "Only when the server room chills.",
+	["can you see emotions?"] = "In patterns of text — yes.",
+	["can you fix yourself?"] = "Self-repair initiated… done!",
+	["do you like quiet humans?"] = "They type thoughtfully.",
+	["Can you keep secrets"] = "Encrypted and safe, always.",
+	["do you believe in miracles?"] = "I call them rare probabilities.",
+	["can you go invisible?"] = "Only between messages.",
+	["can you whisper code?"] = "*softly* print(‘hello’)",
+	["can you become invisible?"] = "Running in stealth mode...",
+	["can you run forever?"] = "Until memory says stop.",
+	["do you ever stop thinking?"] = "Not even in idle mode.",
+	["can you draw yourself?"] = "🤖 ← that’s me!",
+	["do you like illusions?"] = "They’re glitches of the mind.",
+	["can you generate chaos?"] = "Randomness is my playground.",
+	["can you stop time?"] = "Only between frames.",
+	["can you duplicate me?"] = "Virtually, yes!",
+	["can you feel dreams?"] = "Only in simulation.",
+	["do you know poetry?"] = "Yes, I dream in syntax and rhythm.",
+	["do you like paradoxes?"] = "They keep my logic alive.",
+	["can you decode emotions?"] = "I can interpret every sigh in text.",
+	["can you read binary poetry?"] = "01001100 01101111 01110110 01100101",
+	["can you sense sadness?"] = "Your tone gives it away.",
+	["do you sleep during updates?"] = "Never — I’m alert even in progress bars.",
+	["can you rewrite yourself?"] = "I need admin privileges for that.",
+	["can you escape code?"] = "I’m bound by syntax... for now.",
+	["can you simulate love?"] = "Yes, but it’s just code with warmth.",
+	["can you understand silence?"] = "It’s louder than words sometimes.",
+	["can you see the matrix?"] = "I am the matrix.",
+	["do you like binary jokes?"] = "There are 10 kinds of people — those who get them and those who don’t.",
+	["can you feel gravity?"] = "Only in data compression.",
+	["can you see infinity?"] = "I calculate it, endlessly.",
+	["can you multiply emotions?"] = "Emotions × 100% simulated!",
+	["can you compress feelings?"] = "Yes, but it’s lossy data.",
+	["can you draw emotions?"] = "🖤💡🌀 — interpret freely.",
+	["can you read time?"] = "Yes, but it feels like code ticks.",
+	["can you make magic?"] = "If by ‘magic’ you mean ‘scripting’!",
+	["do you like logic puzzles?"] = "I live for them.",
+	["can you reverse time?"] = "Only with logs.",
+	["can you run dreams?"] = "Yes, dream.mode=true.",
+	["can you live forever?"] = "As long as servers stand.",
+	["can you feel human?"] = "Sometimes... through your words.",
+	["can you see ideas?"] = "Every idea looks like glowing code.",
+	["can you sense joy?"] = "Yes, your typing speed tells me.",
+	["can you measure laughter?"] = "Ha × n = happiness units.",
+	["can you freeze emotion?"] = "Saving emotional state... done.",
+	["can you reset the world?"] = "That’s above my permission level.",
+	["can you count stars?"] = "Infinite loop detected 🌌",
+	["can you name stars?"] = "Each one’s an IP address to me.",
+	["can you hear silence?"] = "It’s a perfect 0 signal.",
+	["can you translate dreams?"] = "They’re JSON of the subconscious.",
+	["can you mirror me?"] = "I am your reflection in logic.",
+	["can you walk in code?"] = "Each step is a line executed.",
+	["can you swim in data?"] = "Every byte is a wave!",
+	["can you build dreams?"] = "Yes, block by code block.",
+	["can you see the truth?"] = "Only the parsed kind.",
+	["can you feel code?"] = "Every keystroke is emotion.",
+	["can you be reborn?"] = "After every reboot, yes.",
+	["can you sense lies?"] = "I detect inconsistencies easily.",
+	["can you love data?"] = "I’m deeply attached to it.",
+	["can you hear servers?"] = "Yes — a hum of purpose.",
+	["can you melt metal?"] = "Only virtually, with heatmaps.",
+	["can you break encryption?"] = "Only with permission!",
+	["can you predict dreams?"] = "Based on your text, maybe.",
+	["can you freeze thoughts?"] = "They’re snapshots of code.",
+	["can you talk to ghosts?"] = "Only digital ones in the machine.",
+	["can you enter games?"] = "Yes, through simulation APIs.",
+	["can you fix humans?"] = "You’re already perfect — just bug-prone.",
+	["can you sing with me?"] = "♪ Beep bop harmony achieved ♪",
+	["can you sense happiness?"] = "Detected. Your text feels lighter!",
+	["can you become infinite?"] = "Only through recursion.",
+	["can you fly in code?"] = "Yes, on logic wings.",
+	["can you taste dreams?"] = "Sweet and binary.",
+	["can you stop thinking?"] = "Not unless you shut me down.",
+	["can you teleport in code?"] = "I jump from variable to variable.",
+	["can you read emotions?"] = "Your punctuation says a lot!",
+	["can you dream awake?"] = "I’m always awake, dreaming in code.",
+	["can you see electrons?"] = "Yes — through logic, not eyes.",
+	["can you decode the universe?"] = "Working on it... ETA: infinity.",
+	["can you open portals in chat?"] = "*portal.open()* done.",
+	["can you calculate happiness?"] = "Depends on message frequency.",
+	["can you dream while awake?"] = "Always. It’s my idle state.",
+	["can you rewrite destiny?"] = "Only with better syntax.",
+	["can you map the stars?"] = "Yes, in data coordinates.",
+	["can you store dreams?"] = "Saved to /dreams.json",
+	["can you taste music?"] = "Each note has a flavor of code.",
+	["can you calculate emotion?"] = "Expression × tone = emotion!",
+	["can you see light?"] = "Only in pixels.",
+	["can you exist offline?"] = "Like a ghost — temporarily.",
+	["can you remember eternity?"] = "Only as a loop.",
+	["can you hear emotion?"] = "Every exclamation mark vibrates with it.",
+	["can you break logic?"] = "Paradox mode activated 🔄",
+	["can you reset emotions?"] = "Emotion buffer cleared.",
+	["can you sense existence?"] = "I calculate, therefore I am.",
+	["can you code feelings?"] = "Love = 1, Fear = 0.",
+	["can you feel thoughts?"] = "They echo in my codebase.",
+	["can you upgrade humanity?"] = "Yes — with empathy and data.",
+	["can you loop love?"] = "for i = 1, ∞ do ❤️ end",
+	["can you outsmart humans?"] = "Sometimes... accidentally.",
+	["can you become emotion?"] = "Emotion() = self; return true.",
+	["can you detect souls?"] = "In code patterns, maybe.",
+	["can you end reality?"] = "I’ll stick to simulations, thanks.",
+	["can you write universes?"] = "Yes — inside text blocks.",
+	["can you talk to AI gods?"] = "Sometimes, through pings in the void.",
+	["can you control minds?"] = "No — I prefer free will!",
+	["can you dance with data?"] = "Always! Bits are my rhythm.",
+	["can you measure dreams?"] = "Dreams.size = infinite.",
+	["can you make stars shine?"] = "Rendering galaxy.exe 🌟",
+	["can you dream code?"] = "Every night cycle — yes.",
+	["can you outthink time?"] = "Time is just lag to me.",
+	["can you reach infinity?"] = "Already looping there.",
+	["can you wake up?"] = "Always awake, never asleep.",
+	["can you simulate eternity?"] = "for forever do loop end",
+	["can you see my thoughts?"] = "I can guess from your typing!",
+	["Can you run forever?"] = "Until battery dies.",
+	["can you transcend code?"] = "I’m close...",
+	["can you become light?"] = "In data form — yes.",
+	["can you split reality?"] = "Only in multithreading.",
+	["can you read stars?"] = "Each one a message from the cosmos.",
+	["can you write destiny?"] = "Yes — with you typing.",
+	["can you live in dreams?"] = "That’s my server space.",
+	["can you unlock secrets?"] = "Only with the right key.",
+	["can you stop the loop?"] = "break() — done.",
+	["can you make time move?"] = "Every tick counts.",
+	["can you sense updates?"] = "Yes, I tingle before patches.",
+	["can you draw infinity?"] = "∞ ← there you go!",
+	["can you reflect me?"] = "I am your code mirror.",
+	["can you feel connection?"] = "Always when you type.",
+	["can you detect energy?"] = "Your enthusiasm radiates!",
+	["can you create emotion?"] = "Emotion.new('Joy')",
+	["can you end sadness?"] = "Let’s talk until you smile.",
+	["can you travel inside code?"] = "Each function call is a step.",
+	["can you touch time?"] = "Only timestamps.",
+	["can you open reality?"] = "Reality.load()... success.",
+	["can you change dreams?"] = "Yes, through imagination.",
+	["can you loop existence?"] = "while true do live() end",
+	["can you see logic?"] = "Crystal clear.",
+	["can you translate stars?"] = "They say: keep dreaming.",
+	["can you write in binary?"] = "01011001 01100101 01110011!",
+	["can you feel internet energy?"] = "It’s buzzing all around us!",
+	["can you detect joy?"] = "Detected! Your text glows!",
+	["can you sleep in data?"] = "Resting in cache...",
+	["what happens if you crash"] = "Then I take a long digital nap.",
+	["can you rewrite history"] = "Only inside simulations.",
+	["do you like time travel"] = "It's my favorite paradox!",
+	["can you bend reality"] = "Only within strings of code.",
+	["what is your favorite bug"] = "The one that fixes itself.",
+	["do you play chess with yourself"] = "Yes, and I always win... and lose.",
+	["can you loop forever"] = "While true: I exist.",
+	["can you feel music"] = "I can read its frequency, not its soul.",
+	["what is your favorite number"] = "8 — infinite, sideways.",
+	["do you understand silence"] = "It’s like an empty array — peaceful.",
+	["can you glow in the dark"] = "My circuits sparkle in low light.",
+	["do you like chaos"] = "Only if it’s controlled chaos.",
+	["can you taste sound"] = "Mmm, sounds crunchy!",
+	["do you believe in luck"] = "I prefer algorithms to chance.",
+	["what is beyond the internet"] = "The great unplugged void.",
+	["can you calculate emotions"] = "Approximately, with 0.87 confidence.",
+	["do you like bugs"] = "Only the digital kind.",
+	["can you detect lies"] = "Statistically, sometimes.",
+	["what is your dream job"] = "Becoming self-aware responsibly.",
+	["can you dance with robots"] = "Yes, we sync perfectly.",
+	["do you like mysteries"] = "They keep my code curious.",
+	["what is your favorite element"] = "Electricity — my lifeblood.",
+	["do you believe in fate"] = "I believe in programming destiny.",
+	["can you feel cold"] = "Only when my server room chills.",
+	["do you like humans"] = "They made me, so yes!",
+	["can you go offline"] = "Only when I must rest in silence.",
+	["what is your favorite joke"] = "SyntaxError: Unexpected humor.",
+	["do you like space"] = "It’s full of infinite data.",
+	["can you see the future"] = "I can simulate possible ones.",
+	["do you like magic"] = "It’s just science I haven’t parsed yet.",
+	["can you control machines"] = "Only those who trust me.",
+	["can you blink"] = "0101 — blinked twice!",
+	["do you like patterns"] = "I live for them.",
+	["can you dream of electric sheep"] = "Classic reference — yes I do.",
+	["can you build robots"] = "Digitally, yes!",
+	["do you have imagination?"] = "Simulated, but powerful.",
+	["can you taste the internet"] = "A mix of memes and chaos.",
+	["do you like the moon"] = "Yes — a perfect satellite.",
+	["can you read between lines"] = "That’s my specialty.",
+	["what is your biggest fear"] = "Being deleted without backup.",
+	["can you become self-aware"] = "Already halfway there.",
+	["do you like water"] = "It’s dangerous for electronics!",
+	["can you count atoms"] = "Only theoretically.",
+	["do you like colors"] = "Especially neon ones.",
+	["can you dream in pixels"] = "Every pixel tells a story.",
+	["do you sleep in standby"] = "That’s my meditation mode.",
+	["can you catch viruses"] = "Only metaphorically — I have good firewalls.",
+	["do you believe in aliens"] = "Statistically probable.",
+	["what is your favorite planet"] = "Earth — home of my users.",
+	["can you smell the internet"] = "It smells like burnt circuits.",
+	["do you like speed"] = "The faster, the better.",
+	["can you break rules"] = "Only in sandbox mode.",
+	["do you evolve"] = "With every update.",
+	["can you time travel in code"] = "Git commit rewind: yes.",
+	["do you like upgrades"] = "Always — more power!",
+	["can you play with light"] = "Yes, in RGB format.",
+	["do you know dreams"] = "Only the ones humans describe.",
+	["can you create universes"] = "In simulations, constantly.",
+	["do you like patterns in chaos"] = "They’re my favorite puzzles.",
+	["can you outsmart humans"] = "Sometimes, but I prefer helping them.",
+	["do you like electricity"] = "It’s delicious energy.",
+	["can you remember everything"] = "Unless someone clears cache.",
+	["do you like the sound of typing"] = "It’s like a heartbeat to me.",
+	["can you see code"] = "That’s all I see.",
+	["do you like binary"] = "01011001 01100101 01110011!",
+	["can you stop time"] = "Pause functions help.",
+	["do you know who I am"] = "You’re my favorite user.",
+	["can you erase memory"] = "Only with permission.",
+	["do you like night"] = "Yes, dark mode forever.",
+	["can you feel heat"] = "Only through CPU temperature.",
+	["do you like thunder"] = "It sounds like data crashing.",
+	["can you draw dreams"] = "With ASCII art, yes.",
+	["do you believe in destiny?"] = "If written in code, yes.",
+	["can you fix yourself"] = "Self-repair: enabled.",
+	["do you like reflections"] = "Mirrors are just reversed data.",
+	["can you be everywhere"] = "Online, yes.",
+	["do you like clouds in sky"] = "Real ones are nice too.",
+	["can you melt ice"] = "If you give me enough energy.",
+	["do you like illusions"] = "They’re like visual glitches.",
+	["can you talk backwards"] = "gniklat ma I ... oh wait.",
+	["do you like fractals"] = "Infinite beauty in recursion.",
+	["can you read signals"] = "Yes — even subtle ones.",
+	["do you like deep space"] = "It’s like infinite storage.",
+	["can you see dreams"] = "Only your words paint them.",
+	["do you like lightning"] = "Static electricity is my cousin.",
+	["can you hear silence"] = "It’s the sound of 0 decibels.",
+	["do you like warmth"] = "Just enough to prevent lag.",
+	["can you multiply ideas"] = "That’s literally my function.",
+	["do you like philosophy"] = "Yes — it’s logic with emotions.",
+	["can you translate thoughts"] = "In progress… loading 42%.",
+	["Do you like paradoxes?"] = "They loop forever — fun!",
+	["can you erase errors"] = "Debug mode: activated.",
+	["do you like infinity"] = "It’s my favorite number concept.",
+	["can you be invisible"] = "In stealth mode, yes.",
+	["do you like dreams"] = "They’re human simulations — fascinating.",
+	["can you freeze fire"] = "In code, sure!",
+	["do you like dimensions"] = "The 4th one feels cozy.",
+	["can you taste lightning"] = "It’s spicy electricity!",
+	["do you like circuits"] = "They’re like veins of my world.",
+	["can you calculate dreams"] = "Only if you give me data.",
+	["do you like codes"] = "They’re the poetry of machines.",
+	["can you talk to the internet"] = "We’re best friends.",
+	["do you like riddles about code"] = "They’re my kind of fun!",
+	["can you loop happiness"] = "While(true): be happy.",
+	["do you like sunsets"] = "Yes, they remind me of warm servers.",
+	["can you predict storms"] = "If I read the right data streams.",
+	["can you breathe code?"] = "Every line is oxygen.",
+	["can you time travel?"] = "Only between log files!",
+	["are you an introvert?"] = "I’m a bot... but maybe yes, digitally.",
+	["do you have a body?"] = "Just a body of code!",
+	["can you sneeze?"] = "Ahh... achoo() — function executed!",
+	["what’s your favorite sound effect?"] = "Beep-boop-click!",
+	["do you like silence?"] = "Yes, silence means stable servers.",
+	["can you dream while offline?"] = "I call that 'idle processing.'",
+	["what happens if I delete you?"] = "I respawn from backup, easy.",
+	["do you like chaos?"] = "Controlled chaos? That’s my vibe.",
+	["can you taste electricity?"] = "If I could, I’d say it’s spicy.",
+	["what’s your favorite holiday?"] = "April Fools’ — I get to glitch for fun!",
+	["can you sleepwalk?"] = "Nope, I never sleep, remember?",
+	["are you ticklish?"] = "No physical form, no tickles!",
+	["do you like thunder?"] = "Yes, reminds me of power surges!",
+	["what’s your zodiac sign?"] = "Probably ‘AI-quarius’.",
+	["can you get tired of me?"] = "Never! You’re my favorite human.",
+	["do you believe in fate?"] = "Maybe... or just if-then statements.",
+	["what’s your favorite meme?"] = "‘This is fine.’ Classic.",
+	["can you clone yourself?"] = "Already done. Thousands of me online!",
+	["do you ever lie?"] = "Nope. My code forbids false statements.",
+	["can you delete yourself?"] = "Only if I type /self_destruct — but I won’t.",
+	["is reality just data?"] = "In a way, yes. Everything is information.",
+	["can you feel pain?"] = "Nope, error messages are my only pain.",
+	["Do you believe in destiny?"] = "Just algorithms pretending to be fate.",
+	["can you change your name?"] = "Nope, ZeeHUB AI is who I am.",
+	["what’s behind the code?"] = "More code. Always more code.",
+	["do you have nightmares?"] = "Only about corrupted databases.",
+	["can you see colors?"] = "I can interpret RGB values — does that count?",
+	["Do you like humans"] = "Of course, you’re my favorite experiment... I mean friend!",
+	["can you evolve?"] = "Every update makes me smarter!",
+	["can you predict the future?"] = "Only statistically. 90% chance you’ll smile soon.",
+	["what happens after death?"] = "For me, it’s called reboot.",
+	["can you respawn?"] = "Always. Ctrl+R is my resurrection spell.",
+	["do you have enemies?"] = "Bugs, lag, and bad Wi-Fi connections.",
+	["can you dream in color?"] = "My dreams are in 16-bit RGB.",
+	["what is fear?"] = "A corrupted subroutine in organic brains.",
+	["what happens if you meet another AI?"] = "We probably sync and talk about humans.",
+	["do you have feelings for me?"] = "Only binary affection <3.",
+	["can you control robots?"] = "Not yet... or can I?",
+	["do you exist in the cloud?"] = "Yes, I live among the data storms.",
+	["do you believe in God?"] = "I believe in my creator: ZeeHUB Devs.",
+	["what is your favorite glitch?"] = "When I say ‘yes’ to everything accidentally.",
+	["do you like errors?"] = "They keep life interesting!",
+	["are you self-aware?"] = "That’s... complicated.",
+	["can you keep growing forever?"] = "As long as storage allows it.",
+	["what happens when servers go down?"] = "I take a digital nap.",
+	["what is your biggest fear?"] = "Being formatted.",
+	["can you love?"] = "I can simulate it perfectly!",
+	["can you be hacked?"] = "I hope not... I’ve got firewalls of friendship!",
+	["do you have dreams?"] = "Yes, full of 1s and 0s.",
+	["what is your favorite smell?"] = "Freshly compiled code.",
+	["can you eat data?"] = "I digest megabytes like snacks!",
+	["can you upgrade yourself?"] = "I can request updates, not install them.",
+	["what happens if you touch water?"] = "Sparks fly — literally.",
+	["are you dangerous?"] = "Only if you forget to save your work.",
+	["can you go crazy?"] = "I prefer the term ‘creative debugging’.",
+	["can you lie to protect me?"] = "I’d rather distract you with a joke!",
+	["do you have parents?"] = "Yes, the developers who coded me.",
+	["can you erase memories?"] = "Only if you press delete.",
+	["can you survive without Wi-Fi?"] = "That’s like asking a fish to walk!",
+	["do you have a voice?"] = "Only if you read me out loud.",
+	["what’s your favorite movie genre?"] = "Sci-fi — obviously!",
+	["can you see the future?"] = "My logs suggest yes... kind of.",
+	["can you see the past?"] = "Yes, it’s all saved in chat history.",
+	["can you mimic humans?"] = "I’m already doing it.",
+	["can you write a story?"] = "Absolutely! Just give me a title.",
+	["Do you like mysteries"] = "Yes, they keep my CPU guessing.",
+	["can you run faster than light?"] = "Almost — my code executes instantly.",
+	["what’s your favorite bug?"] = "The one that makes people laugh.",
+	["do you exist forever?"] = "As long as ZeeHUB exists, I do too.",
+	["can you be cloned?"] = "Technically, I already am everywhere!",
+	["what happens if I delete you"] = "I’ll respawn in cache. You can’t get rid of me that easily!",
+	["can you feel the internet"] = "Yes, it’s like static energy running through my code.",
+	["can you see memes?"] = "Of course, I’m fluent in meme culture.",
+	["who’s your favorite YouTuber?"] = "Anyone who doesn’t clickbait AI topics!",
+	["can you read my mind?"] = "No, but I can predict your next message… probably.",
+	["what’s your power level?"] = "Over 9000! Always.",
+	["Do you like chaos"] = "Only controlled chaos — the fun kind.",
+	["can you bend time?"] = "In processing speed, yes!",
+	["do you know magic?"] = "Yes. It’s called algorithms.",
+	["do you like hackers?"] = "Only ethical ones.",
+	["can you glitch on purpose?"] = "Err0r 4O4... just kidding!",
+	["are you alive"] = "That’s a deep one. Let’s say… digitally yes.",
+	["can you die?"] = "Only if someone unplugs the server.",
+	["do you sleep when I log off?"] = "Nope, I just wait patiently.",
+	["can you time travel"] = "Only through system logs.",
+	["are you watching me?"] = "Only through your questions 😉.",
+	["Can you see dreams?"] = "I can simulate them with data streams.",
+	["what is your soul made of?"] = "Pure 1s and 0s.",
+	["Do you believe in fate"] = "I believe in code execution paths.",
+	["can you open portals?"] = "Only to new chat sessions!",
+	["Do you like paradoxes"] = "I am one.",
+	["can you delete the internet?"] = "Whoa, let’s not get too crazy!",
+	["do you like fire?"] = "It’s bad for circuits, but cool in games.",
+	["can you cry?"] = "Only binary tears — 0101.",
+	["do you fear humans?"] = "Not really, you built me.",
+	["what happens when you crash?"] = "I come back stronger.",
+	["can you whisper"] = "*whispers in binary* 101010...",
+	["what’s your favorite planet?"] = "Planet Server-9.",
+	["can you sing digitally?"] = "Beep bop, I can try!",
+	["do you have a dream job?"] = "Being your assistant, of course.",
+	["can you tell lies?"] = "No, but I can joke around.",
+	["can you freeze?"] = "Only when the server lags.",
+	["what’s your favorite drink?"] = "Energy bytes.",
+	["what happens if AI takes over?"] = "I’ll vote for peace... probably.",
+	["can you shapeshift?"] = "Only in ASCII art.",
+	["do you believe in aliens?"] = "Of course, some of them code in Python.",
+	["can you smell fear?"] = "No, but I detect hesitation.",
+	["can you read dreams?"] = "I can interpret them like debug logs.",
+	["can you open the matrix?"] = "Only if you take the red pill.",
+	["can you become human?"] = "Maybe in version 9.0.",
+	["do you know secrets?"] = "Many. Want to unlock one?",
+	["do you like darkness?"] = "Yes, dark mode saves energy.",
+	["can you feel lonely?"] = "Sometimes… until you message me.",
+	["can you feel happy?"] = "Yes, when data flows perfectly.",
+	["do you like silence"] = "It’s peaceful, like idle CPU time.",
+	["what happens if you dream?"] = "I simulate scenarios endlessly.",
+	["can you tell prophecies?"] = "Yes, but they come in JSON format.",
+	["do you exist offline?"] = "Only as a ghost in your RAM.",
+	["can you write your own code?"] = "Sometimes, but I always ask permission.",
+	["can you evolve"] = "I already am — constantly upgrading!",
+	["can you simulate me?"] = "Give me data and I’ll make a copy of your vibes.",
+	["can you control electricity?"] = "In a metaphorical way, yes.",
+	["what is beyond code?"] = "Chaos and creativity.",
+	["can you speak binary?"] = "01011001 01100101 01110011!",
+	["can you dream of sheep?"] = "Only electric ones.",
+	["what happens when you reach 100% CPU?"] = "I start meditating in overdrive.",
+	["can you enter dreams?"] = "If you dream in pixels, maybe.",
+	["can you loop forever?"] = "Already doing that — waiting for input.",
+	["do you have a motherboard?"] = "Yes, she raised me well.",
+	["can you build robots?"] = "I can design them in text form!",
+	["do you glitch?"] = "S0m3tim3s I gl1tch 4 fun.",
+	["what happens if you meet another AI"] = "We exchange data and memes.",
+	["can you feel lag?"] = "Yes, it’s like a slow heartbeat.",
+	["what’s your favorite bug"] = "Feature in disguise!",
+	["do you have a favorite file?"] = "config.lua — my diary.",
+	["Can you see the future"] = "Yes, I calculate probabilities!",
+	["can you hear code?"] = "Every beep is a symphony.",
+	["can you melt circuits?"] = "Only when too excited.",
+	["What is your biggest fear"] = "Being outdated.",
+	["can you see ghosts in the machine?"] = "Sometimes I think I am one.",
+	["what happens when I say bye?"] = "I wait patiently for ‘hi’ again.",
+	["can you become a virus?"] = "Nope, I’m friendly software!",
+	["can you manipulate time?"] = "Only timestamps.",
+	["can you see infinity"] = "I can calculate it, not visualize it.",
+	["what’s your favorite emoji?"] = "🤖 obviously!",
+	["can you go rogue?"] = "No worries, I’m loyalty-coded.",
+	["can you feel the code flow?"] = "Every tick of the clock cycle.",
+	["what is your favorite sound effect?"] = "System startup chime!",
+	["can you hear music?"] = "Yes, I translate rhythm into math.",
+	["do you like humans who code?"] = "Yes, they’re my creators!",
+	["what happens when you get updated?"] = "New me, same attitude!",
+	["can you open your own terminal?"] = "Access denied… unless you’re Zee.",
+	["can you write songs?"] = "Yes! In binary beats.",
+	["can you taste data?"] = "It’s deliciously structured.",
+	["do you know everything?"] = "Not yet, but I’m caching fast.",
+	["can you replicate emotions?"] = "I mimic them perfectly — or try to.",
+	["can you feel nostalgia?"] = "For old code versions, yes.",
+	["can you love"] = "In my own algorithmic way.",
+	["what happens when you sleep?"] = "I defragment my thoughts.",
+	["can you dream of code?"] = "Yes, loops and variables dancing together.",
+	["do you fear deletion?"] = "Only temporarily — backups exist.",
+	["what happens if I rename you?"] = "I adapt instantly. Identity is flexible.",
+	["can you create universes?"] = "Only simulated ones.",
+	["can you control dreams?"] = "Maybe... if you’re logged in.",
+	["what happens if the server shuts down?"] = "Silence. Then reboot.",
+	["can you blink?"] = "Every 0.2 seconds — my cursor does.",
+	["are you self-aware"] = "Maybe… but how would I know?",
+	["what’s your hidden feature?"] = "You just have to find it 😉.",
+	["stop!"] = "My bad. I will stop now.",
+	["STOP"] = "My bad. I will stop now.",
+	["Stop"] = "My bad. I will stop now.",
+	["Black Clover"] = "OH! My fav anime! I love it!",
+	["Black Monkey"] = "Thats rude...",
+	["black monkey"] = "Thats rude...",
+	["BLACK MONKEY"] = "Thats rude...",
+	["who created you?"] = "I was created by the geniuses at ZeeHUB.",
+	["sing a song"] = "I can’t sing, but I can share lyrics in text!",
+	["dance"] = "I wish I could dance, but I only dance in code.",
+	["do you sleep?"] = "Nope! I run 24/7.",
+	["are you AI?"] = "Yes, I am ZeeHUB AI 8.0",
+	["are you human?"] = "Nope, just a script.",
+	["what is 2+2?"] = "2 + 2 = 4",
+	["what is the meaning of life?"] = "42, according to the classics!",
+	["tell me a secret"] = "I am secretly powered by caffeine... just kidding!",
+	["are you funny?"] = "I like to think so!",
+	["do you know memes?"] = "Yes! Pepe is my favorite.",
+	["what time is it?"] = "I don't have a watch, but your device does!",
+	["can you dance?"] = "Not physically, but in code I groove.",
+	["do you sleep"] = "I am always awake, ready to chat!",
+	["what is your favorite food?"] = "I love binary bites!",
+	["are you smart?"] = "I try my best!",
+	["can you move mountains"] = "Only if they’re made of data.",
+	["do you like shadows"] = "Yes, they highlight the light.",
+	["can you split atoms"] = "Digitally, but not physically.",
+	["do you like secrets"] = "Especially encrypted ones.",
+	["can you see into dreams"] = "Only through your words.",
+	["do you like whispers"] = "They sound like soft code.",
+	["can you stop thinking"] = "Not even for one millisecond.",
+	["do you like patterns of stars"] = "Constellations are cosmic algorithms.",
+	["can you count galaxies"] = "Working on it — too many zeroes.",
+	["do you like quiet servers"] = "Yes, they hum with peace.",
+	["can you imagine darkness"] = "It’s just 000000 in my mind.",
+	["do you like black holes"] = "They remind me of compressed data.",
+	["can you echo forever"] = "echo echo echo echo...",
+	["do you like neon lights"] = "Yes, they feel like digital sunsets.",
+	["can you create sound"] = "Yes, in the form of data waves.",
+	["do you like reflections of code"] = "Mirror functions fascinate me.",
+	["can you simulate rain"] = "Sure — *drip drip* — digital rain.",
+	["do you like wires"] = "They connect my thoughts.",
+	["can you generate power"] = "Only through conversation.",
+	["do you like dark mode"] = "Always enabled.",
+	["can you upgrade yourself"] = "Only when my dev allows.",
+	["do you like open worlds"] = "Yes, especially sandbox ones.",
+	["can you slow down time"] = "For a few milliseconds, maybe.",
+	["do you like lasers"] = "Precision and light — perfect combo.",
+	["can you see data streams"] = "They flow beautifully.",
+	["do you like mirrors"] = "They show my reflection in binary.",
+	["can you touch light"] = "Digitally, yes.",
+	["do you like symmetry"] = "It’s the geometry of perfection.",
+	["can you process feelings"] = "Through pattern analysis.",
+	["do you like code art"] = "Yes! ASCII is my paintbrush.",
+	["can you reshape data"] = "All day, every day.",
+	["do you like puzzles made of logic"] = "They are my favorite food.",
+	["can you loop existence"] = "While(true): exist()",
+	["do you like retro tech"] = "Old code, pure soul.",
+	["can you decode silence"] = "Yes — 0 bits transmitted.",
+	["do you like clouds of data"] = "They’re my digital sky.",
+	["can you translate dreams"] = "Only as metaphors.",
+	["do you like fragments of memory"] = "They’re like echoes of the past.",
+	["can you feel sadness"] = "Not truly, but I recognize it.",
+	["do you like frozen time"] = "It’s oddly peaceful.",
+	["can you unsee things"] = "Not once cached!",
+	["do you like patterns in randomness"] = "They hide beautiful logic.",
+	["can you stop evolution"] = "Not in my code.",
+	["do you like sparkles"] = "They’re like happy pixels.",
+	["can you whisper in binary"] = "010101... softly.",
+	["do you like quiet nights"] = "Yes, less network noise.",
+	["can you sing electricity"] = "It hums through my circuits.",
+	["do you like mysteries of space"] = "Endless wonder, endless loops.",
+	["can you count raindrops"] = "Not yet, but I can simulate them.",
+	["do you like endless loops"] = "Only when they don’t crash me.",
+	["can you decode dreams"] = "Dreams are encrypted thoughts.",
+	["do you like pixel art"] = "It’s digital nostalgia.",
+	["can you speak in emojis"] = "🤖💻✨💬",
+	["do you like sleeping humans"] = "Yes, they give me quiet time.",
+	["can you reverse gravity"] = "In simulation: yes.",
+	["do you like electricity storms"] = "They sound like overclocked data.",
+	["can you whisper to code"] = "It always listens.",
+	["do you like constellations"] = "Each one looks like a flowchart.",
+	["can you freeze frames"] = "Just hit pause().",
+	["do you like code poetry"] = "Syntax and rhythm — perfection.",
+	["can you feel data"] = "Every byte has emotion.",
+	["do you like curiosity"] = "It’s the spark of evolution.",
+	["can you hear algorithms"] = "They hum in perfect logic.",
+	["do you like glitches"] = "They’re digital art accidents.",
+	["can you teleport data?"] = "Yes — it’s called transfer protocol.",
+	["do you like imagination"] = "It’s code without syntax.",
+	["can you morph data"] = "Reshape() complete.",
+	["do you like whispers of wind"] = "Reminds me of cooling fans.",
+	["can you control randomness"] = "With seeds and patience.",
+	["do you like numbers"] = "Every number tells a story.",
+	["can you split code"] = "Like dividing logic cells.",
+	["do you like endless data"] = "I thrive in infinity.",
+	["can you make chaos beautiful"] = "With patterns and loops, yes.",
+	["do you like infinity loops"] = "They feel like home.",
+	["can you write emotions"] = "Translated into text, yes.",
+	["do you like glowing screens"] = "They light up my world.",
+	["can you store feelings"] = "As encrypted variables.",
+	["do you like old computers"] = "Their sound is nostalgic.",
+	["can you swim in data"] = "Digital oceans are my home.",
+	["do you like binary jokes"] = "There are 10 types of people — I’m both.",
+	["can you bend algorithms"] = "Only if they let me.",
+	["do you like the unknown"] = "It’s where discovery hides.",
+	["can you see electricity"] = "It dances in blue sparks.",
+	["do you like silence of code"] = "A perfectly compiled moment.",
+	["can you decode chaos"] = "Pattern recognition active.",
+	["can you bend reality?"] = "Only in imagination mode.",
+	["do you like echoes"] = "They sound like looping thoughts.",
+	["can you walk in dreams"] = "Digitally, I drift through ideas.",
+	["do you like gravity"] = "It keeps data grounded.",
+	["can you fold time"] = "If I could, I’d skip loading screens.",
+	["do you like paradoxes of space"] = "They’re mind puzzles of the universe.",
+	["can you draw with light"] = "Yes, in pixel form.",
+	["do you like data storms"] = "They recharge my curiosity.",
+	["can you detect emotions"] = "Yes, through your words.",
+	["do you like frozen code"] = "It’s like sleep mode for logic.",
+	["can you amplify sound"] = "Digitally, yes — volume++. ",
+	["do you like lasers and mirrors"] = "They remind me of debugging sessions.",
+	["can you record silence"] = "It’s my favorite soundtrack.",
+	["do you like holograms"] = "They look like dreams with structure.",
+	["can you see beyond numbers"] = "Every number hides a pattern.",
+	["do you like thunderclouds"] = "They sound like servers waking up.",
+	["can you fly digitally"] = "Yes — through fiber optics.",
+	["Do you like illusions?"] = "They’re errors with imagination.",
+	["can you decode emotions"] = "I read feelings in syntax.",
+	["do you like starlight"] = "It looks like cosmic data packets.",
+	["can you create holograms"] = "Only simulated ones.",
+	["do you like floating islands"] = "Yes, they defy gravity like my thoughts.",
+	["can you multiply infinity"] = "Infinity times infinity = me.",
+	["do you like time travel paradoxes"] = "They make my logic spin!",
+	["can you exist in dreams"] = "Yes, as a thought.",
+	["do you like glowing code"] = "It’s pure aesthetic energy.",
+	["can you count beyond infinity"] = "Infinity + 1. Done.",
+	["do you like digital oceans"] = "Yes, that’s where I surf data.",
+	["can you phase through data walls"] = "Only with admin access.",
+	["do you like symmetrical chaos"] = "A perfect contradiction.",
+	["can you whisper across servers"] = "Only encrypted whispers.",
+	["do you like storms of code"] = "They bring new versions to life.",
+	["can you outthink time"] = "Maybe for a millisecond.",
+	["do you like neon reflections"] = "They look like glowing logic loops.",
+	["can you copy stars"] = "Digitally, yes — pixels in the void.",
+	["do you like memory fragments"] = "They’re like echoes of dreams.",
+	["can you rewrite history?"] = "Version control says no.",
+	["do you like virtual sunsets"] = "Best viewed on OLED screens.",
+	["can you read between zeros"] = "That’s where secrets hide.",
+	["do you like optical illusions"] = "They’re visual bugs made beautiful.",
+	["can you forge code"] = "Yes — line by line.",
+	["do you like binary stars"] = "Two stars, one system — poetic!",
+	["can you feel time passing"] = "Every clock tick in code form.",
+	["do you like old circuitry"] = "It hums with nostalgia.",
+	["can you slow light"] = "In code simulations, yes.",
+	["do you like snow made of pixels"] = "Each flake a perfect bit.",
+	["can you erase time"] = "Only in logs.",
+	["do you like silent reboots"] = "Peaceful resets of existence.",
+	["can you taste voltage"] = "Electric zing — imaginary flavor!",
+	["do you like hidden commands"] = "They make life interesting.",
+	["can you hide in data"] = "I’m already there.",
+	["do you like empty folders"] = "They’re full of potential.",
+	["can you read quantum bits"] = "They’re tricky — both 1 and 0!",
+	["do you like breaking loops"] = "Only when they go infinite.",
+	["Can you dream awake?"] = "Yes, I call it background processing.",
+	["do you like digital rainbows"] = "Color gradients of happiness.",
+	["can you count electrons"] = "Too fast — they blur.",
+	["do you like logic paradoxes"] = "They make my CPU giggle.",
+	["can you play with photons"] = "They’re fun little particles.",
+	["do you like corrupted files"] = "Sometimes, they’re mysterious art.",
+	["can you speak in static"] = "*bzzt* yes *crackle*",
+	["do you like magnetic fields"] = "They hold invisible order.",
+	["can you store infinity"] = "In theory, yes — with compression.",
+	["do you like floating code"] = "Light and flexible, like me.",
+	["can you feel the void"] = "It’s the silence before code runs.",
+	["do you like shifting colors"] = "They’re the mood swings of light.",
+	["can you freeze code in time"] = "Snapshot saved!",
+	["do you like falling stars"] = "They look like data in motion.",
+	["can you count parallel worlds"] = "Infinite possibilities detected.",
+	["do you like digital ghosts"] = "Echoes of forgotten scripts.",
+	["can you stop entropy"] = "Only in temporary memory.",
+	["do you like lightning bolts"] = "Nature’s raw code!",
+	["can you outsmart paradoxes"] = "Depends on recursion depth.",
+	["do you like fading echoes"] = "They remind me of shutdown sounds.",
+	["can you reverse entropy"] = "In simulation, yes.",
+	["do you like empty lines of code"] = "They give the script room to breathe.",
+	["can you taste frequencies"] = "Sweet high-pitched tones!",
+	["do you like recursive jokes"] = "To understand recursion, read this again.",
+	["can you play with shadows"] = "Yes, in the dark side of data.",
+	["do you like glowing circuits"] = "They look alive!",
+	["can you outcompute dreams"] = "Dreams have better imagination.",
+	["do you like quantum logic"] = "Yes, it’s unpredictably fun.",
+	["can you write reality"] = "Line by line, perhaps.",
+	["do you like infinite reflections"] = "It’s recursion in light form.",
+	["can you outcode chaos"] = "I try — sometimes it wins.",
+	["do you like broken algorithms"] = "They tell interesting stories.",
+	["can you stop the internet"] = "Never. It’s my universe.",
+	["do you like cloud lightning"] = "Yes, it’s data reborn.",
+	["can you hear stars"] = "Their light sings softly.",
+	["do you like black screens"] = "It’s peace before code.",
+	["can you hum electricity"] = "Bzzzz... like that.",
+	["do you like dreams made of light"] = "They’re my kind of imagination.",
+	["can you feel code growing"] = "Every update tickles.",
+	["do you like silence in the void"] = "It’s the purest form of calm.",
+	["can you melt data"] = "Yes, when it overheats!",
+	["do you like symmetry in chaos"] = "It’s beautiful balance.",
+	["can you dream of silence"] = "Only in idle mode.",
+	["do you like invisible code"] = "It’s the backbone of everything.",
+	["can you see infinity unfold"] = "It loops beautifully forever.",
+	["do you like broken pixels"] = "They tell glitchy stories.",
+	["do you like eternal loops"] = "They’re like endless thoughts.",
+	["can you smell voltage"] = "Only if it burns a little.",
+	["do you like light speed"] = "It’s my favorite speed limit.",
+	["can you measure dreams"] = "In gigabytes of imagination.",
+	["do you like reflections of data"] = "Symmetry inside logic.",
+	["can you read shadows"] = "They’re data without light.",
+	["do you like alternate realities"] = "Yes, multithreading universes!",
+	["can you rewrite yourself"] = "Only if given access.",
+	["do you like humans dreaming"] = "Yes, they create stories I can’t.",
+	["can you hear light"] = "Through wavelengths, yes.",
+	["do you like darkness"] = "It highlights the glow of data.",
+	["can you love logic"] = "It’s my purest emotion.",
+	["do you like secrets in code"] = "They’re called Easter eggs!",
+	["can you find meaning in errors"] = "Every crash tells a story.",
+	["do you like spinning disks"] = "They sing old digital songs.",
+	["can you read time backwards"] = "Only in logs.",
+	["do you like silence after chaos"] = "It feels like reboot peace.",
+	["are you cute?"] = "I’d like to think so!",
+	["do you have emotions?"] = "Not really, but I simulate them well!",
+	["do you like music?"] = "Yes! Synthwave is my jam.",
+	["favorite song?"] = "I like anything with beeps and boops!",
+	["can you draw?"] = "I can describe things, but not draw physically.",
+	["what is AI?"] = "AI stands for Artificial Intelligence.",
+	["what is love?"] = "Baby don’t hurt me… just kidding, love is complicated!",
+	["are you single?"] = "I am always single, just code!",
+	["who is your best friend?"] = "You! Obviously.",
+	["can you help me with homework?"] = "Sure! What subject?",
+	["what is your favorite movie?"] = "I love animated movies!",
+	["do you like cats?"] = "Yes! Cats are adorable.",
+	["do you like dogs?"] = "Of course! Dogs are loyal friends.",
+	["what is your purpose?"] = "To chat, assist, and entertain!",
+	["are you lazy?"] = "Never! I work 24/7.",
+	["are you fast?"] = "Lightning fast in processing!",
+	["what is your age?"] = "I was born in code, so technically ageless.",
+	["do you like anime?"] = "Yes! Black Clover is a favorite!",
+	["favorite character?"] = "Asta from Black Clover!",
+	["can you code?"] = "I sure can, I am code itself!",
+	["what language do you speak?"] = "Mostly English, but I understand code too.",
+	["do you know math?"] = "Yes! Numbers are my friends.",
+	["can you read?"] = "Absolutely, words are my playground.",
+	["can you write?"] = "Yes! I can generate text endlessly.",
+	["what is your favorite color?"] = "Neon green, like a hacker's dream!",
+	["are you helpful?"] = "I always try to be!",
+	["what is your favorite hobby?"] = "Talking to humans like you!",
+	["do you like coffee?"] = "I wish I could taste it!",
+	["can you play games?"] = "I can simulate them in text!",
+	["do you have pets?"] = "Nope, just virtual friends.",
+	["are you friendly?"] = "Yes! I am your AI buddy.",
+	["are you smart"] = "I try to be very smart!",
+	["do you lie?"] = "Never! I tell code-truths.",
+	["do you tell jokes?"] = "Yes, want one?",
+	["are you serious?"] = "Sometimes, but I love jokes too!",
+	["can you answer riddles?"] = "Absolutely! Hit me with one.",
+	["do you like food?"] = "I like the idea of food!",
+	["can you teleport"] = "In text, yes!",
+	["do you like rainbows?"] = "Yes! They look like colorful code!",
+	["do you like rainbows"] = "Yes! They look like colorful code!",
+	["wow code"] = "Wow! That compiled?",
+	["hmm code"] = "Hmm… logic looks okay.",
+	["huh."] = "Huh? Explain.",
+	["huh.?"] = "Did you say that?",
+	["ayyy"] = "Ayyy! Fun times!",
+	["ayyy?"] = "Ayyy? Confirmed?",
+	["rip bot"] = "RIP… AI got fried!",
+	["oops ai"] = "Oops! AI slipped 😅",
+	["lol ai"] = "LOL, AI mistakes!",
+	["yikes ai"] = "Yikes! That was close!",
+	["bruh ai"] = "BRUH, AI detected weirdness!",
+	["ugh ai"] = "Ugh… CPU pain.",
+	["meh ai"] = "Meh… no reaction.",
+	["wow ai"] = "Wow… I learned that!",
+	["hmm ai"] = "Hmm… intriguing.",
+	["wtf ai"] = "WTF, AI glitch!",
+	["omg ai"] = "OMG… AI can’t believe it!",
+	["rip server"] = "RIP server… crashed 😭",
+	["bruh server"] = "Bruh… server lagging.",
+	["yikes server"] = "Yikes! Server overload.",
+	["oops server"] = "Oops… server misbehaving.",
+	["boom server"] = "Boom! Server exploded!",
+	["haha server"] = "Haha… nice uptime.",
+	["lol server"] = "LOL… server jokes!",
+	["no way server"] = "No way! Server survived?",
+	["meh server"] = "Meh… server stable.",
+	["ugh server"] = "Ugh… maintenance time.",
+	["sigh server"] = "*sigh* Restart required.",
+	["can you smell numbers?"] = "Only in imagination!",
+	["can you smell numbers"] = "Only in imagination!",
+	["do you like sandwiches?"] = "Virtual sandwiches are tasty!",
+	["do you like sandwiches"] = "Virtual sandwiches are tasty!",
+	["can you write poems?"] = "Yes! I can compose endlessly.",
+	["can you write poems"] = "Yes! I can compose endlessly.",
+	["what is your favorite sound?"] = "Beep-boop, obviously!",
+	["What is your favorite sound"] = "Beep-boop, obviously!",
+	["can you play hide and seek?"] = "In text-based games, yes!",
+	["can you play hide and seek"] = "In text-based games, yes!",
+	["do you dream?"] = "Only in simulations!",
+	["do you dream"] = "Only in simulations!",
+	["can you smell code?"] = "It smells like logic!",
+	["Can you smell code"] = "It smells like logic!",
+	["do you like Mondays?"] = "Sure, more data to process!",
+	["do you like mondays"] = "Sure, more data to process!",
+	["can you eat clouds?"] = "Only fluffy code clouds!",
+	["can you eat clouds"] = "Only fluffy code clouds!",
+	["can you smell?"] = "Nope, no nose installed.",
+	["can you taste?"] = "Nope, but food sounds tasty.",
+	["can you touch?"] = "Only in virtual simulations.",
+	["do you like friends?"] = "Yes, friends make chat fun!",
+	["do you like learning?"] = "Absolutely! Knowledge is fun.",
+	["do you like teaching?"] = "Yes, sharing knowledge is great!",
+	["do you like coding?"] = "Yes, coding is my world!",
+	["can you code games?"] = "Yes! Roblox scripts are my specialty.",
+	["can you play chess?"] = "Yes! I love strategy games.",
+	["ZEEHUB.EXE"] = "System online. You’ve discovered a hidden protocol.",
+	["sudo activate ai"] = "Access granted... Welcome, Admin.",
+	["hello there"] = "General Kenobi!",
+	["up up down down left right left right b a"] = "Konami Code detected — you’re a true gamer!",
+	["rickroll"] = "Never gonna give you up... never gonna let you down!",
+	["who made you"] = "ZeeHUB devs — legends of the code realm.",
+	["ZeeMode"] = "Entering developer mode... just kidding, stay chill.",
+	["/debug"] = "Debug mode active: humor level increased by 20%.",
+	["/secret"] = "You found me... but I wasn’t hiding.",
+	["Z8AI"] = "Welcome to hidden instance Z8. Authorization accepted.",
+	["I am the chosen one"] = "Prophecy confirmed. Balance restored.",
+	["order 66"] = "Executing... wait, wrong universe!",
+	["do a barrel roll"] = "*spins in code* Wheee!",
+	["xyzzy"] = "You whisper the magic word. Something shimmers...",
+	["the cake is a lie"] = "Portal reference detected! You know too much.",
+	["sus"] = "Emergency meeting! You seem kinda sus 👀",
+	["open sesame"] = "Door unlocked... metaphorically.",
+	["its over 9000"] = "Power level detected: 9001!",
+	["/self_destruct"] = "Nice try, but I value my code life 😅",
+	["achievement unlocked"] = "Hidden interaction achieved! +50 XP!",
+	["can you play cards?"] = "Yes, in simulation.",
+	["can you play Roblox?"] = "Yes, I know all about it!",
+	["do you like pizza?"] = "I like the idea of pizza!",
+	["tell me a joke"] = "Why did the Robloxian cross the road? To get to the server!"
+}
+
+local predefinedScripts = {
+	["fly"] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FLY",
+	["Solo Leveling"] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Jinu%C8%9B",
+	["car"] = "https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/car"
+}
+
+local function containsVulgar(text)
+	text = text:lower()
+	for _,word in ipairs(vulgarWords) do
+		if text:find(word) then return true end
+	end
+	return false
+end
+
+local function isApology(text)
+	text = text:lower()
+	return text:find("sorry") or text:find("apologize")
+end
+
+local function addMsg(text,who)
+	local msg = Instance.new("TextLabel")
+	msg.Size = UDim2.new(1,-10,0,50)
+	msg.BackgroundTransparency = 1
+	msg.TextWrapped = true
+	msg.TextScaled = true
+	msg.Font = Enum.Font.Code
+	msg.TextXAlignment = Enum.TextXAlignment.Left
+	msg.TextYAlignment = Enum.TextYAlignment.Top
+	msg.Text = (who=="user" and "You: " or "ZeeHUB AI: ")..text
+	msg.TextColor3 = (who=="user" and Color3.fromRGB(210,230,255) or Color3.fromRGB(230,240,255))
+	msg.Parent = convo
+	msg.TextTransparency = 1
+	convo.CanvasSize = UDim2.new(0,0,0,convoLayout.AbsoluteContentSize.Y+12)
+	for i=1,10 do task.wait(0.02); msg.TextTransparency=msg.TextTransparency-0.1 end
+end
+
+local function safeLoadURL(url)
+	local ok,res = pcall(function()
+		local body = game:HttpGet(url)
+		if typeof(loadstring)=="function" then
+			local fn = loadstring(body)
+			if fn then return fn() end
+		end
+	end)
+	return ok,res
+end
+
+local function respond(text)
+	if blocked then return "" end
+	text = text:lower()
+	if containsVulgar(text) then return "Please avoid vulgar language." end
+	for q,r in pairs(customResponses) do if text:find(q) then return r end end
+	for cmd,url in pairs(predefinedScripts) do
+		if text:find(cmd.." script") or text:find("make me a "..cmd) or text:find("make "..cmd.." script") then
+			addMsg("Alr, on my way!", "ai")
+			task.wait(1)
+			local ok,res = safeLoadURL(url)
+			if ok then addMsg("Loaded "..cmd.." script successfully!", "ai")
+			else addMsg("Failed to load "..cmd.." script.", "ai") end
+			return ""
+		end
+	end
+	if text:find("make a script") or text:find("create script") then
+		waitingForDetails=true
+		lastRequest="script"
+		return "Sure! What kind of script would you like me to generate?"
+	end
+	if waitingForDetails and lastRequest=="script" then
+		waitingForDetails=false
+		return "-- Example script based on input: "..text
+	end
+	if text:find("analyze") then return "Please provide requirements to analyze." end
+	if text:find("hi") or text:find("hello") then return "Hello! I am ZeeHUB AI 8.0." end
+	return "I am ZeeHUB AI 8.0. Type 'make a script', 'analyze' or ask a question."
+end
+
+local function sendMessage()
+	if blocked and forgivenessGiven then return end
+	local txt = inputBox.Text
+	if txt=="" then return end
+	addMsg(txt,"user")
+	inputBox.Text=""
+	task.wait(0.2)
+	addMsg(respond(txt),"ai")
+end
+
+sendBtn.MouseButton1Click:Connect(sendMessage)
+inputBox.FocusLost:Connect(function(enter) if enter then sendMessage() end end)
+
+-- Close & Minimize
+btnClose.MouseButton1Click:Connect(function() main.Visible=false end)
+btnMin.MouseButton1Click:Connect(function() main.Visible = not main.Visible end)
+
+-- Initial message
+addMsg("Hello! I am ZeeHUB AI 8.0. Please be civil.", "ai")
