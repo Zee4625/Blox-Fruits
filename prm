@@ -608,6 +608,14 @@ server:
 https://discord.gg/ecKrSHRZa6]])
 })
 
+TabInfo:AddButton({
+    Title = "ZeeHUB Ai",
+    Tip = "Are u fr?",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/AI1", true))()
+    end,
+})
+
 Window:Notify({
     Title = "⚠️⚠️⚠️Important⚠️⚠️⚠️",
     Description = "This is still a beta! Join the discord for more info! THIS IS FOR ANY GAME BUT IS THE BETA!!",
