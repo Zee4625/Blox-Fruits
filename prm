@@ -307,6 +307,14 @@ TabMovement:AddButton({
     end,
 })
 
+TabMovement:AddButton({
+    Title = "ZeeHUB Ai",
+    Tip = "Are u fr?",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/AI1", true))()
+    end,
+})
+
 
 -- ESP Tab
 local TabESP = Window:AddTab({Title = "ESP", Icon = "eye"})
@@ -615,10 +623,3 @@ Window:Notify({
     Duration = 12,
 })
 
-TabInfo:AddButton({
-    Title = "ZeeHUB Ai",
-    Tip = "Are u fr?",
-    Callback = function()
-        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/AI1", true))()
-    end,
-})
