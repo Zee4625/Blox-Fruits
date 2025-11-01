@@ -299,13 +299,6 @@ TabMovement:AddToggle({
     end,
 })
 
-TabMovement:AddButton({
-    Title = "Rejoin",
-    Tip = "Click to rejoin the game",
-    Callback = function()
-        game:GetService("TeleportService"):Teleport(game.PlaceId)
-    end,
-})
 
 TabMovement:AddButton({
     Title = "ZeeHUB Ai",
@@ -315,6 +308,13 @@ TabMovement:AddButton({
     end,
 })
 
+TabMovement:AddButton({
+    Title = "Rejoin",
+    Tip = "Click to rejoin the game",
+    Callback = function()
+        game:GetService("TeleportService"):Teleport(game.PlaceId)
+    end,
+})
 
 -- ESP Tab
 local TabESP = Window:AddTab({Title = "ESP", Icon = "eye"})
