@@ -300,13 +300,7 @@ TabMovement:AddToggle({
 })
 
 
-TabMovement:AddButton({
-    Title = "ZeeHUB Ai",
-    Tip = "Are u fr?",
-    Callback = function()
-        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/AI1", true))()
-    end,
-})
+
 
 TabMovement:AddButton({
     Title = "Rejoin",
