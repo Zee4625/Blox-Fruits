@@ -1,0 +1,563 @@
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "Project Smash " .. Fluent.Version,
+    SubTitle = "by ZeeZeron",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(480, 360),  -- Diminuindo o tamanho da janela
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+local Tabs = {
+    AutoFarm = Window:AddTab({ Title = "Auto Farm", Icon = "swords" }),
+    Others = Window:AddTab({ Title = "Others", Icon = "swords" }),
+    Utilities = Window:AddTab({ Title = "Utilities", Icon = "swords" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+local Options = Fluent.Options
+
+do
+    Fluent:Notify({
+        Title = "Zetra Hub",
+        Content = "subscribe to the channel",
+        SubContent = "ZetraScripts YT",
+        Duration = 5
+    })
+
+    local Toggle = Tabs.AutoFarm:AddToggle("AutoFarmPlayerToggle", { 
+        Title = "Auto Farm Player", 
+        Default = false 
+    })
+
+    local AutoFarmEnabled = false
+    local currentTarget = nil
+
+    local function TeleportToPlayer(targetPlayer)
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+
+        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local targetCharacter = targetPlayer.Character
+            local targetPosition = targetCharacter.HumanoidRootPart.Position
+
+            if character then
+                character:SetPrimaryPartCFrame(CFrame.new(targetPosition))
+            end
+        end
+    end
+
+    local function FindClosestPlayer()
+        local closestPlayer = nil
+        local closestDistance = math.huge
+
+        for _, targetPlayer in pairs(game.Players:GetPlayers()) do
+            if targetPlayer ~= game.Players.LocalPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") and targetPlayer.Character.Humanoid.Health > 0 then
+                local playerPosition = targetPlayer.Character.HumanoidRootPart.Position
+                local localPlayerPosition = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+                local distance = (playerPosition - localPlayerPosition).Magnitude
+
+                if distance < closestDistance then
+                    closestDistance = distance
+                    closestPlayer = targetPlayer
+                end
+            end
+        end
+
+        return closestPlayer
+    end
+
+    local function StartAutoFarm()
+        while AutoFarmEnabled do
+            if currentTarget == nil or not currentTarget.Character or not game.Players:FindFirstChild(currentTarget.Name) or currentTarget.Character.Humanoid.Health <= 0 then
+                currentTarget = FindClosestPlayer()
+                if currentTarget then
+                    TeleportToPlayer(currentTarget)
+                end
+            end
+
+            if currentTarget and currentTarget.Character and currentTarget.Character:FindFirstChild("HumanoidRootPart") then
+                local targetPosition = currentTarget.Character.HumanoidRootPart.Position
+                local player = game.Players.LocalPlayer
+                local character = player.Character or player.CharacterAdded:Wait()
+                character:SetPrimaryPartCFrame(CFrame.new(targetPosition))
+            end
+
+            wait(0.1)
+        end
+    end
+
+    Toggle:OnChanged(function()
+        AutoFarmEnabled = Options.AutoFarmPlayerToggle.Value
+
+        if AutoFarmEnabled then
+            currentTarget = FindClosestPlayer()
+            if currentTarget then
+                TeleportToPlayer(currentTarget)
+            end
+            StartAutoFarm()
+        else
+            currentTarget = nil
+            print("Auto Farm desativado.")
+        end
+    end)
+
+    Options.AutoFarmPlayerToggle:SetValue(false)
+
+local PVPSection = Tabs.Utilities:AddSection("PVP")
+
+    local KnockbackToggle = Tabs.Utilities:AddToggle("NoKnockBackToggle", { 
+        Title = "No KnockBack", 
+        Default = false 
+    })
+
+    KnockbackToggle:OnChanged(function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+        if humanoid then
+            humanoid:SetAttribute("NoKnockBack", KnockbackToggle.Value)  -- Usa um atributo para controlar o Knockback
+        end
+    end)
+
+end
+
+local StunToggle = Tabs.Utilities:AddToggle("NoStunToggle", { 
+    Title = "No Stun", 
+    Default = false 
+})
+
+StunToggle:OnChanged(function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    if humanoid then
+        humanoid:SetAttribute("NoStun", StunToggle.Value)  -- Usa um atributo para controlar o Stun
+    end
+end)
+
+game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+    if game.Players.LocalPlayer.Character.Humanoid.Health > 0 then
+        -- Verifique se o stun deve ser aplicado
+        if not game.Players.LocalPlayer.Character.Humanoid:GetAttribute("NoStun") then
+            -- Lógica para aplicar stun
+        end
+    end
+end)
+
+local SpikeToggle = Tabs.Utilities:AddToggle("AutoSpikeToggle", { 
+    Title = "Auto Spike", 
+    Default = false 
+})
+
+local autoSpikeEnabled = false
+
+local function autoSpike()
+    while autoSpikeEnabled do
+        for _, enemy in pairs(game.Workspace.Enemies:GetChildren()) do
+            if enemy:FindFirstChild("Humanoid") then
+                enemy.Humanoid:TakeDamage(50)
+            end
+        end
+        wait(1) -- ajusta o tempo entre cada "spike" se necessário
+    end
+end
+
+SpikeToggle:OnChanged(function()
+    autoSpikeEnabled = SpikeToggle.Value
+
+    if autoSpikeEnabled then
+        spawn(autoSpike) -- Inicia a função Auto Spike em uma nova thread para evitar travamentos
+    else
+        print("Auto Spike desativado.")
+    end
+end)
+
+Options.AutoSpikeToggle:SetValue(false)
+
+local ParryToggle = Tabs.Utilities:AddToggle("ParryAbilityToggle", { 
+    Title = "Parry Ability", 
+    Default = false 
+})
+
+local ParryEnabled = false
+
+local parryKey = Enum.KeyCode.E
+
+local function ActivateParry()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    if humanoid then
+        -- Lógica para ativar o parry (como um escudo temporário)
+        print("Parry ativado!")
+        humanoid:SetAttribute("ParryActive", true)
+
+        wait(1.5) -- Duração do parry
+        humanoid:SetAttribute("ParryActive", false)
+        print("Parry desativado!")
+    end
+end
+
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessedEvent)
+    if not gameProcessedEvent and input.KeyCode == parryKey and ParryEnabled then
+        ActivateParry()
+    end
+end)
+
+ParryToggle:OnChanged(function()
+    ParryEnabled = ParryToggle.Value
+end)
+
+game.Players.LocalPlayer.Character.Humanoid.Touched:Connect(function(hit)
+    local humanoid = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    
+    if humanoid and humanoid:GetAttribute("ParryActive") then
+        -- Lógica para evitar dano enquanto o parry estiver ativo
+        print("Ataque bloqueado pelo parry!")
+        
+        if hit.Parent and hit.Parent:FindFirstChild("Humanoid") then
+            local attackerHumanoid = hit.Parent:FindFirstChild("Humanoid")
+            attackerHumanoid:TakeDamage(20)  -- Aplica dano ao atacante
+        end
+    end
+end)
+
+local Toggle = Tabs.AutoFarm:AddToggle("KillAuraToggle", { 
+    Title = "Kill Aura", 
+    Default = false 
+})
+
+local AutoAttackEnabled = false
+
+-- Função para encontrar o jogador mais próximo (já existente no seu script)
+local function FindClosestPlayer()
+    local closestPlayer = nil
+    local closestDistance = math.huge
+
+    for _, targetPlayer in pairs(game.Players:GetPlayers()) do
+        if targetPlayer ~= game.Players.LocalPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") and targetPlayer.Character.Humanoid.Health > 0 then
+            local playerPosition = targetPlayer.Character.HumanoidRootPart.Position
+            local localPlayerPosition = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+            local distance = (playerPosition - localPlayerPosition).Magnitude
+
+            if distance < closestDistance then
+                closestDistance = distance
+                closestPlayer = targetPlayer
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+local function StartAutoAttack()
+    while AutoAttackEnabled do
+        wait(0.1)  -- Intervalo entre os ataques, ajuste conforme necessário
+        local targetPlayer = FindClosestPlayer()  -- Encontra o jogador mais próximo
+
+        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
+            local humanoid = targetPlayer.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid:TakeDamage(10)  -- Aplica 10 de dano, ajuste conforme necessário
+            end
+        end
+    end
+end
+
+Toggle:OnChanged(function()
+    AutoAttackEnabled = Toggle.Value
+
+    if AutoAttackEnabled then
+        StartAutoAttack()  -- Inicia o auto ataque quando o toggle é ativado
+    else
+        -- AutoAttackEnabled = false já foi definido pelo toggle, o loop será interrompido
+        print("Auto Attack desativado.")
+    end
+end)
+
+-- Inicialmente, o toggle está desativado
+Toggle:SetValue(false)
+
+-- Adicionais:
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:SetFolder("FluentScriptHub")
+SaveManager:SetFolder("FluentScriptHub/specific-game")
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+
+Fluent:Notify({
+    Title = "Fluent",
+    Content = "The script has been Loaded.",
+    Duration = 8
+})
+
+local AntiAFKToggle = Tabs.Others:AddToggle("AntiAFKToggle", {
+    Title = "Anti AFK",
+    Default = false
+})
+
+local AntiAFKEnabled = false
+local virtualUser = game:GetService("VirtualUser")
+
+local function AntiAFK()
+    while AntiAFKEnabled do
+        -- Simula o movimento do mouse para evitar ser kickado por AFK
+        virtualUser:CaptureController()
+        virtualUser:ClickButton2(Vector2.new())  -- Simula clique direito do mouse
+        
+        -- Opcionalmente, faça o personagem se mover para frente e para trás de forma aleatória
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid:Move(Vector3.new(math.random(-1, 1), 0, math.random(-1, 1)))
+        end
+        
+        wait(math.random(30, 60))  -- Intervalo aleatório entre 30 e 60 segundos para simular atividade humana
+    end
+end
+
+AntiAFKToggle:OnChanged(function()
+    AntiAFKEnabled = Options.AntiAFKToggle.Value
+
+    if AntiAFKEnabled then
+        -- Conecte o evento quando o jogador for detectado como inativo
+        game:GetService("Players").LocalPlayer.Idled:Connect(function()
+            virtualUser:CaptureController()
+            virtualUser:ClickButton2(Vector2.new())
+        end)
+
+        AntiAFK()
+    else
+        print("Anti AFK desativado.")
+    end
+end)
+
+local InvisibilityToggle = Tabs.Others:AddToggle("InvisibilityToggle", { 
+    Title = "Invisibility", 
+    Default = false 
+})
+
+local function SetInvisibility(enabled)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") or part:IsA("MeshPart") then
+            part.Transparency = enabled and 1 or 0 -- Torna o personagem invisível (1) ou visível (0)
+            part.CanCollide = not enabled -- Desativa colisão quando invisível
+        elseif part:IsA("Accessory") then
+            part.Handle.Transparency = enabled and 1 or 0 -- Torna acessórios invisíveis
+        end
+    end
+end
+
+InvisibilityToggle:OnChanged(function()
+    SetInvisibility(InvisibilityToggle.Value)
+end)
+
+Options.AntiAFKToggle:SetValue(false)
+
+-- Adiciona um Toggle (interruptor) para Anti Fling
+local FlingToggle = Tabs.AutoFarm:AddToggle("AntiFlingToggle", { 
+    Title = "Anti Fling", 
+    Default = false 
+})
+
+FlingToggle:OnChanged(function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+
+    if FlingToggle.Value then
+        if humanoidRootPart then
+            -- Previne mudanças repentinas na velocidade que possam indicar um fling
+            humanoidRootPart.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)  -- Define propriedades físicas
+            humanoidRootPart.Velocity = Vector3.new(0, 0, 0)  -- Reseta a velocidade
+        end
+    else
+        if humanoidRootPart then
+            -- Restaura as propriedades físicas padrão do HumanoidRootPart quando desativado
+            humanoidRootPart.CustomPhysicalProperties = nil
+        end
+    end
+end)
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    if FlingToggle.Value then
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        
+        if humanoidRootPart then
+            -- Se a velocidade do jogador for muito alta, resete-a
+            if humanoidRootPart.Velocity.Magnitude > 50 then  -- Ajuste o valor conforme necessário
+                humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+            end
+        end
+    end
+end)
+
+local ESPSection = Tabs.AutoFarm:AddSection("ESP")
+
+-- Adiciona um Toggle (interruptor) para ESP All Players Highlight
+local ESPToggle = Tabs.AutoFarm:AddToggle("ESPPlayersToggle", { 
+    Title = "ESP All Players", 
+    Default = false 
+})
+
+local playerHighlights = {}
+
+local function CreateESP(player)
+    if player.Character then
+        local highlight = Instance.new("Highlight")
+        highlight.Parent = player.Character
+        highlight.Adornee = player.Character
+        highlight.FillColor = Color3.new(1, 0, 0) -- Cor do destaque (vermelho)
+        highlight.FillTransparency = 0.5 -- Transparência do destaque
+        playerHighlights[player.UserId] = highlight -- Armazenar o highlight na tabela
+    end
+end
+
+local function RemoveESP(player)
+    if playerHighlights[player.UserId] then
+        playerHighlights[player.UserId]:Destroy()
+        playerHighlights[player.UserId] = nil -- Limpar a tabela após a remoção
+    end
+end
+
+local function UpdateESP()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            if ESPToggle.Value then
+                CreateESP(player)
+            else
+                RemoveESP(player)
+            end
+        end
+    end
+end
+
+ESPToggle:OnChanged(function()
+    if ESPToggle.Value then
+        -- Ativar ESP
+        UpdateESP()  -- Adiciona ESP a todos os jogadores quando ativado
+    else
+        -- Desativar ESP
+        for _, player in pairs(game.Players:GetPlayers()) do
+            RemoveESP(player)  -- Remove ESP de todos os jogadores quando desativado
+        end
+    end
+end)
+
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        if ESPToggle.Value then
+            CreateESP(player) -- Cria ESP para novos jogadores se o toggle estiver ativo
+        end
+    end)
+end)
+
+game.Players.PlayerRemoving:Connect(function(player)
+    RemoveESP(player)
+end)
+
+for _, player in pairs(game.Players:GetPlayers()) do
+    if player ~= game.Players.LocalPlayer then
+        -- Cria ESP para jogadores já existentes apenas se o toggle estiver ativado
+        if ESPToggle.Value then
+            CreateESP(player)
+        end
+    end
+end
+
+-- Adiciona um Toggle (interruptor) para No Void
+local VoidToggle = Tabs.Utilities:AddToggle("NoVoidToggle", { 
+    Title = "No Void", 
+    Default = false 
+})
+
+VoidToggle:OnChanged(function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    if humanoid then
+        humanoid:SetAttribute("NoVoid", VoidToggle.Value)  -- Usa um atributo para controlar o No Void
+    end
+end)
+
+game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+    if game.Players.LocalPlayer.Character.Humanoid.Health > 0 then
+        -- Verifique se o void deve ser aplicado
+        if not game.Players.LocalPlayer.Character.Humanoid:GetAttribute("NoVoid") then
+            -- Lógica para aplicar o void (por exemplo, remoção do jogador)
+        end
+    end
+end)
+
+local EXTRASection = Tabs.AutoFarm:AddSection("EXTRA")
+
+local DashToggle = Tabs.AutoFarm:AddToggle("NoDashCooldownToggle", { 
+    Title = "No Dash Cooldown", 
+    Default = false 
+})
+
+DashToggle:OnChanged(function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    if humanoid then
+        if DashToggle.Value then
+            -- Desativar o cooldown do dash
+            humanoid:SetAttribute("NoDashCooldown", true)  -- Use um atributo para controlar
+        else
+            -- Reativar o cooldown do dash
+            humanoid:SetAttribute("NoDashCooldown", false)
+        end
+    end
+end)
+
+game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+    if game.Players.LocalPlayer.Character.Humanoid.Health > 0 then
+        if humanoid:GetAttribute("NoDashCooldown") then
+            -- Aqui você deve modificar o código do seu dash para ignorar o cooldown
+            -- Isso pode variar dependendo de como o dash é implementado no seu jogo
+        end
+    end
+end)
+
+local SpeedToggle = Tabs.Others:AddToggle("SpeedToggle", { 
+    Title = "Increase Speed", 
+    Default = false 
+})
+
+local originalWalkSpeed = 16 -- Padrão de velocidade de caminhada
+
+SpeedToggle:OnChanged(function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    if humanoid then
+        if SpeedToggle.Value then
+            humanoid.WalkSpeed = originalWalkSpeed * 4 -- Aumenta a velocidade
+        else
+            humanoid.WalkSpeed = originalWalkSpeed -- Restaura a velocidade original
+        end
+    end
+end)
+
+SaveManager:LoadAutoloadConfig()
