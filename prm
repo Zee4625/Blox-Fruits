@@ -575,6 +575,15 @@ TabGamm:AddButton({
 })
 
 TabGamm:AddButton({
+    Title = "Project Smash",
+    Tip = "Run collaborative script Project Smash",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PROSMASH1", true))()
+    end,
+})
+
+
+TabGamm:AddButton({
     Title = "Wierd Gun Game",
     Tip = "Run collaborative script Wierd Gun Game",
     Callback = function()
@@ -616,4 +625,3 @@ Window:Notify({
     Description = "This is still a beta! Join the discord for more info! THIS IS FOR ANY GAME BUT IS THE BETA!!",
     Duration = 12,
 })
-
