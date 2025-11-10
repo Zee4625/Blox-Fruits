@@ -313,6 +313,8 @@ TabMovement:AddButton({
 -- ESP Tab
 local TabESP = Window:AddTab({Title = "ESP", Icon = "eye"})
 
+
+
 TabESP:AddToggle({
     Title = "X-ray",
     Tip = "Highlight Players",
@@ -395,6 +397,17 @@ task.spawn(function()
         task.wait(1)
     end
 end)
+
+
+
+TabESP:AddButton({
+    Title = "Radar",
+    Tip = "Radar+NightVision",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/radar1", true))()
+    end,
+})
+
 
 -- Collab Tab
 local TabCollab = Window:AddTab({Title = "COLLAB", Icon = "users"})
