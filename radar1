@@ -1,9 +1,9 @@
 --[[
-    ✅ NPC Radar + Motion Highlight + Night Vision (activabil cu tasta M)
-    ▸ Pune acest LocalScript în StarterPlayer > StarterPlayerScripts
-    ▸ Highlight doar pentru NPC-uri și părți simple care se mișcă
-    ▸ Radar în colțul stânga-sus
-    ▸ Night Vision activat/dezactivat prin tasta M
+    🌌 NPC Radar + Motion Highlight + Night Vision (tasta M)
+    ▸ Radar modern, tu mereu în centru
+    ▸ Plasat în colțul dreapta sus
+    ▸ Night Vision dedesubt
+    ▸ Indicator "N" deasupra radarului
 --]]
 
 local Players = game:GetService("Players")
@@ -18,7 +18,8 @@ local LOCAL_PLAYER = Players.LocalPlayer
 local CHECK_INTERVAL = 0.25
 local MOVE_THRESHOLD = 0.05
 local IDLE_TIMEOUT = 0.5
-local RADAR_RADIUS = 80
+local RADAR_SIZE = 170
+local RADAR_RANGE = 120
 
 -- STORAGE
 local tracked = {}
@@ -26,44 +27,73 @@ local radarDots = {}
 local nightVisionOn = false
 
 ---------------------------------------------------------
--- CREATE GUI
+-- GUI
 ---------------------------------------------------------
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "RadarGUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = LOCAL_PLAYER:WaitForChild("PlayerGui")
 
--- Radar frame
+-- Radar container
 local RadarFrame = Instance.new("Frame")
 RadarFrame.Name = "Radar"
-RadarFrame.Size = UDim2.new(0, 150, 0, 150)
-RadarFrame.Position = UDim2.new(0, 10, 0, 10)
-RadarFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-RadarFrame.BackgroundTransparency = 0.3
-RadarFrame.BorderSizePixel = 1
+RadarFrame.Size = UDim2.new(0, RADAR_SIZE, 0, RADAR_SIZE)
+RadarFrame.Position = UDim2.new(1, -RADAR_SIZE - 10, 0, 10) -- colțul sus-dreapta
+RadarFrame.BackgroundColor3 = Color3.fromRGB(15, 25, 15)
+RadarFrame.BackgroundTransparency = 0.25
+RadarFrame.BorderSizePixel = 0
 RadarFrame.Parent = ScreenGui
+RadarFrame.ClipsDescendants = true
 
+local RadarCorner = Instance.new("UICorner")
+RadarCorner.CornerRadius = UDim.new(1, 0)
+RadarCorner.Parent = RadarFrame
+
+-- Border circular verde
+local Border = Instance.new("UIStroke")
+Border.Thickness = 2
+Border.Color = Color3.fromRGB(0, 255, 0)
+Border.Transparency = 0.3
+Border.Parent = RadarFrame
+
+-- Titlu
 local RadarTitle = Instance.new("TextLabel")
 RadarTitle.Size = UDim2.new(1, 0, 0, 20)
-RadarTitle.Position = UDim2.new(0, 0, 0, 0)
 RadarTitle.Text = "📡 RADAR"
 RadarTitle.TextColor3 = Color3.fromRGB(0, 255, 0)
 RadarTitle.BackgroundTransparency = 1
-RadarTitle.Font = Enum.Font.Code
-RadarTitle.TextSize = 14
+RadarTitle.Font = Enum.Font.GothamBold
+RadarTitle.TextSize = 16
 RadarTitle.Parent = RadarFrame
 
--- Buton optional (ramane ca indicator)
+-- Indicator N (North) deasupra radarului
+local NorthIndicator = Instance.new("TextLabel")
+NorthIndicator.Size = UDim2.new(0, 20, 0, 20)
+NorthIndicator.Position = UDim2.new(0.5, -10, 0, -25) -- deasupra radarului
+NorthIndicator.Text = "N"
+NorthIndicator.TextColor3 = Color3.fromRGB(0, 255, 0)
+NorthIndicator.BackgroundTransparency = 1
+NorthIndicator.Font = Enum.Font.GothamBold
+NorthIndicator.TextSize = 18
+NorthIndicator.ZIndex = 3
+NorthIndicator.Parent = RadarFrame
+
+-- Night Vision indicator (puțin dedesubt)
 local NightVisionBtn = Instance.new("TextLabel")
 NightVisionBtn.Name = "NightVisionIndicator"
-NightVisionBtn.Size = UDim2.new(0, 140, 0, 25)
-NightVisionBtn.Position = UDim2.new(0, 5, 0, 120)
+NightVisionBtn.Size = UDim2.new(1, -10, 0, 24)
+NightVisionBtn.Position = UDim2.new(0, 5, 1, -30) -- dedesubt
 NightVisionBtn.Text = "🌙 Night Vision: OFF (M)"
-NightVisionBtn.Font = Enum.Font.Code
+NightVisionBtn.Font = Enum.Font.Gotham
 NightVisionBtn.TextSize = 14
 NightVisionBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-NightVisionBtn.BackgroundColor3 = Color3.fromRGB(20, 80, 20)
+NightVisionBtn.BackgroundColor3 = Color3.fromRGB(25, 80, 25)
+NightVisionBtn.BackgroundTransparency = 0.1
 NightVisionBtn.Parent = RadarFrame
+
+local NVCorner = Instance.new("UICorner")
+NVCorner.CornerRadius = UDim.new(0, 6)
+NVCorner.Parent = NightVisionBtn
 
 ---------------------------------------------------------
 -- UTILS
@@ -80,14 +110,14 @@ local function getPos(obj)
 end
 
 local function isNPC(obj)
-	return obj:IsA("Model") and obj:FindFirstChildOfClass("Humanoid") and not game.Players:GetPlayerFromCharacter(obj)
+	return obj:IsA("Model") and obj:FindFirstChildOfClass("Humanoid") and not Players:GetPlayerFromCharacter(obj)
 end
 
 local function makeHighlight(obj, color)
 	local h = Instance.new("Highlight")
 	h.Name = "MoveHighlight"
 	h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-	h.FillTransparency = 0.8
+	h.FillTransparency = 0.7
 	h.OutlineTransparency = 0.4
 	h.FillColor = color
 	h.OutlineColor = color
@@ -109,21 +139,47 @@ local function updateRadar()
 	local root = char and char:FindFirstChild("HumanoidRootPart")
 	if not root then return end
 
-	local centerX, centerY = 75, 75
+	local center = Vector2.new(RADAR_SIZE / 2, RADAR_SIZE / 2)
+
+	-- punctul jucătorului
+	local selfDot = Instance.new("Frame")
+	selfDot.Size = UDim2.new(0, 8, 0, 8)
+	selfDot.Position = UDim2.new(0, center.X - 4, 0, center.Y - 4)
+	selfDot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	selfDot.BorderSizePixel = 0
+	selfDot.ZIndex = 2
+	selfDot.Parent = RadarFrame
+	table.insert(radarDots, selfDot)
+
 	for obj, info in pairs(tracked) do
 		if obj and obj.Parent and info.hl then
 			local pos = getPos(obj)
 			if pos then
 				local rel = pos - root.Position
-				local x = rel.X / 4
-				local z = rel.Z / 4
-				if math.abs(x) < RADAR_RADIUS and math.abs(z) < RADAR_RADIUS then
+				local x, z = rel.X, rel.Z
+				local dist = math.sqrt(x^2 + z^2)
+				if dist < RADAR_RANGE then
+					local scale = (RADAR_SIZE / 2 - 10) / RADAR_RANGE
+					local scaledX = x * scale
+					local scaledZ = z * scale
+
 					local dot = Instance.new("Frame")
-					dot.Size = UDim2.new(0, 5, 0, 5)
-					dot.Position = UDim2.new(0, centerX + x, 0, centerY + z)
-					dot.BackgroundColor3 = info.isNPC and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 255)
+					dot.Size = UDim2.new(0, 6, 0, 6)
+					dot.Position = UDim2.new(0, center.X + scaledX - 3, 0, center.Y + scaledZ - 3)
+					dot.BackgroundColor3 = info.isNPC and Color3.fromRGB(255, 60, 60) or Color3.fromRGB(0, 200, 255)
 					dot.BorderSizePixel = 0
+					dot.BackgroundTransparency = 0.1
+					dot.ZIndex = 1
 					dot.Parent = RadarFrame
+
+					task.spawn(function()
+						dot:TweenSize(UDim2.new(0, 8, 0, 8), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
+						task.wait(0.15)
+						if dot then
+							dot:TweenSize(UDim2.new(0, 6, 0, 6), Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.15, true)
+						end
+					end)
+
 					table.insert(radarDots, dot)
 				end
 			end
@@ -132,7 +188,7 @@ local function updateRadar()
 end
 
 ---------------------------------------------------------
--- TRACKING SYSTEM
+-- TRACKING
 ---------------------------------------------------------
 local function tryTrack(obj)
 	if isNPC(obj) or (obj:IsA("BasePart") and not obj:FindFirstAncestorOfClass("Model")) then
@@ -164,7 +220,7 @@ Workspace.DescendantAdded:Connect(tryTrack)
 Workspace.DescendantRemoving:Connect(stopTrack)
 
 ---------------------------------------------------------
--- MAIN LOOP
+-- LOOP
 ---------------------------------------------------------
 task.spawn(function()
 	while true do
@@ -179,7 +235,7 @@ task.spawn(function()
 						info.lastPos = pos
 						info.lastMove = t
 						if not info.hl or not info.hl.Parent then
-							local color = info.isNPC and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(0, 255, 255)
+							local color = info.isNPC and Color3.fromRGB(255, 60, 60) or Color3.fromRGB(0, 200, 255)
 							info.hl = makeHighlight(obj, color)
 						end
 					elseif info.hl and (t - info.lastMove) > IDLE_TIMEOUT then
@@ -196,7 +252,7 @@ task.spawn(function()
 end)
 
 ---------------------------------------------------------
--- NIGHT VISION TOGGLE (TASTA M)
+-- NIGHT VISION
 ---------------------------------------------------------
 local function setNightVision(on)
 	nightVisionOn = on
@@ -204,11 +260,11 @@ local function setNightVision(on)
 		NightVisionBtn.Text = "🌙 Night Vision: ON (M)"
 		NightVisionBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
 		Lighting.Brightness = 3
-		Lighting.Ambient = Color3.fromRGB(100, 255, 100)
-		Lighting.ColorShift_Top = Color3.fromRGB(100, 255, 100)
+		Lighting.Ambient = Color3.fromRGB(120, 255, 120)
+		Lighting.ColorShift_Top = Color3.fromRGB(120, 255, 120)
 	else
 		NightVisionBtn.Text = "🌙 Night Vision: OFF (M)"
-		NightVisionBtn.BackgroundColor3 = Color3.fromRGB(20, 80, 20)
+		NightVisionBtn.BackgroundColor3 = Color3.fromRGB(25, 80, 25)
 		Lighting.Brightness = 1
 		Lighting.Ambient = Color3.fromRGB(127, 127, 127)
 		Lighting.ColorShift_Top = Color3.new(0, 0, 0)
