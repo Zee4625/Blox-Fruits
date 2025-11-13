@@ -20,12 +20,12 @@ local shifting = false
 local rpm = 0
 
 --== VEHICLE SETTINGS ==--
-local accelRate = 1.02
-local naturalDecel = 0.97
+local accelRate = 1.08
+local naturalDecel = 0.9
 local brakeRate = 0.9
 local handBrakeRate = 0.65
 local turnSpeed = 3
-local gearUpDelay = 0.15
+local gearUpDelay = 0.16
 local gearDownDelay = 0.25
 local maxGear = 8 -- gearul maxim implicit
 
