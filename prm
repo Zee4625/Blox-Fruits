@@ -588,6 +588,16 @@ TabGamm:AddButton({
 })
 
 TabGamm:AddButton({
+    Title = "PIXEL BLADE",
+    Tip = "Run collaborative script PIXEL BLADE",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR", true))()
+    end,
+})
+
+
+
+TabGamm:AddButton({
     Title = "Project Smash",
     Tip = "Run collaborative script Project Smash",
     Callback = function()
