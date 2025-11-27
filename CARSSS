@@ -31,14 +31,14 @@ local maxGear = 8 -- gearul maxim implicit
 
 --== GEAR SPEEDS (setabile manual) ==--
 local gearSpeeds = {
-	30,   -- Gear 1
-	60,   -- Gear 2
-	110,  -- Gear 3
-	180,  -- Gear 4
-	270,  -- Gear 5
-	380,  -- Gear 6
-	470,  -- Gear 7
-	570   -- Gear 8
+	50,   -- Gear 1
+	80,   -- Gear 2
+	130,  -- Gear 3
+	195,  -- Gear 4
+	290,  -- Gear 5
+	410,  -- Gear 6
+	507,  -- Gear 7
+	670   -- Gear 8
 }
 
 --== GUI SETUP ==--
