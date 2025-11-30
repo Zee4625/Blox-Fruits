@@ -555,6 +555,14 @@ TabGamm:AddButton({
 })
 
 TabGamm:AddButton({
+    Title = "TSB",
+    Tip = "Run collaborative script The Stronghest Battelgrounds",
+    Callback = function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/TSB-7821", true))()
+    end,
+})
+
+TabGamm:AddButton({
     Title = "Grow A Garden",
     Tip = "Run collaborative script Grow A Garden",
     Callback = function()
