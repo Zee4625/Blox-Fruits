@@ -1,4 +1,4 @@
-local Bracket = loadstring(game:HttpGet("https://raw.githubusercontent.com/AlexR32/Bracket/main/BracketV32.lua"))()
+    local Bracket = loadstring(game:HttpGet("https://raw.githubusercontent.com/AlexR32/Bracket/main/BracketV32.lua"))()
 Bracket:Notification()
 Bracket:Notification2()
 
@@ -6,12 +6,12 @@ local Window = Bracket:Window({
     Name = "ZeeHUB V9",
     Enabled = true,
     Color = Color3.new(1,0.5,0.25),
-    Size = UDim2.new(0,496,0,496),
-    Position = UDim2.new(0.5,-248,0.5,-248)
+    Size = UDim2.new(0,440,0,340), -- DIMENSIUNE MAI MICĂ
+    Position = UDim2.new(0.5,-220,0.5,-170) -- POZIȚIE CENTRATĂ
 })
 
 -----------------------------------------------------------
--- TAB 1 – MOBILE (conține TOATE butoanele cerute)
+-- TAB 1 – MOBILE
 -----------------------------------------------------------
 local MobileTab = Window:Tab({Name = "Mobile"}) do
     
