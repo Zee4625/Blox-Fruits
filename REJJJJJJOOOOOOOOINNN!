@@ -1,0 +1,18 @@
+-- Ecran negru
+local screenGui = Instance.new("ScreenGui")
+screenGui.IgnoreGuiInset = true
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game.CoreGui
+
+local blackFrame = Instance.new("Frame", screenGui)
+blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+blackFrame.Size = UDim2.new(1, 0, 1, 0)
+
+-- Așteaptă 1 secundă
+task.wait(0.8)
+
+-- Rejoin
+local ts = game:GetService("TeleportService")
+local plr = game.Players.LocalPlayer
+
+ts:Teleport(game.PlaceId, plr)
