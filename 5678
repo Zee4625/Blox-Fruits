@@ -1,143 +1,206 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- Dollarware example script
 
-local Window = Rayfield:CreateWindow({
-   Name = "ZeeHUB v9",
-   Icon = 121236209756012, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
-   LoadingTitle = "Rayfield Interface Suite",
-   LoadingSubtitle = "by Sirius",
-   ShowText = "Rayfield", -- for mobile users to unhide rayfield, change if you'd like
-   Theme = "Green", -- Check https://docs.sirius.menu/rayfield/configuration/themes
-
-   ToggleUIKeybind = "K", -- The keybind to toggle the UI visibility (string like "K" or Enum.KeyCode)
-
-   DisableRayfieldPrompts = false,
-   DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
-
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = nil, -- Create a custom folder for your hub/game
-      FileName = "Big Hub"
-   },
-
-   Discord = {
-      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
-      Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
-      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
-   },
-
-   KeySystem = false, -- Set this to true to use our key system
-   KeySettings = {
-      Title = "Untitled",
-      Subtitle = "Key System",
-      Note = "No method of obtaining the key is provided", -- Use this to tell the user how to get a key
-      FileName = "Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
-      SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
-      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"Hello"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
-   }
+-- Snag the ui loader function thingy (loadstring the link, but dont call it)
+local uiLoader = loadstring(game:HttpGet('https://raw.githubusercontent.com/topitbopit/dollarware/main/library.lua'))
+-- Because of the way the library loads, settings are handled on the loadstring call
+local ui = uiLoader({
+    rounding = false, -- Whether certain features get rounded 
+    theme = 'grape', -- The theme. Available themes are: cherry, orange, lemon, lime, raspberry, blueberry, grape, watermelon
+    smoothDragging = false -- Smooth dragging
 })
 
-local Tab = Window:CreateTab("Main", 4483362458) -- Title, Image
+ui.autoDisableToggles = true -- All toggles will automatically be disabled when the ui is destroyed (window is closed)
+-- so you don't have to manually handle everything. This defaults to true!
 
-local Button = Tab:CreateButton({
-   Name = "X-ray",
-   Callback = function()
-       loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ESP-CORNER"))()
-   end,
+-- Make a window, which houses all the stuff for the gui
+-- Technically multiple windows can be made, but there is no (and likely wont ever be) official support for them
+-- since its a lot of work for such a minute use
+local window = ui.newWindow({
+    text = 'ZeeHUB v10', -- Title of window 
+    resize = true, -- Ability to resize
+    size = Vector2.new(420, 290), -- Window size, accepts UDim2s and Vector2s
+    position =nil -- Custom position, defaults to roughly the bottom right corner
 })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Rayfield:Notify({
-   Title = "Notification Title",
-   Content = "Notification Content",
-   Duration = 6.5,
-   Image = "rewind",
+local menu = window:addMenu({
+    text = 'Main'
 })
+
+-----------------------------
+-- SECTION 1 – Butonul "Hi"
+-----------------------------
+local section1 = menu:addSection({
+    text = 'ESP',
+    side = 'auto',
+    showMinButton = true
+})
+
+section1:addButton({
+    text = 'X-Ray',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'X-RAY-2',
+        message = 'Loading...',
+        duration = 3
+    })
+
+    -- execută scriptul
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ESP-CORNER"))()
+end)
+
+section1:addButton({
+    text = 'X-Ray-Name',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'X-RAY-2 ',
+        message = 'Loading...',
+        duration = 3
+    })
+
+    -- execută scriptul
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/NAMESP"))()
+end)
+-- radar321 XDAS SEX
+section1:addButton({
+    text = 'X-Ray-Radar',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'X-RAY-3 ',
+        message = 'Loading...',
+        duration = 3
+    })
+
+    -- execută scriptul
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/RADARMODEEEEEEEEEEEEE"))()
+end)
+
+--https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/SEEEEENS
+
+section1:addButton({
+    text = 'X-Ray-Box',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'X-RAY-4 ',
+        message = 'Loading...',
+        duration = 3
+    })
+
+    -- execută scriptul
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/SEEEEENS"))()
+end)
+--------------------------------
+-- SECTION 2 – Alt buton random
+--------------------------------
+local section2 = menu:addSection({
+    text = 'Callbacks',
+    side = 'left',
+    showMinButton = true
+})
+
+section2:addButton({
+    text = 'Rejoin',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'Rejoin.... ',
+        message = 'Rejoin....',
+        duration = 3
+    })
+
+    -- execută scriptul
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/REJJJJJJOOOOOOOOINNN!"))()
+end)
+--https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/REJJJJJJOOOOOOOOINNN!
+--------------------------------
+-- SECTION 3 – Alt buton random
+--------------------------------
+local section3 = menu:addSection({
+    text = 'Section 3',
+    side = 'right',
+    showMinButton = true
+})
+
+section3:addButton({
+    text = 'Button 3',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'Button 3',
+        message = 'Ai apasat Button 3!',
+        duration = 3
+    })
+end)
+
+
+
+
+
+
+
+--dGAUDASD SEXXXXXXADS
+
+local menu = window:addMenu({
+    text = 'Collabs'
+})
+
+-- Creăm o secțiune pentru butoane
+local section = menu:addSection({
+    text = 'Collab-Guis',
+    side = 'auto',
+    showMinButton = true
+})
+
+section:addButton({
+    text = 'Talentless',
+    style = 'large'
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Piano", true))()
+end)
+
+section:addButton({
+    text = 'Zombie.Anim',
+    style = 'large'
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZOMBIUUU", true))()
+end)
+
+section:addButton({
+    text = 'R15 Anims',
+    style = 'large'
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/r154", true))()
+end)
+
+section:addButton({
+    text = 'CoolKID hubs',
+    style = 'large'
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/COOLKID", true))()
+end)
+
+section:addButton({
+    text = 'Shift Lock',
+    style = 'large'
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Shifttt53422323", true))()
+end)
+
+
+
+
+local sectionX = menu:addSection({
+    text = 'Collab',
+    side = 'auto',
+    showMinButton = true
+})
+
+sectionX:addButton({
+    text = '?',
+    style = 'large'
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Piano", true))()
+end)
