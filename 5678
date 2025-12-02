@@ -1,111 +1,13 @@
-    local Bracket = loadstring(game:HttpGet("https://raw.githubusercontent.com/AlexR32/Bracket/main/BracketV32.lua"))()
-Bracket:Notification()
-Bracket:Notification2()
+local Luxtl = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Luxware-UI-Library/main/Source.lua"))()
 
-local Window = Bracket:Window({
-    Name = "ZeeHUB V9",
-    Enabled = true,
-    Color = Color3.new(1,0.5,0.25),
-    Size = UDim2.new(0,410,0,270), -- DIMENSIUNE MAI MICĂ
-    Position = UDim2.new(0.5,-220,0.5,-170) -- POZIȚIE CENTRATĂ
-})
+local Window = Luxtl.CreateWindow("Wisteria GUI", 6105620301)
 
------------------------------------------------------------
--- TAB 1 – MOBILE
------------------------------------------------------------
-local MobileTab = Window:Tab({Name = "Mobile"}) do
-    
-    MobileTab:Button({
-        Name = "Old Mobile Hub",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/prmmm"))()
-        end
-    })
+-- Doar 2 taburi
+local mainTab = Window:Tab("Main", 6087485864)
+local secondTab = Window:Tab("Other")
 
-    MobileTab:Button({
-        Name = "Hunty Zombies",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZMBO"))()
-        end
-    })
-
-    MobileTab:Button({
-        Name = "Pixel Blade",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PIXEL"))()
-        end
-    })
-
-    MobileTab:Button({
-        Name = "99 Nights",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR"))()
-        end
-    })
-
-    MobileTab:Button({
-        Name = "Project Smash",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PROSMASH1"))()
-        end
-    })
-
-    MobileTab:Button({
-        Name = "Driving Empire",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CARSSS"))()
-        end
-    })
-
-    MobileTab:Button({
-        Name = "Weird Gun Game",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WGUN"))()
-        end
-    })
-
-    MobileTab:Button({
-        Name = "Bee-BSS",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BSSSSSSSSSSSSSS"))()
-        end
-    })
-
-    MobileTab:Button({
-        Name = "Demonfall",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://api.junkie-development.de/api/v1/luascripts/public/58767ffc288c78fd334e474d1893d9807479fb2a8a4eb28156bf02c95e5b9aaf/download"))()
-        end
-    })
-
-    MobileTab:Button({
-        Name = "The Lost Front",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORNT%20AA"))()
-        end
-    })
-end
-
------------------------------------------------------------
--- TAB 2 – PC
------------------------------------------------------------
-local PcTab = Window:Tab({Name = "PC"}) do
-    PcTab:Button({
-        Name = "PC Example Button",
-        Callback = function()
-            print("Button PC apăsat!")
-        end
-    })
-end
-
------------------------------------------------------------
--- TAB 3 – COLLAB-UI
------------------------------------------------------------
-local CollabTab = Window:Tab({Name = "Collab-UI"}) do
-    CollabTab:Button({
-        Name = "Collab Example Button",
-        Callback = function()
-            print("Collab UI button apăsat!")
-        end
-    })
-end
+-- În primul tab: 1 singur buton random
+local section = mainTab:Section("Random Section")
+section:Button("Buton Random", function()
+    print("Ai apasat butonul random!")
+end)
