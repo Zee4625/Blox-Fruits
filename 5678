@@ -7,7 +7,7 @@ local Window = Bracket:Window({
     Enabled = true,
     Color = Color3.fromRGB(9,255,0), -- VERDE NEON
     Size = UDim2.new(0,280,0,250),
-    Position = UDim2.new(0.5, 450, 0.5, -380)
+    Position = UDim2.new(0.5, 410, 0.5, -310)
 })
 
 -----------------------------------------------------------
