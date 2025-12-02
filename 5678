@@ -1,111 +1,143 @@
-local Bracket = loadstring(game:HttpGet("https://raw.githubusercontent.com/AlexR32/Bracket/main/BracketV32.lua"))()
-Bracket:Notification("ZeeHUB v9")
-Bracket:Notification2("HI")
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local Window = Bracket:Window({
-    Name = "ZeeHUB v9",
-    Enabled = true,
-    Color = Color3.fromRGB(9,255,0), -- VERDE NEON
-    Size = UDim2.new(0,280,0,250),
-    Position = UDim2.new(0.5, 340, 0.5, -240)
+local Window = Rayfield:CreateWindow({
+   Name = "ZeeHUB v9",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Rayfield Interface Suite",
+   LoadingSubtitle = "by Sirius",
+   ShowText = "Rayfield", -- for mobile users to unhide rayfield, change if you'd like
+   Theme = "Green", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   ToggleUIKeybind = "K", -- The keybind to toggle the UI visibility (string like "K" or Enum.KeyCode)
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil, -- Create a custom folder for your hub/game
+      FileName = "Big Hub"
+   },
+
+   Discord = {
+      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
+      Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
+      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "Untitled",
+      Subtitle = "Key System",
+      Note = "No method of obtaining the key is provided", -- Use this to tell the user how to get a key
+      FileName = "Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
+      SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
+      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+      Key = {"Hello"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+   }
 })
 
------------------------------------------------------------
--- TAB 1 – MOBILE (conține TOATE butoanele cerute)
------------------------------------------------------------
-local MobileTab = Window:Tab({Name = "Mobile"}) do
-    
-    MobileTab:Button({
-        Name = "Old Mobile Hub",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/prmmm"))()
-        end
-    })
+local Tab = Window:CreateTab("Games", 4483362458) -- Title, Image
 
-    MobileTab:Button({
-        Name = "Hunty Zombies",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZMBO"))()
-        end
-    })
+local Button = Tab:CreateButton({
+   Name = "Hunty Zombie",
+   Callback = function()
+       loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZMBO"))()
+   end,
+})
 
-    MobileTab:Button({
-        Name = "Pixel Blade",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PIXEL"))()
-        end
-    })
 
-    MobileTab:Button({
-        Name = "99 Nights",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR"))()
-        end
-    })
 
-    MobileTab:Button({
-        Name = "Project Smash",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PROSMASH1"))()
-        end
-    })
 
-    MobileTab:Button({
-        Name = "Driving Empire",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CARSSS"))()
-        end
-    })
 
-    MobileTab:Button({
-        Name = "Weird Gun Game",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WGUN"))()
-        end
-    })
 
-    MobileTab:Button({
-        Name = "Bee-BSS",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BSSSSSSSSSSSSSS"))()
-        end
-    })
 
-    MobileTab:Button({
-        Name = "Demonfall",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://api.junkie-development.de/api/v1/luascripts/public/58767ffc288c78fd334e474d1893d9807479fb2a8a4eb28156bf02c95e5b9aaf/download"))()
-        end
-    })
 
-    MobileTab:Button({
-        Name = "The Lost Front",
-        Callback = function()
-            loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORNT%20AA"))()
-        end
-    })
-end
 
------------------------------------------------------------
--- TAB 2 – PC
------------------------------------------------------------
-local PcTab = Window:Tab({Name = "PC"}) do
-    PcTab:Button({
-        Name = "PC Example Button",
-        Callback = function()
-            print("Button PC apăsat!")
-        end
-    })
-end
 
------------------------------------------------------------
--- TAB 3 – COLLAB-UI
------------------------------------------------------------
-local CollabTab = Window:Tab({Name = "Collab-UI"}) do
-    CollabTab:Button({
-        Name = "Collab Example Button",
-        Callback = function()
-            print("Collab UI button apăsat!")
-        end
-    })
-end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Rayfield:Notify({
+   Title = "Notification Title",
+   Content = "Notification Content",
+   Duration = 6.5,
+   Image = "rewind",
+})
