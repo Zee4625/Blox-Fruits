@@ -385,6 +385,13 @@ sectionZ:addButton({
 }, function()
     loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORNT%20AA", true))()
 end)
+
+sectionZ:addButton({
+    text = "Forge-BETA!",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORGEEEEEE", true))()
+end)
 -- NIGAAAAA
 
 
@@ -464,4 +471,11 @@ sectionZ2:addButton({
     style = "large"
 }, function()
     loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORNT%20AA", true))()
+end)
+
+sectionZ2:addButton({
+    text = "Forge-BETA!",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORGEEEEEE", true))()
 end)
