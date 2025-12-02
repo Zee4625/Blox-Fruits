@@ -135,12 +135,6 @@ section3:addButton({
     })
 end)
 
-
-
-
-
-
-
 --dGAUDASD SEXXXXXXADS
 
 local menu = window:addMenu({
@@ -192,15 +186,77 @@ end)
 
 
 
+
+
+
+
+-- MILKKKK!
+
 local sectionX = menu:addSection({
-    text = 'Collab',
+    text = 'Collabs',
     side = 'auto',
     showMinButton = true
 })
 
 sectionX:addButton({
-    text = '?',
-    style = 'large'
+    text = "Zee and Cars.HB",
+    style = "large"
 }, function()
-    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Piano", true))()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/car", true))()
+end)
+
+sectionX:addButton({
+    text = "Zee and Invincible.Fly",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FLY", true))()
+end)
+
+sectionX:addButton({
+    text = "Zee and Invincible.FlyV2",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/INVFLY2", true))()
+end)
+
+sectionX:addButton({
+    text = "Zee and Invisible.y",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/SPYME", true))()
+end)
+
+sectionX:addButton({
+    text = "Zee and RETURN BY DEATH!",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/RETURNBYD", true))()
+end)
+
+sectionX:addButton({
+    text = "Zee and Altar",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ALT", true))()
+end)
+
+sectionX:addButton({
+    text = "Zee and Jerk.ANIM",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JERCCC", true))()
+end)
+
+sectionX:addButton({
+    text = "Zee and Wally",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WALLY", true))()
+end)
+
+sectionX:addButton({
+    text = "Zee and NarX",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/NARUTo", true))()
 end)
