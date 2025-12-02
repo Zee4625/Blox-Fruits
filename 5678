@@ -1,59 +1,17 @@
 local Bracket = loadstring(game:HttpGet("https://raw.githubusercontent.com/AlexR32/Bracket/main/BracketV32.lua"))()
-Bracket:Notification()
-Bracket:Notification2()
+Bracket:Notification("ZeeHUB v9")
+Bracket:Notification2("HI")
 
 local Window = Bracket:Window({
-    Name = "ZeeHUB V9",
+    Name = "ZeeHUB v9",
     Enabled = true,
-    Color = Color3.fromRGB(1,0.5,0.25), -- VERDE NEON
-    Size = UDim2.new(0,310,0,170),
-    Position = UDim2.new(0.5,-220,0.5,-170)
+    Color = Color3.fromRGB(9,255,0), -- VERDE NEON
+    Size = UDim2.new(0,280,0,250),
+    Position = UDim2.new(0.5, 450, 0.5, -380)
 })
 
-----------------------------------------------------------------
--- 🔽 CREARE BUTON DE MINIMIZARE CU ICON
-----------------------------------------------------------------
-
--- Butonul mic din colțul din dreapta sus
-local MinimizeButton = Instance.new("ImageButton")
-MinimizeButton.Parent = Window.Main
-MinimizeButton.Size = UDim2.new(0, 25, 0, 25)
-MinimizeButton.Position = UDim2.new(1, -30, 0, 5)
-MinimizeButton.BackgroundTransparency = 1
-MinimizeButton.Image = "rbxassetid://121236209756012"
-MinimizeButton.ZIndex = 999999
-
--- Pătratul de restaurare (icon)
-local RestoreButton = Instance.new("ImageButton")
-RestoreButton.Image = "rbxassetid://121236209756012"
-RestoreButton.Size = UDim2.new(0, 40, 0, 40)
-RestoreButton.Position = UDim2.new(0, 20, 0, 200)
-RestoreButton.BackgroundColor3 = Color3.new(0,0,0)
-RestoreButton.BackgroundTransparency = 0
-RestoreButton.Visible = false
-RestoreButton.ZIndex = 999999
-RestoreButton.Parent = game.CoreGui
-
-local minimized = false
-
-MinimizeButton.MouseButton1Click:Connect(function()
-    if not minimized then
-        Window.Main.Visible = false
-        RestoreButton.Visible = true
-        minimized = true
-    end
-end)
-
-RestoreButton.MouseButton1Click:Connect(function()
-    if minimized then
-        Window.Main.Visible = true
-        RestoreButton.Visible = false
-        minimized = false
-    end
-end)
-
 -----------------------------------------------------------
--- TAB 1 – MOBILE
+-- TAB 1 – MOBILE (conține TOATE butoanele cerute)
 -----------------------------------------------------------
 local MobileTab = Window:Tab({Name = "Mobile"}) do
     
