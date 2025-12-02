@@ -260,3 +260,30 @@ sectionX:addButton({
 }, function()
     loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/NARUTo", true))()
 end)
+
+-- GDFFAGHSJKDL;ASD XEEE
+
+
+local menu = window:addMenu({
+    text = 'Games'
+})
+
+local sectionZ = menu:addSection({
+    text = 'Games-PC',
+    side = 'auto',
+    showMinButton = true
+})
+
+sectionZ:addButton({
+    text = 'NIGGA',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'NIGGA',
+        message = 'Loading...',
+        duration = 3
+    })
+
+    -- execută scriptul
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/prm"))()
+end)
