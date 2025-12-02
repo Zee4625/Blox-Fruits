@@ -275,15 +275,193 @@ local sectionZ = menu:addSection({
 })
 
 sectionZ:addButton({
-    text = 'NIGGA',
-    style = 'large'
+    text = "Hunty Zombies",
+    style = "large"
 }, function()
-    ui.notify({
-        title = 'NIGGA',
-        message = 'Loading...',
-        duration = 3
-    })
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZMBO", true))()
+end)
 
-    -- execută scriptul
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/prm"))()
+sectionZ:addButton({
+    text = "BlueLock Rivals",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BBQ", true))()
+end)
+
+sectionZ:addButton({
+    text = "TSB",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/TSB-7821", true))()
+end)
+
+sectionZ:addButton({
+    text = "Grow A Garden",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/GRO", true))()
+end)
+
+sectionZ:addButton({
+    text = "JJK",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JJK-X", true))()
+end)
+
+sectionZ:addButton({
+    text = "Trident Survival",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/TRIDENT87678", true))()
+end)
+
+sectionZ:addButton({
+    text = "MM2",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/M2FS", true))()
+end)
+
+sectionZ:addButton({
+    text = "99 Nights",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR", true))()
+end)
+
+sectionZ:addButton({
+    text = "PIXEL BLADE",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PIXEL", true))()
+end)
+
+sectionZ:addButton({
+    text = "Project Smash",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PROSMASH1", true))()
+end)
+
+sectionZ:addButton({
+    text = "Wierd Gun Game",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WGUN", true))()
+end)
+
+sectionZ:addButton({
+    text = "Blox Fruits",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Xz0", true))()
+end)
+
+sectionZ:addButton({
+    text = "Driving Empire",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CARSSS", true))()
+end)
+
+sectionZ:addButton({
+    text = "Bee-BSS",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BSSSSSSSSSSSSSS", true))()
+end)
+
+sectionZ:addButton({
+    text = "Demonfall",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://api.junkie-development.de/api/v1/luascripts/public/58767ffc288c78fd334e474d1893d9807479fb2a8a4eb28156bf02c95e5b9aaf/download", true))()
+end)
+
+sectionZ:addButton({
+    text = "The Lost Front",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORNT%20AA", true))()
+end)
+-- NIGAAAAA
+
+
+
+
+
+
+
+
+
+
+
+local sectionZ2 = menu:addSection({
+    text = 'Mobile',
+    side = 'right',
+    showMinButton = true
+})
+
+sectionZ2:addButton({
+    text = "Hunty Zombies",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZMBO", true))()
+end)
+
+sectionZ2:addButton({
+    text = "Pixel Blade",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PIXEL", true))()
+end)
+
+sectionZ2:addButton({
+    text = "99 Nights",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR", true))()
+end)
+
+sectionZ2:addButton({
+    text = "Project Smash",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PROSMASH1", true))()
+end)
+
+sectionZ2:addButton({
+    text = "Driving Empire",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CARSSS", true))()
+end)
+
+sectionZ2:addButton({
+    text = "Wierd Gun Game",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WGUN", true))()
+end)
+
+sectionZ2:addButton({
+    text = "Bee-BSS",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BSSSSSSSSSSSSSS", true))()
+end)
+
+sectionZ2:addButton({
+    text = "Demonfall",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://api.junkie-development.de/api/v1/luascripts/public/58767ffc288c78fd334e474d1893d9807479fb2a8a4eb28156bf02c95e5b9aaf/download", true))()
+end)
+
+sectionZ2:addButton({
+    text = "The Lost Front",
+    style = "large"
+}, function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORNT%20AA", true))()
 end)
