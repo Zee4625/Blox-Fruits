@@ -1,5 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("TSBG CUSTOM MOVESETS GOLDENHEAD", "DarkTheme")
+local Window = Library.CreateLib("TSBG CUSTOM MOVESETS-ZEEHUB V10", "DarkTheme")
 local Tab = Window:NewTab("Scripts")
 local Section = Tab:NewSection("Scripts")
 Section:NewButton("Sans Moveset (USE TATSUMAKI)", "ButtonInfo", function()
@@ -41,4 +41,3 @@ Section:NewButton("Another Hub with yuji moveset and others", "ButtonInfo", func
 loadstring(game:HttpGet("https://raw.githubusercontent.com/xVicity/GLACIER/main/LATEST.lua"))()
     print("Clicked")
 end)
-Tags: 
