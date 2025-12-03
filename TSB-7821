@@ -1,43 +1,155 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("TSBG CUSTOM MOVESETS-ZEEHUB V10", "DarkTheme")
-local Tab = Window:NewTab("Scripts")
-local Section = Tab:NewSection("Scripts")
-Section:NewButton("Sans Moveset (USE TATSUMAKI)", "ButtonInfo", function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Qaiddanial2904/ROBLOX-FREAKY-GOJO-REAL/refs/heads/main/SANS%20%5BREDACTED%5D"))()
-    print("Clicked")
+-- Dollarware example script
+
+-- Snag the ui loader function thingy (loadstring the link, but dont call it)
+local uiLoader = loadstring(game:HttpGet('https://raw.githubusercontent.com/topitbopit/dollarware/main/library.lua'))
+-- Because of the way the library loads, settings are handled on the loadstring call
+local ui = uiLoader({
+    rounding = false, -- Whether certain features get rounded 
+    theme = 'orange', -- The theme. Available themes are: cherry, orange, lemon, lime, raspberry, blueberry, grape, watermelon
+    smoothDragging = false -- Smooth dragging
+})
+
+ui.autoDisableToggles = true -- All toggles will automatically be disabled when the ui is destroyed (window is closed)
+-- so you don't have to manually handle everything. This defaults to true!
+
+-- Make a window, which houses all the stuff for the gui
+-- Technically multiple windows can be made, but there is no (and likely wont ever be) official support for them
+-- since its a lot of work for such a minute use
+local window = ui.newWindow({
+    text = 'ZeeHUB v10', -- Title of window 
+    resize = true, -- Ability to resize
+    size = Vector2.new(420, 290), -- Window size, accepts UDim2s and Vector2s
+    position =UDim2.new(0.35, 0, 0.26, 0) -- Custom position, defaults to roughly the bottom right corner
+})
+
+local menu = window:addMenu({
+    text = 'Main'
+})
+
+-----------------------------
+-- SECTION 1 – Butonul "Hi"
+-----------------------------
+local section1 = menu:addSection({
+    text = 'Random',
+    side = 'auto',
+    showMinButton = true
+})
+
+section1:addButton({
+    text = 'X-Ray',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'X-RAY-2',
+        message = 'Loading...',
+        duration = 3
+    })
+
+    -- execută scriptul
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ESP-CORNER"))()
 end)
-Section:NewButton("Child Emperor (USE SAITAMA)", "ButtonInfo", function()
-loadstring(game:HttpGet("https://pastebin.com/raw/CaXFZ2S2"))()
-    print("Clicked")
+
+
+section1:addButton({
+    text = 'Rejoin',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'Rejoin.... ',
+        message = 'Rejoin....',
+        duration = 3
+    })
+
+    -- execută scriptul
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/REJJJJJJOOOOOOOOINNN!"))()
 end)
-Section:NewButton("Idk (Has custom movesets inside!", "ButtonInfo", function()
-loadstring(game:HttpGet"https://raw.githubusercontent.com/Wi-sp/Limitless-legacy/refs/heads/main/GUI")()
-    print("Clicked")
+
+-----------------------------
+-- SECTION – Movesets
+-----------------------------
+local section1 = menu:addSection({
+    text = 'Movesets',
+    side = 'auto',
+    showMinButton = true
+})
+
+section1:addButton({
+    text = 'Deku (Use Saitama)',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'Deku',
+        message = 'Use Saitama for this moveset.',
+        duration = 3
+    })
+    loadstring(game:HttpGet("https://pastefy.app/MNg2zcxz/raw"))()
+ --loadstring(game:HttpGet("https://pastefy.app/MNg2zcxz/raw"))()
+
+
 end)
-Section:NewButton("Arcaura (USE GAROU)", "ButtonInfo", function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Reapvitalized/TSB/refs/heads/main/ARCAURA.lua"))()
-    print("Clicked")
+
+
+-- Kungfu Panda
+section1:addButton({
+    text = 'Kungfu Panda (Use Garou)',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'Kungfu Panda',
+        message = 'Use Garou for this moveset.',
+        duration = 3
+    })
+    loadstring(game:HttpGet("https://pastebin.com/raw/DqXUTANt"))()
 end)
-Section:NewButton("Dio Moveset (USE GAROU)", "ButtonInfo", function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Medley-Taboritsky/RobloxScripting/refs/heads/main/DIO_Garou_TSB"))()
-    print("Clicked")
+
+
+
+-- Sukuna
+section1:addButton({
+    text = 'Sukuna (Use Saitama)',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'Sukuna',
+        message = 'Use Saitama for this moveset.',
+        duration = 3
+    })
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/sparksnaps/Sukuna-15-Fingers/refs/heads/main/Lua"))()
 end)
-Section:NewButton("Reaper Moveset V2 (USE METAL BAT)", "ButtonInfo", function()
-getgenv().Music = true
-getgenv().AttackQuality = 'High'
- getgenv().ConstantSpeed = false
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Reapvitalized/TSB/main/APOPHENIA.lua"))()
-    print("Clicked")
+
+-- Gojo
+section1:addButton({
+    text = 'Toji (Use Atomic)',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'Toji',
+        message = 'Use Atomic for this moveset.',
+        duration = 3
+    })
+    loadstring(game:HttpGet('https://pastebin.com/raw/VQnyWP5D'))()
 end)
-Section:NewButton("Jun Moveset (USE SAITAMA)", "ButtonInfo", function()
-loadstring(game:HttpGet('https://raw.githubusercontent.com/Kenjihin69/Kenjihin69/refs/heads/main/Tp%20exploit%20saitama%20to%20jun'))()
-    print("Clicked")
+
+section1:addButton({
+    text = 'Naruto (Use Saitama)',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'Saitama',
+        message = 'Use Saitama for this moveset.',
+        duration = 3
+    })
+    loadstring(game:HttpGet("https://pastebin.com/raw/Da0AwazD"))()
 end)
-Section:NewButton("Sonic Moveset (ANY MOVESET)", "ButtonInfo", function()
-loadstring(game:HttpGet("https://pastebin.com/raw/7V1mUBtQ"))()
-    print("Clicked")
-end)
-Section:NewButton("Another Hub with yuji moveset and others", "ButtonInfo", function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/xVicity/GLACIER/main/LATEST.lua"))()
-    print("Clicked")
+
+section1:addButton({
+    text = 'Sukuna v2 (Use Saitama)',
+    style = 'large'
+}, function()
+    ui.notify({
+        title = 'Sukuna v2',
+        message = 'Use Saitama for this moveset.',
+        duration = 3
+    })
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/damir512/whendoesbrickdie/main/tspno.txt",true))()
 end)
