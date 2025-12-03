@@ -1,0 +1,29 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/Kinetic"))()
+
+local Window = Library.NewWindow({
+    Text = "Test UI",
+    WindowSize = Vector2.new(550, 450),
+    WindowPosition = Vector2.new(400, 200),
+})
+
+--========== PAGE 1 ==========
+local Page1 = Window.NewPage({Text = "Collabs"})
+local Section1 = Page1.NewSection({Text = "Section"})
+
+Section1.NewButton({
+    Text = "Buton Collabs",
+    Callback = function()
+        print("Ai apasat butonul Collabs!")
+    end
+})
+
+--========== PAGE 2 ==========
+local Page2 = Window.NewPage({Text = "Games"})
+local Section2 = Page2.NewSection({Text = "Section"})
+
+Section2.NewButton({
+    Text = "Buton Games",
+    Callback = function()
+        print("Ai apasat butonul Games!")
+    end
+})
