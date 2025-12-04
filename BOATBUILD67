@@ -1,0 +1,199 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local plrGui = player:WaitForChild("PlayerGui")
+task.wait(1)
+
+local Pos1 = Vector3.new(-55, -5, -225)
+local Pos2 = Vector3.new(-20, 65, 8819)
+local Pos3 = Vector3.new(-55, -358, 9492)
+local tweenDuration = 25
+local safeMinY = -40
+local bufferY = 2
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "AutoFarmGUI"
+gui.ResetOnSpawn = false
+gui.Parent = plrGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0,350,0,150)
+frame.Position = UDim2.new(0.5,-175,0.5,-75)
+frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+frame.BorderSizePixel = 0
+frame.Parent = gui
+frame.ClipsDescendants = true
+
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0,20)
+local gradient = Instance.new("UIGradient", frame)
+gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(50,50,70)), ColorSequenceKeypoint.new(1,Color3.fromRGB(20,20,40))})
+local shadow = Instance.new("UIStroke", frame)
+shadow.Thickness = 2
+shadow.Color = Color3.fromRGB(80,80,100)
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,-20,0,35)
+title.Position = UDim2.new(0,10,0,10)
+title.BackgroundTransparency = 1
+title.Text = "Build A Boat AutoFarm"
+title.TextColor3 = Color3.fromRGB(180,180,255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.Parent = frame
+
+local madeBy = Instance.new("TextLabel")
+madeBy.Size = UDim2.new(1,-20,0,20)
+madeBy.Position = UDim2.new(0,10,0,45)
+madeBy.BackgroundTransparency = 1
+madeBy.Text = "Made by: ZeeHUB"
+madeBy.TextColor3 = Color3.fromRGB(0,255,0)
+madeBy.Font = Enum.Font.Gotham
+madeBy.TextSize = 14
+madeBy.TextXAlignment = Enum.TextXAlignment.Left
+madeBy.Parent = frame
+
+local infoText = Instance.new("TextLabel")
+infoText.Size = UDim2.new(1,-20,0,20)
+infoText.Position = UDim2.new(0,10,0,65)
+infoText.BackgroundTransparency = 1
+infoText.Text = "105 gold per 40 secs"
+infoText.TextColor3 = Color3.fromRGB(200,200,255)
+infoText.Font = Enum.Font.Gotham
+infoText.TextSize = 14
+infoText.TextXAlignment = Enum.TextXAlignment.Left
+infoText.Parent = frame
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(1,-40,0,50)
+button.Position = UDim2.new(0,20,0,90)
+button.BackgroundColor3 = Color3.fromRGB(50,50,70)
+button.TextColor3 = Color3.fromRGB(255,255,255)
+button.Font = Enum.Font.GothamBold
+button.TextSize = 18
+button.Text = "Auto Farm: OFF"
+button.Parent = frame
+local btnCorner = Instance.new("UICorner", button)
+btnCorner.CornerRadius = UDim.new(0,12)
+
+button.MouseEnter:Connect(function()
+	button.BackgroundColor3 = Color3.fromRGB(70,70,100)
+end)
+button.MouseLeave:Connect(function()
+	button.BackgroundColor3 = Color3.fromRGB(50,50,70)
+end)
+
+local UserInput = game:GetService("UserInputService")
+local dragging = false
+local dragStart, startPos
+local function update(input)
+	local delta = input.Position - dragStart
+	frame.Position = UDim2.new(
+		startPos.X.Scale, startPos.X.Offset + delta.X,
+		startPos.Y.Scale, startPos.Y.Offset + delta.Y
+	)
+end
+frame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then dragging = false end
+		end)
+	end
+end)
+frame.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		update(input)
+	end
+end)
+
+local function getRootPart(character)
+	return character:FindFirstChild("HumanoidRootPart")
+		or character:FindFirstChild("LowerTorso")
+		or character:FindFirstChild("UpperTorso")
+		or character:FindFirstChild("Torso")
+end
+local function setNoClip(character,state)
+	pcall(function()
+		for _,part in ipairs(character:GetDescendants()) do
+			if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+				part.CanCollide = not state
+			end
+		end
+	end)
+	local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+	if humanoid then humanoid.PlatformStand = state end
+end
+
+local function tweenTo(root,targetPos,duration)
+	if not root or not root.Parent then return end
+	setNoClip(root.Parent,true)
+	local startPos = root.Position
+	local elapsed = 0
+	local look = root.CFrame.LookVector
+	while elapsed < duration do
+		if not root.Parent then break end
+		local dt = RunService.Heartbeat:Wait()
+		elapsed += dt
+		local alpha = math.clamp(elapsed/duration,0,1)
+		local newPos = startPos:Lerp(targetPos,alpha)
+		if newPos.Y < safeMinY then newPos = Vector3.new(newPos.X,safeMinY,newPos.Z) end
+		newPos = Vector3.new(newPos.X,newPos.Y+bufferY,newPos.Z)
+		root.CFrame = CFrame.new(newPos,newPos+look)
+		root.Velocity = Vector3.zero
+		root.RotVelocity = Vector3.zero
+	end
+	root.CFrame = CFrame.new(targetPos+Vector3.new(0,bufferY,0), targetPos+Vector3.new(0,bufferY,0)+look)
+	setNoClip(root.Parent,false)
+end
+
+local isOn = false
+local stopFlag = false
+
+local function startLoop(character)
+	stopFlag = false
+	local root = getRootPart(character)
+	if not root then return end
+	spawn(function()
+		while isOn and not stopFlag and root.Parent do
+			root.CFrame = CFrame.new(Pos1)
+			task.wait(0.3)
+			tweenTo(root,Pos2,tweenDuration)
+			task.wait(0.3)
+			root.CFrame = CFrame.new(Pos3)
+			task.wait(2)
+			local char = player.Character
+			local hum = char:FindFirstChildWhichIsA("Humanoid")
+			if hum then hum:BreakJoints() end
+			player.CharacterAdded:Wait()
+			task.wait(0.5)
+			char = player.Character
+			root = getRootPart(char)
+		end
+	end)
+end
+
+player.CharacterAdded:Connect(function(char)
+	task.wait(0.4)
+	if isOn then
+		stopFlag = true
+		task.wait(0.2)
+		startLoop(char)
+	end
+end)
+
+if player.Character then startLoop(player.Character) end
+
+button.MouseButton1Click:Connect(function()
+	isOn = not isOn
+	button.Text = isOn and "Auto Farm: ON" or "Auto Farm: OFF"
+	if isOn and player.Character then
+		stopFlag = false
+		startLoop(player.Character)
+	else
+		stopFlag = true
+	end
+end)
