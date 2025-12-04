@@ -1,0 +1,391 @@
+-- ts file was generated at discord.gg/25ms
+
+
+local vu1 = game:GetService("Players")
+local vu2 = vu1.LocalPlayer
+local v3 = vu2
+local v4 = vu2.WaitForChild(v3, "PlayerGui")
+local vu5 = game:GetService("ReplicatedStorage")
+local vu6 = game:GetService("TextChatService")
+game:GetService("VirtualInputManager")
+local vu7 = Instance.new("ScreenGui")
+vu7.Name = "RageBaiterGUI"
+vu7.ResetOnSpawn = false
+vu7.IgnoreGuiInset = true
+vu7.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+vu7.Parent = v4
+local v8 = Instance.new("Frame")
+v8.Size = UDim2.new(0, 320, 0, 230)
+v8.AnchorPoint = Vector2.new(0.5, 0.5)
+v8.Position = UDim2.new(0.5, 0, 0.5, 0)
+v8.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+v8.BackgroundTransparency = 0.15
+v8.BorderSizePixel = 0
+v8.Active = true
+v8.Draggable = true
+v8.Parent = vu7
+Instance.new("UICorner", v8).CornerRadius = UDim.new(0, 10)
+Instance.new("UIStroke", v8).Color = Color3.fromRGB(60, 60, 60)
+local v9 = Instance.new("Frame")
+v9.Size = UDim2.new(1, 0, 0, 35)
+v9.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+v9.BackgroundTransparency = 0.1
+v9.BorderSizePixel = 0
+v9.Parent = v8
+Instance.new("UICorner", v9).CornerRadius = UDim.new(0, 10)
+local v10 = Instance.new("TextLabel")
+v10.Size = UDim2.new(1, - 45, 1, 0)
+v10.Position = UDim2.new(0, 10, 0, 0)
+v10.BackgroundTransparency = 1
+v10.TextColor3 = Color3.new(1, 1, 1)
+v10.Text = "Troll Player Rage Baiter-ZeeHUB"
+v10.Font = Enum.Font.GothamBold
+v10.TextSize = 16
+v10.TextXAlignment = Enum.TextXAlignment.Left
+v10.Parent = v9
+local v11 = Instance.new("TextButton")
+v11.Size = UDim2.new(0, 30, 0, 30)
+v11.Position = UDim2.new(1, - 35, 0.5, - 15)
+v11.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+v11.TextColor3 = Color3.new(1, 1, 1)
+v11.Text = "X"
+v11.Font = Enum.Font.GothamBold
+v11.TextSize = 14
+v11.Parent = v9
+Instance.new("UICorner", v11).CornerRadius = UDim.new(1, 0)
+local v12 = Instance.new("Frame")
+v12.Size = UDim2.new(1, - 20, 0, 100)
+v12.Position = UDim2.new(0, 10, 0, 45)
+v12.BackgroundTransparency = 1
+v12.Parent = v8
+local vu13 = Instance.new("ImageLabel")
+vu13.Size = UDim2.new(0, 80, 0, 80)
+vu13.Position = UDim2.new(0, 0, 0, 10)
+vu13.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+vu13.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+vu13.Parent = v12
+Instance.new("UICorner", vu13).CornerRadius = UDim.new(1, 0)
+Instance.new("UIStroke", vu13).Color = Color3.fromRGB(80, 80, 80)
+local v14 = Instance.new("Frame")
+v14.Size = UDim2.new(1, - 100, 1, 0)
+v14.Position = UDim2.new(0, 95, 0, 0)
+v14.BackgroundTransparency = 1
+v14.Parent = v12
+local vu15 = Instance.new("TextBox")
+vu15.Size = UDim2.new(1, 0, 0, 28)
+vu15.Position = UDim2.new(0, 0, 0, 5)
+vu15.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+vu15.TextColor3 = Color3.new(1, 1, 1)
+vu15.Text = ""
+vu15.PlaceholderText = "Enter username..."
+vu15.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+vu15.Font = Enum.Font.Gotham
+vu15.TextSize = 14
+vu15.ClearTextOnFocus = false
+vu15.Parent = v14
+Instance.new("UICorner", vu15).CornerRadius = UDim.new(0, 6)
+local vu16 = Instance.new("TextBox")
+vu16.Name = "SuffixBox"
+vu16.Size = UDim2.new(1, 0, 0, 28)
+vu16.Position = UDim2.new(0, 0, 0, 38)
+vu16.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+vu16.TextColor3 = Color3.new(1, 1, 1)
+vu16.PlaceholderText = "Emoji, Text, etc..."
+vu16.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+vu16.Font = Enum.Font.Gotham
+vu16.TextSize = 14
+vu16.ClearTextOnFocus = false
+vu16.Parent = v14
+Instance.new("UICorner", vu16).CornerRadius = UDim.new(0, 6)
+task.defer(function()
+    vu16.Text = "\239\191\189\239\191\189\239\191\189\239\191\189\239\191\189\226\152\157\239\184\143"
+end)
+local vu17 = Instance.new("TextLabel")
+vu17.Size = UDim2.new(1, 0, 0, 20)
+vu17.Position = UDim2.new(0, 0, 0, 70)
+vu17.BackgroundTransparency = 1
+vu17.Text = "UserID: None"
+vu17.TextColor3 = Color3.fromRGB(180, 180, 255)
+vu17.Font = Enum.Font.GothamMedium
+vu17.TextSize = 12
+vu17.TextXAlignment = Enum.TextXAlignment.Left
+vu17.Parent = v14
+local vu18 = Instance.new("TextLabel")
+vu18.Size = UDim2.new(1, 0, 0, 20)
+vu18.Position = UDim2.new(0, 0, 0, 88)
+vu18.BackgroundTransparency = 1
+vu18.Text = "Status  Inactive"
+vu18.TextColor3 = Color3.fromRGB(200, 200, 200)
+vu18.Font = Enum.Font.Gotham
+vu18.TextSize = 12
+vu18.TextXAlignment = Enum.TextXAlignment.Left
+vu18.Parent = v14
+local v19 = Instance.new("Frame")
+v19.Size = UDim2.new(1, - 20, 0, 80)
+v19.Position = UDim2.new(0, 10, 0, 160)
+v19.BackgroundTransparency = 1
+v19.Parent = v8
+local vu20 = Instance.new("TextButton")
+vu20.Size = UDim2.new(0.48, 0, 0, 32)
+vu20.Position = UDim2.new(0, 0, 0, 8)
+vu20.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
+vu20.TextColor3 = Color3.new(1, 1, 1)
+vu20.Text = "Start Copy Target"
+vu20.Font = Enum.Font.GothamBold
+vu20.TextSize = 14
+vu20.Parent = v19
+Instance.new("UICorner", vu20).CornerRadius = UDim.new(0, 6)
+local vu21 = Instance.new("TextButton")
+vu21.Size = UDim2.new(0.48, 0, 0, 32)
+vu21.Position = UDim2.new(0.52, 0, 0, 8)
+vu21.BackgroundColor3 = Color3.fromRGB(255, 180, 80)
+vu21.TextColor3 = Color3.new(1, 1, 1)
+vu21.Text = "Copy All Player"
+vu21.Font = Enum.Font.GothamBold
+vu21.TextSize = 14
+vu21.Parent = v19
+Instance.new("UICorner", vu21).CornerRadius = UDim.new(0, 6)
+local vu22 = Instance.new("Frame")
+vu22.Size = UDim2.new(0, 220, 0, 120)
+vu22.Position = UDim2.new(0.5, - 110, 0.5, - 60)
+vu22.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+vu22.Visible = false
+vu22.Parent = vu7
+Instance.new("UICorner", vu22).CornerRadius = UDim.new(0, 10)
+local v23 = Instance.new("TextLabel")
+v23.Size = UDim2.new(1, - 20, 0, 40)
+v23.Position = UDim2.new(0, 10, 0, 15)
+v23.BackgroundTransparency = 1
+v23.TextColor3 = Color3.new(1, 1, 1)
+v23.Text = "Are you sure you want to close this?"
+v23.Font = Enum.Font.GothamBold
+v23.TextSize = 14
+v23.TextWrapped = true
+v23.Parent = vu22
+local v24 = Instance.new("TextButton")
+v24.Size = UDim2.new(0.4, 0, 0, 30)
+v24.Position = UDim2.new(0.1, 0, 0, 70)
+v24.BackgroundColor3 = Color3.fromRGB(80, 180, 80)
+v24.TextColor3 = Color3.new(1, 1, 1)
+v24.Text = "Yes"
+v24.Font = Enum.Font.GothamBold
+v24.TextSize = 14
+v24.Parent = vu22
+Instance.new("UICorner", v24).CornerRadius = UDim.new(0, 6)
+local v25 = Instance.new("TextButton")
+v25.Size = UDim2.new(0.4, 0, 0, 30)
+v25.Position = UDim2.new(0.5, 0, 0, 70)
+v25.BackgroundColor3 = Color3.fromRGB(180, 80, 80)
+v25.TextColor3 = Color3.new(1, 1, 1)
+v25.Text = "No"
+v25.Font = Enum.Font.GothamBold
+v25.TextSize = 14
+v25.Parent = vu22
+Instance.new("UICorner", v25).CornerRadius = UDim.new(0, 6)
+v11.MouseButton1Click:Connect(function()
+    vu22.Visible = true
+end)
+v24.MouseButton1Click:Connect(function()
+    vu7:Destroy()
+end)
+v25.MouseButton1Click:Connect(function()
+    vu22.Visible = false
+end)
+local vu26 = nil
+local vu27 = false
+local vu28 = false
+local vu29 = {}
+local v30 = vu15
+vu15.GetPropertyChangedSignal(v30, "Text"):Connect(function()
+    local v31 = vu15.Text
+    if v31 == "" then
+        vu17.Text = "UserID: None"
+        vu18.Text = "Status  Inactive"
+        vu18.TextColor3 = Color3.fromRGB(200, 200, 200)
+        vu13.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+    else
+        local v32 = vu1
+        local v33, v34, v35 = ipairs(v32:GetPlayers())
+        while true do
+            local v36
+            v35, v36 = v33(v34, v35)
+            if v35 == nil then
+                break
+            end
+            if v36.Name:lower() == v31:lower() then
+                vu17.Text = "UserID: " .. v36.UserId
+                vu13.Image = vu1:GetUserThumbnailAsync(v36.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size180x180)
+                vu18.Text = "Status  Found"
+                vu18.TextColor3 = Color3.fromRGB(100, 255, 100)
+                vu26 = v36
+                return
+            end
+        end
+        vu17.Text = "UserID: Player not found"
+        vu18.Text = "Status  Not Found"
+        vu18.TextColor3 = Color3.fromRGB(255, 80, 80)
+        vu13.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+    end
+end)
+vu20.MouseButton1Click:Connect(function()
+    if vu26 then
+        vu27 = not vu27
+        if vu27 then
+            vu20.Text = "Stop Copying"
+            vu20.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+            vu18.Text = "Status: Copying " .. vu26.Name
+            vu18.TextColor3 = Color3.fromRGB(0, 255, 0)
+        else
+            vu20.Text = "Start Copying"
+            vu20.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
+            vu18.Text = "Status: Inactive"
+            vu18.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+        end
+    else
+        vu18.Text = "Status: No target player"
+    end
+end)
+vu21.MouseButton1Click:Connect(function()
+    vu28 = not vu28
+    if vu28 then
+        vu21.Text = "Stop Copying All"
+        vu21.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+        vu18.Text = "Status: Copying All Players"
+        vu18.TextColor3 = Color3.fromRGB(0, 255, 0)
+        vu29 = {}
+        local v37 = vu1
+        local v38, v39, v40 = ipairs(v37:GetPlayers())
+        while true do
+            local v41
+            v40, v41 = v38(v39, v40)
+            if v40 == nil then
+                break
+            end
+            if v41 ~= vu2 then
+                table.insert(vu29, v41)
+            end
+        end
+    else
+        vu21.Text = "Copy All Players"
+        vu21.BackgroundColor3 = Color3.fromRGB(255, 180, 80)
+        vu18.Text = "Status: Inactive"
+        vu18.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+        vu29 = {}
+    end
+end)
+local function vu48(p42)
+    local vu43 = p42
+    local vu44 = false
+    pcall(function()
+        local v45 = vu6.ChatInputBarConfiguration and vu6.ChatInputBarConfiguration.TargetTextChannel
+        if v45 then
+            v45:SendAsync(vu43)
+            vu44 = true
+        end
+    end)
+    if not vu44 then
+        pcall(function()
+            local v46 = vu5:FindFirstChild("DefaultChatSystemChatEvents")
+            local v47 = v46 and v46:FindFirstChild("SayMessageRequest")
+            if v47 then
+                v47:FireServer(vu43, "All")
+                vu44 = true
+            end
+        end)
+    end
+end
+local function vu55(p49, p50)
+    if not p49 or p49 == "" then
+        return
+    end
+    if vu27 and (vu26 and p50 == vu26.Name) then
+        if string.find(p49, "###") then
+            vu48("Nuh Uh \239\191\189\239\191\189\239\191\189\239\191\189\239\191\189\239\191\189")
+        else
+            task.wait(0.3)
+            vu48("\"" .. p49 .. "\" " .. vu16.Text)
+        end
+    elseif vu28 then
+        local v51, v52, v53 = ipairs(vu29)
+        while true do
+            local v54
+            v53, v54 = v51(v52, v53)
+            if v53 == nil then
+                break
+            end
+            if v54.Name == p50 then
+                if string.find(p49, "###") then
+                    vu48("Nuh Uh \239\191\189\239\191\189\239\191\189\239\191\189\239\191\189\239\191\189")
+                else
+                    task.wait(0.3)
+                    vu48("\"" .. p49 .. "\" " .. vu16.Text)
+                end
+                break
+            end
+        end
+    end
+end
+local function vu59()
+    local v56 = vu5:FindFirstChild("DefaultChatSystemChatEvents")
+    if v56 then
+        local v57 = v56:FindFirstChild("OnMessageDoneFiltering")
+        if v57 then
+            v57.OnClientEvent:Connect(function(p58)
+                if p58 and (p58.Message and p58.FromSpeaker) then
+                    vu55(p58.Message, p58.FromSpeaker)
+                end
+            end)
+        end
+    else
+        return
+    end
+end
+local function vu62()
+    vu6.MessageReceived:Connect(function(p60)
+        local v61 = p60.TextSource and vu1:GetPlayerByUserId(p60.TextSource.UserId)
+        if v61 then
+            vu55(p60.Text, v61.Name)
+        end
+    end)
+end
+pcall(function()
+    if vu6.ChatVersion ~= Enum.ChatVersion.TextChatService then
+        vu59()
+    else
+        vu62()
+    end
+end)
+vu1.PlayerAdded:Connect(function(p63)
+    if vu15.Text ~= "" and p63.Name:lower() == vu15.Text:lower() then
+        vu17.Text = "UserID: " .. p63.UserId
+        vu26 = p63
+    end
+    if vu28 and p63 ~= vu2 then
+        table.insert(vu29, p63)
+    end
+end)
+vu1.PlayerRemoving:Connect(function(p64)
+    if vu26 and p64 == vu26 then
+        vu17.Text = "UserID: Player left"
+        vu26 = nil
+        vu27 = false
+        vu20.Text = "Start Copying"
+        vu20.BackgroundColor3 = Color3.fromRGB(70, 120, 255)
+        vu18.Text = "Status: Target left"
+        vu18.TextColor3 = Color3.fromRGB(200, 200, 200)
+    end
+    if vu28 then
+        local v65, v66, v67 = ipairs(vu29)
+        while true do
+            local v68
+            v67, v68 = v65(v66, v67)
+            if v67 == nil then
+                break
+            end
+            if v68 == p64 then
+                table.remove(vu29, v67)
+                break
+            end
+        end
+    end
+end)
