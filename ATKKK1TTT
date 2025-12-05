@@ -1,0 +1,75 @@
+getgenv().ZeldHub = {
+
+    General = {
+        AutoRoll = false,
+        AutoRetry = true,
+        AutoRefill = true,
+        AutoEscape = false,
+        AutoReloadBlades = true,
+        AntiInjuries = false,
+        RemoveDmgText = false,
+        DeleteMap = false,
+        FailSafe = false,
+        FailSafeDelaySeconds = 180,
+        NapeExtend = false,
+        TitanRipper = false,
+    },
+
+    Main = {
+        Farm = true,
+        MovementMode = "Teleportation", -- "Teleportation" or "Gliding"
+        FarmDelay = 6,
+        GlidingSpeed = 300,
+        FloatHeight = 250,
+        Notifications = false,
+    },
+
+    ThunderSpears = {
+        On = false,
+        KillMode = "Safe", -- "Safe" or "Risk"
+    },
+
+    Mission = {
+        Mission = false,
+        Map = "Shiganshina", -- "Shiganshina", "Trost", "Outskirts", "Giant Forest", "Utgard", "Loading Docks", "Stohess"
+        Difficulty = "Hard",  -- "Easy", "Normal", "Hard", "Severe", "Aberrant"
+        Objective = "Skirmish", -- "Skirmish", "Breach", "Protect", "Escort", "Defend", "Stall", "Guard", "Random"
+
+        Modifiers = {
+            NoPerks = false,
+            NoSkills = false,
+            NoTalents = false,
+            Nightmare = false,
+            Oddball = false,
+            InjuryProne = false,
+            ChronicInjuries = false,
+            Fog = false,
+            GlassCannon = false,
+            TimeTrial = false,
+            Boring = false,
+            Simple = false,
+        },
+    },
+
+    ESP = {
+        esp = false,
+        Color = {R=96, G=205, B=255},
+        Size = {X=50, Y=50, Z=50},
+    },
+
+    Raids = {
+        AutoSkipCutscene = false,
+        AutoPremiumChest = false,
+        AutoFreeChest = false,
+    },
+
+    Teleport = {
+        LobbyPlaceId = 14916516914,
+        MainMenuPlaceId = 13379208636,
+        ReturnToLobbyOnLoad = false,
+        ReturnToMainMenuOnLoad = false,
+        ForceRetryOnLoad = false,
+    }
+}
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/iza308/Zeld-Hub/refs/heads/main/Module/Games/AOTR.lua"))()
