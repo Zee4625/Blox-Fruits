@@ -114,7 +114,7 @@ local function initLibrary()
         local main = library:Create("Frame", {
             Name = "main";
             Parent = gui;
-            Position = UDim2.new(1, -500, 0, 120);
+            Position = UDim2.new(1, -420, 0, 20);
             BorderSizePixel = 0;
             BackgroundColor3 = ui_Settings.mainColor; -- main color
             Size = UDim2.new(0, 400,0, 270);
