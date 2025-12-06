@@ -1,0 +1,112 @@
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+
+-------------------------------------------------
+--               CREAR GUI
+-------------------------------------------------
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "TeleportGUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Name = "MainFrame"
+frame.Size = UDim2.new(0, 200, 0, 115) -- MÁS CHICA
+frame.Position = UDim2.new(0.5, -100, 0.4, -57)
+frame.BackgroundColor3 = Color3.fromRGB(90, 255, 90)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+-- UIGradient más clarito
+local gradient = Instance.new("UIGradient")
+gradient.Rotation = 90
+gradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(70,70,70)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(105,105,105))
+})
+gradient.Parent = frame
+
+-- Título
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 26)
+title.BackgroundTransparency = 1
+title.Text = "Teleport GUI"
+title.TextColor3 = Color3.fromRGB(0, 0, 0)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.Parent = frame
+
+-- Subtítulo
+local subtitle = Instance.new("TextLabel")
+subtitle.Size = UDim2.new(1, 0, 0, 26)
+subtitle.Position = UDim2.new(0, 0, 0, 23)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = "By ZeeHub"
+subtitle.TextColor3 = Color3.fromRGB(0, 0, 0)
+subtitle.Font = Enum.Font.Gotham
+subtitle.TextSize = 25
+subtitle.Parent = frame
+
+-- Botón Teleport
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0.6, 0, 0, 32)
+button.Position = UDim2.new(0.2, 0, 0.55, 0)
+button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+button.Text = "Teleport"
+button.TextColor3 = Color3.fromRGB(0, 0, 0)
+button.Font = Enum.Font.GothamBold
+button.TextSize = 18
+button.Parent = frame
+
+-------------------------------------------------
+--      FUNCIÓN PARA CREAR LA HERRAMIENTA
+-------------------------------------------------
+
+local function createTeleportTool()
+	local tool = Instance.new("Tool")
+	tool.Name = "Teleport"
+	tool.RequiresHandle = false
+	tool.CanBeDropped = false
+
+	tool.Activated:Connect(function()
+		local targetPos = mouse.Hit.p
+		local char = player.Character
+		if char and char:FindFirstChild("HumanoidRootPart") then
+			char.HumanoidRootPart.CFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
+		end
+	end)
+
+	return tool
+end
+
+-------------------------------------------------
+--      BOTÓN: DAR / QUITAR HERRAMIENTA
+-------------------------------------------------
+
+local toolEnabled = false
+local currentTool = nil
+
+button.MouseButton1Click:Connect(function()
+	toolEnabled = not toolEnabled
+
+	if toolEnabled then
+		-- CREAR Y DAR LA HERRAMIENTA
+		currentTool = createTeleportTool()
+		currentTool.Parent = player.Backpack
+		button.Text = "Remove"
+
+	else
+		-- QUITAR LA HERRAMIENTA SI EXISTE
+		if player.Backpack:FindFirstChild("Teleport") then
+			player.Backpack.Teleport:Destroy()
+		end
+		if player.Character and player.Character:FindFirstChild("Teleport") then
+			player.Character.Teleport:Destroy()
+		end
+
+		currentTool = nil
+		button.Text = "Teleport"
+	end
+end)
