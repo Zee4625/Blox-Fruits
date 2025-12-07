@@ -1,0 +1,337 @@
+--== PLAYER SETUP ==--
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+--== SERVICES ==--
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+
+--== VARIABLES ==--
+local speedActive = false
+local bodyVelocity
+local currentSpeed = 0
+local targetSpeed = 0
+local handBrakeActive = false
+local groundOffset = 0.2
+local fakeW = false
+local currentGear = 1
+local shifting = false
+local rpm = 0
+
+--== VEHICLE SETTINGS ==--
+local accelRate = 1.08
+local naturalDecel = 0.9
+local brakeRate = 0.9
+local handBrakeRate = 0.65
+local turnSpeed = 3
+local gearUpDelay = 0.16
+local gearDownDelay = 0.25
+local maxGear = 3 -- GEAR MAX REAL
+
+--== GEAR SPEEDS (MAX = 3) ==--
+local gearSpeeds = {
+	70,   -- Gear 1
+	100,   -- Gear 2
+	130   -- Gear 3 (viteza finală)
+}
+
+--== GUI SETUP ==--
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ZeeModsGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 360, 0, 260)
+mainFrame.Position = UDim2.new(0, 100, 0, 100)
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+mainFrame.BackgroundTransparency = 0.35
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+titleBar.BackgroundTransparency = 0.2
+titleBar.Parent = mainFrame
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 1, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Font = Enum.Font.GothamBlack
+titleLabel.TextSize = 18
+titleLabel.Text = "ZeeHUB – Uma race"
+titleLabel.Parent = titleBar
+
+--== BUTTONS ==--
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(1, -20, 0, 30)
+toggleButton.Position = UDim2.new(0, 10, 0, 40)
+toggleButton.Text = "Speed OFF"
+toggleButton.Parent = mainFrame
+
+local handBrakeButton = Instance.new("TextButton")
+handBrakeButton.Size = UDim2.new(1, -20, 0, 30)
+handBrakeButton.Position = UDim2.new(0, 10, 0, 75)
+handBrakeButton.Text = "Handbrake OFF"
+handBrakeButton.Parent = mainFrame
+
+--== GEAR SELECTOR ==--
+local gearSelectLabel = Instance.new("TextLabel")
+gearSelectLabel.Size = UDim2.new(1, -20, 0, 20)
+gearSelectLabel.Position = UDim2.new(0, 10, 0, 115)
+gearSelectLabel.BackgroundTransparency = 1
+gearSelectLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+gearSelectLabel.Font = Enum.Font.GothamBold
+gearSelectLabel.TextSize = 16
+gearSelectLabel.Text = "Max Gear: " .. maxGear
+gearSelectLabel.Parent = mainFrame
+
+local gearPlus = Instance.new("TextButton")
+gearPlus.Size = UDim2.new(0, 30, 0, 20)
+gearPlus.Position = UDim2.new(1, -40, 0, 115)
+gearPlus.Text = "+"
+gearPlus.Parent = mainFrame
+
+local gearMinus = Instance.new("TextButton")
+gearMinus.Size = UDim2.new(0, 30, 0, 20)
+gearMinus.Position = UDim2.new(1, -80, 0, 115)
+gearMinus.Text = "-"
+gearMinus.Parent = mainFrame
+
+--== SPEED + GEAR DISPLAY ==--
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Size = UDim2.new(1, 0, 0, 25)
+speedLabel.Position = UDim2.new(0, 0, 0, 145)
+speedLabel.BackgroundTransparency = 1
+speedLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+speedLabel.Font = Enum.Font.GothamBlack
+speedLabel.TextSize = 22
+speedLabel.Text = "Speed: 0 km/h"
+speedLabel.Parent = mainFrame
+
+local gearLabel = Instance.new("TextLabel")
+gearLabel.Size = UDim2.new(1, 0, 0, 25)
+gearLabel.Position = UDim2.new(0, 0, 0, 170)
+gearLabel.BackgroundTransparency = 1
+gearLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+gearLabel.Font = Enum.Font.GothamBlack
+gearLabel.TextSize = 22
+gearLabel.Text = "Gear: 1"
+gearLabel.Parent = mainFrame
+
+--== RPM BAR ==--
+local rpmBarBg = Instance.new("Frame")
+rpmBarBg.Size = UDim2.new(1, -40, 0, 20)
+rpmBarBg.Position = UDim2.new(0, 20, 0, 200)
+rpmBarBg.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+rpmBarBg.BackgroundTransparency = 0.3
+rpmBarBg.BorderSizePixel = 0
+rpmBarBg.Parent = mainFrame
+
+local rpmBar = Instance.new("Frame")
+rpmBar.Size = UDim2.new(0, 0, 1, 0)
+rpmBar.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
+rpmBar.BorderSizePixel = 0
+rpmBar.Parent = rpmBarBg
+
+--== MODERN UI EFFECTS ==--
+
+local blur = Instance.new("BlurEffect", Lighting)
+blur.Size = 4
+
+local function round(obj, radius)
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, radius)
+	c.Parent = obj
+end
+
+local function glow(obj, color)
+	local s = Instance.new("UIStroke")
+	s.Color = color
+	s.Thickness = 2
+	s.Transparency = 0.4
+	s.Parent = obj
+end
+
+round(mainFrame, 14)
+round(titleBar, 14)
+round(toggleButton, 10)
+round(handBrakeButton, 10)
+round(gearPlus, 10)
+round(gearMinus, 10)
+round(rpmBarBg, 10)
+round(rpmBar, 10)
+
+glow(mainFrame, Color3.fromRGB(0, 170, 255))
+glow(toggleButton, Color3.fromRGB(0, 150, 255))
+glow(handBrakeButton, Color3.fromRGB(255, 50, 50))
+glow(rpmBarBg, Color3.fromRGB(255, 60, 0))
+
+local rpmGradient = Instance.new("UIGradient", rpmBar)
+rpmGradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(0,255,0)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,180,0)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(255,0,0)),
+}
+
+--== BUTTON HOVER ==--
+local function hover(btn)
+	btn.MouseEnter:Connect(function() btn.BackgroundTransparency = 0.15 end)
+	btn.MouseLeave:Connect(function() btn.BackgroundTransparency = 0.3 end)
+	btn.BackgroundTransparency = 0.3
+	btn.BackgroundColor3 = Color3.fromRGB(25,25,25)
+	btn.Font = Enum.Font.GothamBold
+	btn.TextColor3 = Color3.fromRGB(220,220,220)
+end
+
+hover(toggleButton)
+hover(handBrakeButton)
+hover(gearPlus)
+hover(gearMinus)
+
+--== GEAR BUTTONS ==--
+gearPlus.MouseButton1Click:Connect(function()
+	if maxGear < 3 then
+		maxGear += 1
+		gearSelectLabel.Text = "Max Gear: " .. maxGear
+	end
+end)
+
+gearMinus.MouseButton1Click:Connect(function()
+	if maxGear > 1 then
+		maxGear -= 1
+		gearSelectLabel.Text = "Max Gear: " .. maxGear
+	end
+end)
+
+--== SPEED CONTROL ==--
+local function startSpeed()
+	if not bodyVelocity then
+		bodyVelocity = Instance.new("BodyVelocity")
+		bodyVelocity.MaxForce = Vector3.new(9e9, 0, 9e9)
+		bodyVelocity.Velocity = Vector3.zero
+		bodyVelocity.Parent = humanoidRootPart
+	end
+	currentSpeed = 0
+	targetSpeed = 0
+	currentGear = 1
+end
+
+local function stopSpeed()
+	if bodyVelocity then
+		bodyVelocity:Destroy()
+		bodyVelocity = nil
+	end
+	currentSpeed = 0
+	targetSpeed = 0
+	currentGear = 1
+	fakeW = false
+	speedLabel.Text = "Speed: 0 km/h"
+	gearLabel.Text = "Gear: 1"
+	rpmBar.Size = UDim2.new(0, 0, 1, 0)
+end
+
+toggleButton.MouseButton1Click:Connect(function()
+	speedActive = not speedActive
+	toggleButton.Text = speedActive and "Speed ON" or "Speed OFF"
+	if speedActive then startSpeed() else stopSpeed() end
+end)
+
+handBrakeButton.MouseButton1Click:Connect(function()
+	handBrakeActive = not handBrakeActive
+	handBrakeButton.Text = handBrakeActive and "Handbrake ON" or "Handbrake OFF"
+end)
+
+--== INPUT ==--
+UserInputService.InputBegan:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.W and speedActive then
+		fakeW = true
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.W and speedActive then
+		fakeW = true
+	end
+end)
+
+--== GEAR SHIFT ==--
+local function shiftUp()
+	if shifting or currentGear >= maxGear then return end
+	shifting = true
+	currentGear += 1
+	wait(gearUpDelay)
+	shifting = false
+end
+
+local function shiftDown()
+	if shifting or currentGear <= 1 then return end
+	shifting = true
+	currentGear -= 1
+	wait(gearDownDelay)
+	shifting = false
+end
+
+--== MAIN LOOP ==--
+RunService.Heartbeat:Connect(function()
+	if not speedActive or not bodyVelocity then return end
+
+	local dir = Vector3.zero
+	local pressingW = UserInputService:IsKeyDown(Enum.KeyCode.W)
+	local pressingS = UserInputService:IsKeyDown(Enum.KeyCode.S)
+
+	-- ACCEL
+	if pressingW and not handBrakeActive then
+		targetSpeed = math.min(targetSpeed * accelRate + 1, gearSpeeds[maxGear])
+	elseif fakeW and not pressingS then
+		targetSpeed = math.max(targetSpeed * naturalDecel, 0)
+	else
+		targetSpeed = targetSpeed * naturalDecel
+	end
+
+	-- BRAKE
+	if pressingS then
+		targetSpeed = targetSpeed * brakeRate
+		fakeW = false
+	end
+
+	if handBrakeActive then
+		targetSpeed = targetSpeed * handBrakeRate
+		fakeW = false
+	end
+
+	-- AUTO GEARS
+	local gearMax = gearSpeeds[currentGear]
+	if targetSpeed > gearMax * 0.95 and currentGear < maxGear then
+		shiftUp()
+	elseif targetSpeed < gearMax * 0.5 and currentGear > 1 then
+		shiftDown()
+	end
+
+	currentSpeed = currentSpeed + (targetSpeed - currentSpeed) * 0.2
+	rpm = math.clamp(currentSpeed / gearSpeeds[currentGear], 0, 1)
+
+	-- TURNING
+	if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+		dir -= humanoidRootPart.CFrame.RightVector * turnSpeed
+	end
+	if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+		dir += humanoidRootPart.CFrame.RightVector * turnSpeed
+	end
+
+	dir += humanoidRootPart.CFrame.LookVector * currentSpeed
+	bodyVelocity.Velocity = dir + Vector3.new(0, groundOffset, 0)
+
+	-- UPDATE HUD
+	speedLabel.Text = "Speed: " .. math.floor(currentSpeed) .. " km/h"
+	gearLabel.Text = "Gear: " .. currentGear
+	rpmBar.Size = UDim2.new(rpm, 0, 1, 0)
+
+	if currentSpeed < 5 then fakeW = false end
+end)
