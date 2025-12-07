@@ -1,0 +1,964 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+    local Window = Library.CreateLib("ZeeHub | Weak Legacy 2", "DarkTheme")
+    local Player = Window:NewTab("Player")
+    local PlayerSection = Player:NewSection("Player")
+    local Main = Window:NewTab("Main")
+    local MainSection = Main:NewSection("Main")
+    local Teleports = Window:NewTab("Teleports")
+    local TeleportsSection = Teleports:NewSection("Locations")
+    local Teleports2 = Window:NewTab("Teleports 2")
+    local TeleportsSection2 = Teleports2:NewSection("Locations")
+    local ChristmasEvent = Window:NewTab("Christmas Event")
+    local ChristmasEventSection = ChristmasEvent:NewSection("Christmas Event")
+    local Visual = Window:NewTab("Visuals")
+    local VisualSection = Visual:NewSection("Visual Stuff")
+    local RunService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+
+
+
+local currentSpeed = 16  -- default
+
+
+MainSection:NewButton("Anti AFK", "prevents afk (not made by vavadragons)", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/hassanxzayn-lua/Anti-afk/main/antiafkbyhassanxzyn"))();
+end)
+
+
+MainSection:NewButton("Autoclicker", "Autoclicker", function()
+loadstring(game:HttpGetAsync('https://pastebin.com/raw/WgkcDYUs'))()
+end)
+
+MainSection:NewButton("Teleport To Quest", "Teleports you to your current quest claim", function()
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+
+local char = lp.Character or lp.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+local level = lp:WaitForChild("Data"):WaitForChild("Levels").Value
+
+-- TELEPORT TARGETS
+local tp_1_9       = CFrame.new(336.46, 9.32, 596.83)
+local tp_10_29     = CFrame.new(404.27, 9.32, 727.34)
+local tp_30_49     = CFrame.new(1249.78, 9.50, -1626.83)
+local tp_50_69     = CFrame.new(-412.56, 58.92, 224.13)
+local tp_70_99     = CFrame.new(-510.16, 58.55, 349.77)
+local tp_100_129   = CFrame.new(-511.55, 58.58, 343.99)
+local tp_130_699   = CFrame.new(-514.22, 58.55, 338.09)
+local tp_700_749   = CFrame.new(-220.66, 9.32, 740.33)
+local tp_750_plus  = CFrame.new(821.18, 71.80, 710.81)
+
+if level >= 1 and level <= 9 then
+    hrp.CFrame = tp_1_9
+
+elseif level >= 10 and level <= 29 then
+    hrp.CFrame = tp_10_29
+
+elseif level >= 30 and level <= 49 then
+    hrp.CFrame = tp_30_49
+
+elseif level >= 50 and level <= 69 then
+    hrp.CFrame = tp_50_69
+
+elseif level >= 70 and level <= 99 then
+    hrp.CFrame = tp_70_99
+
+elseif level >= 100 and level <= 129 then
+    hrp.CFrame = tp_100_129
+
+elseif level >= 130 and level <= 699 then
+    hrp.CFrame = tp_130_699
+
+elseif level >= 700 and level <= 749 then
+    hrp.CFrame = tp_700_749
+
+elseif level >= 750 then
+    hrp.CFrame = tp_750_plus
+
+else
+    print("Error! Your level is ".. level)
+end
+end)
+
+MainSection:NewButton("Autofarm Custom", "Autofarm UI", function()
+--========================================================--
+-- Developer Autofarm UI (Persistent Selections + Single Target)
+-- With Auto-Equip Hotbar Slot 1 on Respawn
+--========================================================--
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+local CharacterFolder = workspace:WaitForChild("CharactersAndNPCs")
+
+------------------------------------------------------------
+-- AUTO-EQUIP HOTBAR SLOT 1 ON RESPAWN
+------------------------------------------------------------
+local function equipHotbarSlot1()
+    local char = LocalPlayer.Character
+    if not char then return end
+
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+
+    local backpack = LocalPlayer:WaitForChild("Backpack")
+
+    -- Wait until Backpack has at least one tool
+    repeat task.wait() until #backpack:GetChildren() > 0
+
+    local hotbarTool = nil
+    for _, t in ipairs(backpack:GetChildren()) do
+        if t:IsA("Tool") then
+            hotbarTool = t
+            break
+        end
+    end
+
+    if hotbarTool then
+        hum:EquipTool(hotbarTool)
+        print("Equipped hotbar slot 1 tool:", hotbarTool.Name)
+    else
+        warn("No tool found in hotbar slot 1!")
+    end
+end
+
+-- Auto-equip on respawn
+LocalPlayer.CharacterAdded:Connect(function(char)
+    task.wait(1) -- wait for Backpack + Humanoid to load
+    equipHotbarSlot1()
+end)
+
+-- Equip immediately if character exists
+if LocalPlayer.Character then
+    task.spawn(equipHotbarSlot1)
+end
+
+------------------------------------------------------------
+-- Remove old UI if script is rerun
+------------------------------------------------------------
+local old = LocalPlayer.PlayerGui:FindFirstChild("DevAutoFarmUI")
+if old then old:Destroy() end
+
+------------------------------------------------------------
+-- UI Creation
+------------------------------------------------------------
+local gui = Instance.new("ScreenGui")
+gui.Name = "DevAutoFarmUI"
+gui.ResetOnSpawn = false
+gui.Parent = LocalPlayer.PlayerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 260)
+frame.Position = UDim2.new(0.3, 0, 0.2, 0)
+frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -40, 0, 30)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Autofarm Console"
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.TextScaled = true
+title.Parent = frame
+
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0, 30, 0, 30)
+close.Position = UDim2.new(1, -35, 0, 0)
+close.BackgroundColor3 = Color3.fromRGB(150,0,0)
+close.Text = "X"
+close.TextColor3 = Color3.fromRGB(255,255,255)
+close.Parent = frame
+
+close.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+------------------------------------------------------------
+-- DROPDOWN (Persistent Selections)
+------------------------------------------------------------
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1, -20, 0, 25)
+label.Position = UDim2.new(0, 10, 0, 40)
+label.BackgroundTransparency = 1
+label.Text = "NPC Types:"
+label.TextColor3 = Color3.fromRGB(255,255,255)
+label.TextScaled = true
+label.Parent = frame
+
+local scroll = Instance.new("ScrollingFrame")
+scroll.Size = UDim2.new(1, -20, 0, 130)
+scroll.Position = UDim2.new(0, 10, 0, 70)
+scroll.BackgroundColor3 = Color3.fromRGB(35,35,35)
+scroll.ScrollBarThickness = 6
+scroll.CanvasSize = UDim2.new(0,0,0,0)
+scroll.Parent = frame
+
+local listLayout = Instance.new("UIListLayout")
+listLayout.Parent = scroll
+
+local KnownTypes = {}     -- all NPC types ever discovered
+local SelectedTypes = {}  -- persistent user selections
+
+local function rebuildDropdown()
+    scroll:ClearAllChildren()
+    local newLayout = Instance.new("UIListLayout", scroll)
+
+    for name,_ in pairs(KnownTypes) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, -10, 0, 25)
+        btn.Text = name
+        btn.TextScaled = true
+        btn.TextColor3 = Color3.fromRGB(255,255,255)
+        btn.BackgroundColor3 = SelectedTypes[name] and Color3.fromRGB(0,120,0) or Color3.fromRGB(60,60,60)
+        btn.Parent = scroll
+
+        btn.MouseButton1Click:Connect(function()
+            if SelectedTypes[name] then
+                SelectedTypes[name] = nil
+                btn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+            else
+                SelectedTypes[name] = true
+                btn.BackgroundColor3 = Color3.fromRGB(0,120,0)
+            end
+        end)
+    end
+
+    scroll.CanvasSize = UDim2.new(0,0,0,newLayout.AbsoluteContentSize.Y + 10)
+end
+
+local function updateTypes()
+    for _, v in ipairs(CharacterFolder:GetChildren()) do
+        if v:IsA("Model") and not Players:FindFirstChild(v.Name) then
+            if not KnownTypes[v.Name] then
+                KnownTypes[v.Name] = true
+                rebuildDropdown()
+            end
+        end
+    end
+end
+
+updateTypes()
+CharacterFolder.ChildAdded:Connect(function()
+    task.wait(0.1)
+    updateTypes()
+end)
+
+------------------------------------------------------------
+-- AUTOFARM LOGIC (Single Target)
+------------------------------------------------------------
+local farming = false
+local currentTarget = nil
+
+local function pickTarget()
+    local list = {}
+    for _, model in ipairs(CharacterFolder:GetChildren()) do
+        if model:IsA("Model")
+        and SelectedTypes[model.Name]
+        and not Players:FindFirstChild(model.Name) then
+            table.insert(list, model)
+        end
+    end
+    if #list == 0 then return nil end
+    return list[math.random(1,#list)]
+end
+
+local function farmLoop()
+    while farming do
+        task.wait(0.1)
+
+        if not currentTarget then
+            currentTarget = pickTarget()
+            continue
+        end
+
+        if not currentTarget.Parent then
+            currentTarget = pickTarget()
+            continue
+        end
+
+        local hrp = currentTarget:FindFirstChild("HumanoidRootPart")
+        if not hrp then
+            currentTarget = pickTarget()
+            continue
+        end
+
+        local myChar = LocalPlayer.Character
+        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        if not myHRP then continue end
+
+        local goal = { CFrame = hrp.CFrame * CFrame.new(0, 7, 0) }
+        TweenService:Create(myHRP, TweenInfo.new(0.3), goal):Play()
+
+        if LocalPlayer:FindFirstChild("AttackRemote") then
+            LocalPlayer.AttackRemote:FireServer(currentTarget)
+        end
+    end
+end
+
+------------------------------------------------------------
+-- TOGGLE BUTTON
+------------------------------------------------------------
+local toggle = Instance.new("TextButton")
+toggle.Size = UDim2.new(1, -20, 0, 35)
+toggle.Position = UDim2.new(0, 10, 0, 210)
+toggle.BackgroundColor3 = Color3.fromRGB(0,80,0)
+toggle.TextColor3 = Color3.fromRGB(255,255,255)
+toggle.Text = "Start Autofarm"
+toggle.TextScaled = true
+toggle.Parent = frame
+
+toggle.MouseButton1Click:Connect(function()
+    farming = not farming
+
+    if farming then
+        toggle.Text = "Stop Autofarm"
+        toggle.BackgroundColor3 = Color3.fromRGB(0,150,0)
+        currentTarget = nil
+        task.spawn(farmLoop)
+    else
+        toggle.Text = "Start Autofarm"
+        toggle.BackgroundColor3 = Color3.fromRGB(0,80,0)
+        currentTarget = nil
+    end
+end)
+
+
+end)
+
+TeleportsSection2:NewButton("Teleport to player UI", "Teleports you to other players", function()
+    --[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+-- Services
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local teleportTarget = nil
+
+-- Create GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 250, 0, 300)
+Frame.Position = UDim2.new(0.5, -125, 0.4, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Frame.BorderSizePixel = 2
+Frame.Parent = ScreenGui
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Title.Text = "Player Teleport GUI"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.Parent = Frame
+
+-- Scrolling list
+local ScrollingFrame = Instance.new("ScrollingFrame")
+ScrollingFrame.Size = UDim2.new(1, -10, 1, -70)
+ScrollingFrame.Position = UDim2.new(0, 5, 0, 35)
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 5, 0)
+ScrollingFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+ScrollingFrame.Parent = Frame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = ScrollingFrame
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- TP Button
+local TPButton = Instance.new("TextButton")
+TPButton.Size = UDim2.new(1, -10, 0, 30)
+TPButton.Position = UDim2.new(0, 5, 1, -35)
+TPButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+TPButton.Text = "Teleport"
+TPButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TPButton.Font = Enum.Font.GothamBold
+TPButton.TextSize = 14
+TPButton.Parent = Frame
+
+-- Update player list function
+local function updatePlayerList()
+    for _, child in pairs(ScrollingFrame:GetChildren()) do
+        if child:IsA("TextButton") then
+            child:Destroy()
+        end
+    end
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local PlayerButton = Instance.new("TextButton")
+            PlayerButton.Size = UDim2.new(1, 0, 0, 25)
+            PlayerButton.Text = player.Name
+            PlayerButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            PlayerButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            PlayerButton.Font = Enum.Font.Gotham
+            PlayerButton.TextSize = 12
+            PlayerButton.Parent = ScrollingFrame
+            
+            PlayerButton.MouseButton1Click:Connect(function()
+                teleportTarget = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                TPButton.Text = "Teleport to: " .. player.Name
+            end)
+        end
+    end
+end
+
+-- Teleport function
+TPButton.MouseButton1Click:Connect(function()
+    if teleportTarget then
+        LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = teleportTarget.CFrame + Vector3.new(0, 3, 0)
+    end
+end)
+
+-- Update list on player join/leave
+Players.PlayerAdded:Connect(updatePlayerList)
+Players.PlayerRemoving:Connect(updatePlayerList)
+updatePlayerList()
+
+-- Dragging the GUI
+local dragging, dragInput, dragStart, startPos
+Title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+    end
+end)
+
+Title.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+Title.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+end)
+
+PlayerSection:NewButton("Infinite Jump", "Lets you jump infnite times", function()
+local InfiniteJumpEnabled = true
+game:GetService("UserInputService").JumpRequest:connect(function()
+	if InfiniteJumpEnabled then
+		game:GetService"Players".LocalPlayer.Character:FindFirstChildOfClass'Humanoid':ChangeState("Jumping")
+	end
+end)
+end)
+
+PlayerSection:NewButton("Noclip (not a toggle)", "Lets you noclip", function()
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+local Noclip = nil
+local Clip = nil
+
+function noclip()
+	Clip = false
+	local function Nocl()
+		if Clip == false and game.Players.LocalPlayer.Character ~= nil then
+			for _,v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+				if v:IsA('BasePart') and v.CanCollide and v.Name ~= floatName then
+					v.CanCollide = false
+				end
+			end
+		end
+		wait(0.21) -- basic optimization
+	end
+	Noclip = game:GetService('RunService').Stepped:Connect(Nocl)
+end
+
+function clip()
+	if Noclip then Noclip:Disconnect() end
+	Clip = true
+end
+
+noclip() -- to toggle noclip() and clip()
+end)
+
+MainSection:NewButton("Auto Breathing", "no shit", function()
+local KeyToPress = Enum.KeyCode.G  -- Change to any key
+
+-- Services
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local TweenService = game:GetService("TweenService")
+
+-- GUI Setup
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local ToggleButton = Instance.new("TextButton")
+local ModeButton = Instance.new("TextButton")
+local SpeedSlider = Instance.new("TextBox")
+local SliderLabel = Instance.new("TextLabel")
+local CloseButton = Instance.new("TextButton")
+
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ResetOnSpawn = false
+
+MainFrame.Size = UDim2.new(0, 280, 0, 220)
+MainFrame.Position = UDim2.new(0.5, -140, 0.5, -110)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundColor3 = Color3.fromRGB(255, 0, 100)
+Title.Text = "Max Hub | Auto Breathing"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.Parent = MainFrame
+
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -30, 0, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.new(1, 1, 1)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = MainFrame
+
+ToggleButton.Size = UDim2.new(0, 200, 0, 50)
+ToggleButton.Position = UDim2.new(0.5, -100, 0, 40)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 100)
+ToggleButton.Text = "OFF"
+ToggleButton.TextColor3 = Color3.new(1, 1, 1)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 20
+ToggleButton.Parent = MainFrame
+
+ModeButton.Size = UDim2.new(0, 200, 0, 40)
+ModeButton.Position = UDim2.new(0.5, -100, 0, 100)
+ModeButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+ModeButton.Text = "CLICK MODE"
+ModeButton.TextColor3 = Color3.new(1, 1, 1)
+ModeButton.Font = Enum.Font.GothamBold
+ModeButton.TextSize = 14
+ModeButton.Parent = MainFrame
+
+SliderLabel.Size = UDim2.new(0, 200, 0, 20)
+SliderLabel.Position = UDim2.new(0.5, -100, 0, 150)
+SliderLabel.BackgroundTransparency = 1
+SliderLabel.Text = "Delay: 0.05s"
+SliderLabel.TextColor3 = Color3.new(1, 1, 1)
+SliderLabel.Font = Enum.Font.Gotham
+SliderLabel.Parent = MainFrame
+
+SpeedSlider.Size = UDim2.new(0, 200, 0, 30)
+SpeedSlider.Position = UDim2.new(0.5, -100, 0, 175)
+SpeedSlider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SpeedSlider.Text = "0.05"
+SpeedSlider.TextColor3 = Color3.new(1, 1, 1)
+SpeedSlider.Font = Enum.Font.Gotham
+SpeedSlider.Parent = MainFrame
+
+-- Variables
+local Clicking = false
+local Delay = 0.05
+local HoldMode = false  -- false = Click, true = Hold
+local HoldConnection = nil
+
+-- Functions
+local function PressKey()
+    VirtualInputManager:SendKeyEvent(true, KeyToPress, false, game)
+end
+
+local function ReleaseKey()
+    VirtualInputManager:SendKeyEvent(false, KeyToPress, false, game)
+end
+
+local function StartClicking()
+    Clicking = true
+    ToggleButton.Text = HoldMode and "HOLDING" or "CLICKING"
+    ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    
+    if HoldMode then
+        -- HOLD MODE: Press once and keep held
+        PressKey()
+    else
+        -- CLICK MODE: Spam press/release
+        task.spawn(function()
+            while Clicking do
+                PressKey()
+                task.wait(0.01)
+                ReleaseKey()
+                task.wait(Delay)
+            end
+        end)
+    end
+end
+
+local function StopClicking()
+    Clicking = false
+    ReleaseKey()  -- Always release on stop
+    ToggleButton.Text = "OFF"
+    ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 100)
+end
+
+-- Events
+ToggleButton.MouseButton1Click:Connect(function()
+    if Clicking then
+        StopClicking()
+    else
+        StartClicking()
+    end
+end)
+
+ModeButton.MouseButton1Click:Connect(function()
+    HoldMode = not HoldMode
+    ModeButton.Text = HoldMode and "HOLD MODE" or "CLICK MODE"
+    ModeButton.BackgroundColor3 = HoldMode and Color3.fromRGB(255, 150, 0) or Color3.fromRGB(0, 150, 255)
+    
+    if Clicking then
+        StopClicking()
+        task.wait(0.1)
+        StartClicking()
+    end
+end)
+
+SpeedSlider.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local num = tonumber(SpeedSlider.Text)
+        if num and num > 0 then
+            Delay = num
+            SliderLabel.Text = "Delay: " .. num .. "s"
+        else
+            SpeedSlider.Text = tostring(Delay)
+        end
+    end
+end)
+
+CloseButton.MouseButton1Click:Connect(function()
+    StopClicking()
+    ScreenGui:Destroy()
+end)
+
+-- Start OFF
+StopClicking()
+print("Auto Breathing")
+end)
+
+     MainSection:NewButton("ESP", "Shows all people", function()
+--============================--
+-- Developer ESP (No UI, With Distance + Name)
+--============================--
+
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+local charactersFolder = workspace:WaitForChild("CharactersAndNPCs")
+local espObjects = {}
+
+-- Cleanup old ESP if script is run again
+for _, obj in ipairs(espObjects) do
+    if obj and obj.Parent then
+        obj:Destroy()
+    end
+end
+espObjects = {}
+
+local function addESP(model)
+    if not model:IsA("Model") then return end
+
+    local humanoid = model:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    ---------------------------------------------------
+    -- Highlight
+    ---------------------------------------------------
+    local highlight = Instance.new("Highlight")
+    highlight.Adornee = model
+    highlight.FillColor = Color3.fromRGB(0, 255, 0)
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+    highlight.Parent = model
+    table.insert(espObjects, highlight)
+
+    ---------------------------------------------------
+    -- Billboard for name, health, and distance
+    ---------------------------------------------------
+    local head = model:FindFirstChild("Head") or model:FindFirstChildWhichIsA("BasePart")
+    if not head then return end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Size = UDim2.new(0, 150, 0, 50)
+    billboard.StudsOffset = Vector3.new(0, 4, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Adornee = head
+    billboard.Parent = model
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextStrokeTransparency = 0
+    label.TextScaled = true
+    label.Parent = billboard
+
+    -- Initial text
+    label.Text = model.Name .. " | HP: " .. math.floor(humanoid.Health)
+
+    -- Update health
+    humanoid.HealthChanged:Connect(function()
+        label.Text = model.Name .. " | HP: " .. math.floor(humanoid.Health)
+    end)
+
+    ---------------------------------------------------
+    -- Distance updater loop
+    ---------------------------------------------------
+    task.spawn(function()
+        while billboard.Parent do
+            task.wait(0.1)
+
+            local char = localPlayer.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if not hrp then
+                label.Text = model.Name .. " | HP: " .. math.floor(humanoid.Health) .. " | Dist: --"
+                continue
+            end
+
+            local distance = (head.Position - hrp.Position).Magnitude
+            label.Text = model.Name .. " | HP: " .. math.floor(humanoid.Health) .. " | Dist: " .. math.floor(distance)
+        end
+    end)
+
+    table.insert(espObjects, billboard)
+end
+
+---------------------------------------------------
+-- Add ESP to existing models
+---------------------------------------------------
+for _, model in ipairs(charactersFolder:GetChildren()) do
+    addESP(model)
+end
+
+---------------------------------------------------
+-- Auto-ESP new models
+---------------------------------------------------
+charactersFolder.ChildAdded:Connect(function(child)
+    task.wait(0.1)
+    addESP(child)
+end)
+
+
+
+
+
+end)
+
+    VisualSection:NewButton("All stuff", "Gives all items", function()
+    local Players = game:GetService("Players")
+
+local function updatePlayer(player)
+    local inventory = player:WaitForChild("Inventory", 5)
+    if not inventory then
+        warn("Inventory not found for player:", player.Name)
+        return
+    end
+
+    -- Loop through all children in Inventory
+    for _, item in ipairs(inventory:GetChildren()) do
+        if item:IsA("IntValue") or item:IsA("NumberValue") then
+            item.Value = 100
+        else
+            warn("Skipped non-number value in Inventory:", item.Name)
+        end
+    end
+end
+
+-- Update all players currently in the game
+for _, player in ipairs(Players:GetPlayers()) do
+    updatePlayer(player)
+end
+
+-- Update players who join later
+Players.PlayerAdded:Connect(updatePlayer)
+
+
+
+end)
+
+    VisualSection:NewButton("100 Million Max Breathing", "Gives 100M Max breathing", function()
+    local Players = game:GetService("Players")
+
+local function updatePlayer(player)
+    local breathingSettings = player:WaitForChild("BreathingSettings", 5)
+    if breathingSettings then
+        local maxBreathing = breathingSettings:FindFirstChild("MaxBreathing")
+        if maxBreathing then
+            maxBreathing.Value = 100000000
+        else
+            warn("MaxBreathing value not found for player:", player.Name)
+        end
+    else
+        warn("BreathingSettings not found for player:", player.Name)
+    end
+end
+
+-- Update all current players
+for _, player in ipairs(Players:GetPlayers()) do
+    updatePlayer(player)
+end
+
+-- Update players who join later
+Players.PlayerAdded:Connect(updatePlayer)
+
+end)
+
+    VisualSection:NewButton("Max Level", "Gives level 1650", function()
+    local Players = game:GetService("Players")
+
+local function updatePlayer(player)
+    local dataFolder = player:WaitForChild("Data", 5)
+    if dataFolder then
+        local levels = dataFolder:FindFirstChild("Levels")
+        if levels then
+            levels.Value = 1650
+        else
+            warn("Levels value not found for player:", player.Name)
+        end
+    else
+        warn("Data folder not found for player:", player.Name)
+    end
+end
+
+-- Update all players currently in the game
+for _, player in ipairs(Players:GetPlayers()) do
+    updatePlayer(player)
+end
+
+-- Update players who join later
+Players.PlayerAdded:Connect(updatePlayer)
+
+
+end)
+
+
+
+    ChristmasEventSection:NewButton("Gift Teleport", "Teleports you to a random gift in the Christmas event", function()
+   local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+local giftsFolder = workspace:WaitForChild("Map"):WaitForChild("Gifts")
+
+-- Collect all parts inside the folder
+local parts = {}
+for _, obj in ipairs(giftsFolder:GetDescendants()) do
+	if obj:IsA("BasePart") then
+		table.insert(parts, obj)
+	end
+end
+
+-- Teleport to a random one
+if #parts > 0 then
+	local randomPart = parts[math.random(1, #parts)]
+	hrp.CFrame = randomPart.CFrame + Vector3.new(0, 3, 0) -- slightly above it
+else
+	warn("No parts found inside workspace.Map.Gifts")
+end
+
+end)
+
+    PlayerSection:NewSlider("Walkspeed", "Changes the walkspeed", 250, 16, function(v)
+            currentSpeed = v
+end)
+
+-- Re-apply walkspeed every frame (fixes animation overrides)
+RunService.RenderStepped:Connect(function()
+    local char = player.Character
+    if char then
+        local hum = char:FindFirstChildWhichIsA("Humanoid")
+        if hum and hum.WalkSpeed ~= currentSpeed then
+            hum.WalkSpeed = currentSpeed
+        end
+    end
+end)
+
+    TeleportsSection:NewButton("Danger Zone", "Teleports you to Danger Zone", function()
+   local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+
+root.CFrame = CFrame.new(-70.89, 9.32, -1036.58)
+
+end)
+
+TeleportsSection:NewButton("Demon Cave", "Teleports you to Demon Cave", function()
+    local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+
+root.CFrame = CFrame.new(1612.00, 12.14, -1193.33)
+end)
+
+TeleportsSection:NewButton("Demon Slayer Corp", "Teleports you to Demon Slayer Corp", function()
+    local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+
+root.CFrame = CFrame.new(-861.64, 9.32, -596.07)
+end)
+
+TeleportsSection:NewButton("Final Selection", "Teleports you to Final Selection", function()
+    local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+
+root.CFrame = CFrame.new(-644.33, 9.45, 927.87)
+end)
+
+TeleportsSection:NewButton("Little Village", "Teleports you to Little Village", function()
+    local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+
+root.CFrame = CFrame.new(-468.16, 53.92, 276.72)
+end)
+
+TeleportsSection:NewButton("Main Village", "Teleports you to Main Village", function()
+    local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+
+root.CFrame = CFrame.new(607.50, 9.40, 675.61)
+end)
+
+TeleportsSection2:NewButton("Mugen Train Station", "Teleports you to Mugen Train Station", function()
+    local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+
+root.CFrame = CFrame.new(923.81, 9.33, -2049.97)
+end)
+
+TeleportsSection2:NewButton("Winter Village", "Teleports you to Winter Village", function()
+    local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+
+root.CFrame = CFrame.new(1001.21, 9.31, -1527.98)
+end)
+
+
+
+
+
+
+
+    
