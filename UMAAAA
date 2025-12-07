@@ -19,6 +19,8 @@ local fakeW = false
 local currentGear = 1
 local shifting = false
 local rpm = 0
+local boosting = false 
+local boostCooldown = false -- COOLDOWN GO!
 
 --== VEHICLE SETTINGS ==--
 local accelRate = 1.08
@@ -28,14 +30,10 @@ local handBrakeRate = 0.65
 local turnSpeed = 3
 local gearUpDelay = 0.16
 local gearDownDelay = 0.25
-local maxGear = 3 -- GEAR MAX REAL
+local maxGear = 3 
 
---== GEAR SPEEDS (MAX = 3) ==--
-local gearSpeeds = {
-	70,   -- Gear 1
-	100,   -- Gear 2
-	130   -- Gear 3 (viteza finală)
-}
+--== GEAR SPEEDS ==--
+local gearSpeeds = {70, 100, 130}
 
 --== GUI SETUP ==--
 local screenGui = Instance.new("ScreenGui")
@@ -44,7 +42,7 @@ screenGui.ResetOnSpawn = false
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 360, 0, 260)
+mainFrame.Size = UDim2.new(0, 360, 0, 310)
 mainFrame.Position = UDim2.new(0, 100, 0, 100)
 mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 mainFrame.BackgroundTransparency = 0.35
@@ -81,10 +79,18 @@ handBrakeButton.Position = UDim2.new(0, 10, 0, 75)
 handBrakeButton.Text = "Handbrake OFF"
 handBrakeButton.Parent = mainFrame
 
+--== GO BOOST BUTTON ==--
+local goButton = Instance.new("TextButton")
+goButton.Size = UDim2.new(1, -20, 0, 30)
+goButton.Position = UDim2.new(0, 10, 0, 110)
+goButton.Text = "GO! BOOST"
+goButton.BackgroundColor3 = Color3.fromRGB(255, 120, 0)
+goButton.Parent = mainFrame
+
 --== GEAR SELECTOR ==--
 local gearSelectLabel = Instance.new("TextLabel")
 gearSelectLabel.Size = UDim2.new(1, -20, 0, 20)
-gearSelectLabel.Position = UDim2.new(0, 10, 0, 115)
+gearSelectLabel.Position = UDim2.new(0, 10, 0, 150)
 gearSelectLabel.BackgroundTransparency = 1
 gearSelectLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 gearSelectLabel.Font = Enum.Font.GothamBold
@@ -94,20 +100,20 @@ gearSelectLabel.Parent = mainFrame
 
 local gearPlus = Instance.new("TextButton")
 gearPlus.Size = UDim2.new(0, 30, 0, 20)
-gearPlus.Position = UDim2.new(1, -40, 0, 115)
+gearPlus.Position = UDim2.new(1, -40, 0, 150)
 gearPlus.Text = "+"
 gearPlus.Parent = mainFrame
 
 local gearMinus = Instance.new("TextButton")
 gearMinus.Size = UDim2.new(0, 30, 0, 20)
-gearMinus.Position = UDim2.new(1, -80, 0, 115)
+gearMinus.Position = UDim2.new(1, -80, 0, 150)
 gearMinus.Text = "-"
 gearMinus.Parent = mainFrame
 
 --== SPEED + GEAR DISPLAY ==--
 local speedLabel = Instance.new("TextLabel")
 speedLabel.Size = UDim2.new(1, 0, 0, 25)
-speedLabel.Position = UDim2.new(0, 0, 0, 145)
+speedLabel.Position = UDim2.new(0, 0, 0, 180)
 speedLabel.BackgroundTransparency = 1
 speedLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
 speedLabel.Font = Enum.Font.GothamBlack
@@ -117,7 +123,7 @@ speedLabel.Parent = mainFrame
 
 local gearLabel = Instance.new("TextLabel")
 gearLabel.Size = UDim2.new(1, 0, 0, 25)
-gearLabel.Position = UDim2.new(0, 0, 0, 170)
+gearLabel.Position = UDim2.new(0, 0, 0, 205)
 gearLabel.BackgroundTransparency = 1
 gearLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 gearLabel.Font = Enum.Font.GothamBlack
@@ -128,7 +134,7 @@ gearLabel.Parent = mainFrame
 --== RPM BAR ==--
 local rpmBarBg = Instance.new("Frame")
 rpmBarBg.Size = UDim2.new(1, -40, 0, 20)
-rpmBarBg.Position = UDim2.new(0, 20, 0, 200)
+rpmBarBg.Position = UDim2.new(0, 20, 0, 240)
 rpmBarBg.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 rpmBarBg.BackgroundTransparency = 0.3
 rpmBarBg.BorderSizePixel = 0
@@ -140,47 +146,23 @@ rpmBar.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
 rpmBar.BorderSizePixel = 0
 rpmBar.Parent = rpmBarBg
 
---== MODERN UI EFFECTS ==--
-
-local blur = Instance.new("BlurEffect", Lighting)
-blur.Size = 4
-
-local function round(obj, radius)
-	local c = Instance.new("UICorner")
-	c.CornerRadius = UDim.new(0, radius)
-	c.Parent = obj
-end
-
-local function glow(obj, color)
-	local s = Instance.new("UIStroke")
-	s.Color = color
-	s.Thickness = 2
-	s.Transparency = 0.4
-	s.Parent = obj
-end
+--== UI EFFECT HELPERS ==--
+local function round(obj, r) Instance.new("UICorner", obj).CornerRadius = UDim.new(0, r) end
+local function glow(obj, c) local s = Instance.new("UIStroke", obj) s.Color = c s.Thickness = 2 s.Transparency = 0.4 end
 
 round(mainFrame, 14)
 round(titleBar, 14)
 round(toggleButton, 10)
 round(handBrakeButton, 10)
+round(goButton, 10)
 round(gearPlus, 10)
 round(gearMinus, 10)
 round(rpmBarBg, 10)
 round(rpmBar, 10)
 
-glow(mainFrame, Color3.fromRGB(0, 170, 255))
-glow(toggleButton, Color3.fromRGB(0, 150, 255))
-glow(handBrakeButton, Color3.fromRGB(255, 50, 50))
-glow(rpmBarBg, Color3.fromRGB(255, 60, 0))
+glow(mainFrame, Color3.fromRGB(0,170,255))
+glow(goButton, Color3.fromRGB(255,130,0))
 
-local rpmGradient = Instance.new("UIGradient", rpmBar)
-rpmGradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(0,255,0)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,180,0)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(255,0,0)),
-}
-
---== BUTTON HOVER ==--
 local function hover(btn)
 	btn.MouseEnter:Connect(function() btn.BackgroundTransparency = 0.15 end)
 	btn.MouseLeave:Connect(function() btn.BackgroundTransparency = 0.3 end)
@@ -192,22 +174,19 @@ end
 
 hover(toggleButton)
 hover(handBrakeButton)
+hover(goButton)
 hover(gearPlus)
 hover(gearMinus)
 
 --== GEAR BUTTONS ==--
 gearPlus.MouseButton1Click:Connect(function()
-	if maxGear < 3 then
-		maxGear += 1
-		gearSelectLabel.Text = "Max Gear: " .. maxGear
-	end
+	if maxGear < 3 then maxGear += 1 end
+	gearSelectLabel.Text = "Max Gear: " .. maxGear
 end)
 
 gearMinus.MouseButton1Click:Connect(function()
-	if maxGear > 1 then
-		maxGear -= 1
-		gearSelectLabel.Text = "Max Gear: " .. maxGear
-	end
+	if maxGear > 1 then maxGear -= 1 end
+	gearSelectLabel.Text = "Max Gear: " .. maxGear
 end)
 
 --== SPEED CONTROL ==--
@@ -224,17 +203,8 @@ local function startSpeed()
 end
 
 local function stopSpeed()
-	if bodyVelocity then
-		bodyVelocity:Destroy()
-		bodyVelocity = nil
-	end
-	currentSpeed = 0
-	targetSpeed = 0
-	currentGear = 1
-	fakeW = false
-	speedLabel.Text = "Speed: 0 km/h"
-	gearLabel.Text = "Gear: 1"
-	rpmBar.Size = UDim2.new(0, 0, 1, 0)
+	if bodyVelocity then bodyVelocity:Destroy() bodyVelocity = nil end
+	currentSpeed = 0 targetSpeed = 0 currentGear = 1 fakeW = false
 end
 
 toggleButton.MouseButton1Click:Connect(function()
@@ -248,17 +218,41 @@ handBrakeButton.MouseButton1Click:Connect(function()
 	handBrakeButton.Text = handBrakeActive and "Handbrake ON" or "Handbrake OFF"
 end)
 
---== INPUT ==--
-UserInputService.InputBegan:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.W and speedActive then
-		fakeW = true
+--== GO BOOST (149 km/h + 10 sec cooldown ) ==--
+goButton.MouseButton1Click:Connect(function()
+	if not speedActive or boosting or boostCooldown then return end
+
+	boosting = true
+	boostCooldown = true
+
+	-- BOOST INSTANT LA 149
+	targetSpeed = 140
+	goButton.Text = "BOOST ACTIVE!"
+
+	wait(3)
+
+	-- REVINE LIN LA 130
+	targetSpeed = 130
+
+	boosting = false
+
+	-- PORNIM COOLDOWN 10 SEC
+	for i = 10, 1, -1 do
+		goButton.Text = "Cooldown: " .. i .. "s"
+		wait(1)
 	end
+
+	goButton.Text = "GO! BOOST"
+	boostCooldown = false
 end)
 
-UserInputService.InputEnded:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.W and speedActive then
-		fakeW = true
-	end
+--== INPUT ==--
+UserInputService.InputBegan:Connect(function(i)
+	if i.KeyCode == Enum.KeyCode.W and speedActive then fakeW = true end
+end)
+
+UserInputService.InputEnded:Connect(function(i)
+	if i.KeyCode == Enum.KeyCode.W and speedActive then fakeW = true end
 end)
 
 --== GEAR SHIFT ==--
@@ -282,42 +276,30 @@ end
 RunService.Heartbeat:Connect(function()
 	if not speedActive or not bodyVelocity then return end
 
-	local dir = Vector3.zero
 	local pressingW = UserInputService:IsKeyDown(Enum.KeyCode.W)
 	local pressingS = UserInputService:IsKeyDown(Enum.KeyCode.S)
 
-	-- ACCEL
-	if pressingW and not handBrakeActive then
-		targetSpeed = math.min(targetSpeed * accelRate + 1, gearSpeeds[maxGear])
-	elseif fakeW and not pressingS then
-		targetSpeed = math.max(targetSpeed * naturalDecel, 0)
-	else
-		targetSpeed = targetSpeed * naturalDecel
+	if not boosting then
+		if pressingW and not handBrakeActive then
+			targetSpeed = math.min(targetSpeed * accelRate + 1, gearSpeeds[maxGear])
+		elseif fakeW and not pressingS then
+			targetSpeed = targetSpeed * naturalDecel
+		else
+			targetSpeed = targetSpeed * naturalDecel
+		end
+
+		if pressingS then targetSpeed = targetSpeed * brakeRate end
+		if handBrakeActive then targetSpeed = targetSpeed * handBrakeRate end
 	end
 
-	-- BRAKE
-	if pressingS then
-		targetSpeed = targetSpeed * brakeRate
-		fakeW = false
-	end
-
-	if handBrakeActive then
-		targetSpeed = targetSpeed * handBrakeRate
-		fakeW = false
-	end
-
-	-- AUTO GEARS
 	local gearMax = gearSpeeds[currentGear]
-	if targetSpeed > gearMax * 0.95 and currentGear < maxGear then
-		shiftUp()
-	elseif targetSpeed < gearMax * 0.5 and currentGear > 1 then
-		shiftDown()
-	end
+	if targetSpeed > gearMax * 0.95 and currentGear < maxGear then shiftUp() end
+	if targetSpeed < gearMax * 0.5 and currentGear > 1 then shiftDown() end
 
 	currentSpeed = currentSpeed + (targetSpeed - currentSpeed) * 0.2
 	rpm = math.clamp(currentSpeed / gearSpeeds[currentGear], 0, 1)
 
-	-- TURNING
+	local dir = Vector3.zero
 	if UserInputService:IsKeyDown(Enum.KeyCode.A) then
 		dir -= humanoidRootPart.CFrame.RightVector * turnSpeed
 	end
@@ -328,10 +310,7 @@ RunService.Heartbeat:Connect(function()
 	dir += humanoidRootPart.CFrame.LookVector * currentSpeed
 	bodyVelocity.Velocity = dir + Vector3.new(0, groundOffset, 0)
 
-	-- UPDATE HUD
 	speedLabel.Text = "Speed: " .. math.floor(currentSpeed) .. " km/h"
 	gearLabel.Text = "Gear: " .. currentGear
 	rpmBar.Size = UDim2.new(rpm, 0, 1, 0)
-
-	if currentSpeed < 5 then fakeW = false end
 end)
