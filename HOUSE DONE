@@ -1,0 +1,119 @@
+-- ts file was generated at discord.gg/25ms
+
+
+if game:GetService("CoreGui"):FindFirstChild("ToraScript") then
+    game:GetService("CoreGui").ToraScript:Destroy()
+end
+local v1 = loadstring(game:HttpGet("https://raw.githubusercontent.com/liebertsx/Tora-Library/main/src/librarynew", true))()
+local v2 = v1:CreateWindow("Protect The House")
+v2:AddButton({
+    text = "Inf Ammo",
+    flag = "button",
+    callback = function()
+        local vu3 = nil
+        local _ = hookmetamethod(game, "__index", function(p4, p5)
+            if checkcaller() or (tostring(p4) ~= "Mag" or p5 ~= "Value") then
+                return vu3(p4, p5)
+            else
+                return math.huge
+            end
+        end)
+        game.Players.LocalPlayer.Character.Humanoid.Health = 0
+    end
+})
+v2:AddSlider({
+    text = "Set Distance",
+    flag = "slider1",
+    value = 5,
+    min = 5,
+    max = 100,
+    callback = function(p6)
+        Distance = p6
+    end
+})
+v2:AddToggle({
+    text = "Bring Mobs",
+    flag = "toggle",
+    state = false,
+    callback = function(p7)
+        _G.Bring = p7
+        print("Bring: ", p7)
+        if p7 then
+            Bring()
+        end
+    end
+})
+function Bring()
+    spawn(function()
+        _G.Bring = true
+        while _G.Bring do
+            wait()
+            pcall(function()
+                local v8, v9, v10 = pairs(workspace.Monsters:GetDescendants())
+                while true do
+                    local v11
+                    v10, v11 = v8(v9, v10)
+                    if v10 == nil then
+                        break
+                    end
+                    if v11.Name == "HumanoidRootPart" then
+                        v11.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, - Distance)
+                    end
+                end
+                wait()
+            end)
+        end
+    end)
+end
+game:GetService("RunService")
+v2:AddSlider({
+    text = "Head Size",
+    flag = "slider1",
+    value = 2,
+    min = 2,
+    max = 6,
+    callback = function(p12)
+        getgenv().HeadSizeValue = p12
+    end
+})
+task.spawn(function()
+    while task.wait(1) do
+        if getgenv().HeadSizeValue then
+            local v13, v14, v15 = pairs(workspace.Monsters:GetDescendants())
+            while true do
+                local v16
+                v15, v16 = v13(v14, v15)
+                if v15 == nil then
+                    break
+                end
+                if v16:IsA("BasePart") and v16.Name == "Head" then
+                    v16.CanCollide = false
+                    v16.Size = Vector3.new(getgenv().HeadSizeValue, getgenv().HeadSizeValue, getgenv().HeadSizeValue)
+                end
+            end
+        end
+    end
+end)
+v2:AddButton({
+    text = "Find HiddenBoxes",
+    flag = "button",
+    callback = function()
+        local v17, v18, v19 = pairs(workspace.HiddenWeaponBoxes:GetDescendants())
+        while true do
+            local v20
+            v19, v20 = v17(v18, v19)
+            if v19 == nil then
+                break
+            end
+            if v20:IsA("TouchTransmitter") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v20.Parent, 0)
+                wait()
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v20.Parent, 1)
+            end
+        end
+    end
+})
+v2:AddLabel({
+    text = "By ZeeHUB"
+})
+v1:Init()
