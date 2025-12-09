@@ -1,0 +1,311 @@
+-- ts file was generated at discord.gg/25ms
+
+
+if game:GetService("CoreGui"):FindFirstChild("ToraScript") then
+    game:GetService("CoreGui").ToraScript:Destroy()
+end
+local v1 = loadstring(game:HttpGet("https://raw.githubusercontent.com/liebertsx/Tora-Library/main/src/librarynew", true))()
+local v2 = v1:CreateWindow("Hunty Zombie")
+local vu3 = 0
+v2:AddBox({
+    text = "timestamp attack (1,2, or -1,-2)",
+    flag = "box",
+    value = "timestamp fix",
+    callback = function(p4)
+        vu3 = tonumber(p4) or 0
+    end
+})
+v2:AddToggle({
+    text = "Auto Attack",
+    flag = "toggle",
+    state = false,
+    callback = function(p5)
+        _G.Attack = p5
+        print("Attack:", p5)
+        if p5 then
+            Attack()
+        end
+    end
+})
+function Attack()
+    spawn(function()
+        while _G.Attack do
+            task.wait(0.1)
+            pcall(function()
+                local v6 = os.time() + tick() % 1
+                local v7 = {
+                    buffer.fromstring("\8\4\1"),
+                    {
+                        v6 + vu3
+                    }
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("ByteNetReliable"):FireServer(unpack(v7))
+            end)
+        end
+    end)
+end
+v2:AddSlider({
+    text = "Set Distance",
+    flag = "slider1",
+    value = 0,
+    min = 0,
+    max = 20,
+    callback = function(p8)
+        Distance = p8
+    end
+})
+v2:AddToggle({
+    text = "Auto Mobs",
+    flag = "autoMobs",
+    state = false,
+    callback = function(p9)
+        _G.Mobs = p9
+        if p9 then
+            spawn(AutoMobs)
+        end
+    end
+})
+local vu10 = game:GetService("Players").LocalPlayer
+function AutoMobs()
+    spawn(function()
+        if vu10.Character then
+            vu10.Character:FindFirstChild("HumanoidRootPart")
+        end
+        repeat
+            task.wait(0.5)
+            if vu10.PlayerGui.MainScreen.ObjectiveDisplay.ObjectiveElement.List.Value.Label.Text ~= "0" then
+                _G.Mobs = true
+            else
+                _G.Mobs = false
+                task.wait(7)
+            end
+            local v11, v12, v13 = pairs(workspace:GetDescendants())
+            local v14 = true
+            while true do
+                local v15
+                v13, v15 = v11(v12, v13)
+                if v13 == nil then
+                    break
+                end
+                if v15:IsA("Model") and (v15:GetAttribute("roomIndex") and not v15:GetAttribute("activated")) then
+                    v14 = false
+                    break
+                end
+            end
+        until v14 or not _G.Mobs
+        while true do
+            task.wait()
+            local v16 = vu10.Character
+            if v16 then
+                v16 = vu10.Character:FindFirstChild("HumanoidRootPart")
+            end
+            local v17, v18, v19 = pairs(workspace.Entities:GetDescendants())
+            local v20
+            v19, v20 = v17(v18, v19)
+            if v19 ~= nil then
+                if v20.Name == "HumanoidRootPart" and (v20.Anchored == true and v16) then
+                    v16.CFrame = v20.CFrame * CFrame.new(0, Distance, 0)
+                end
+            end
+            if not _G.Mobs then
+                return
+            end
+        end
+    end)
+end
+vu10.CharacterAdded:Connect(function(_)
+    if _G.Mobs then
+        task.wait(1)
+        AutoMobs()
+    end
+end)
+v2:AddToggle({
+    text = "Auto Doors",
+    flag = "autoDoors",
+    state = false,
+    callback = function(p21)
+        _G.AutoDoors = p21
+        if p21 then
+            spawn(AutoDoors)
+        end
+    end
+})
+function AutoDoors()
+    task.wait(1)
+    local v22, v23, v24 = pairs(workspace:GetDescendants())
+    if v25:IsA("Model") and (v25:GetAttribute("roomIndex") and (not v25:GetAttribute("activated") and v25:GetAttribute("locked") == false)) then
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v25:GetPivot() * CFrame.new(0, 5, 0)
+        task.wait(0.2)
+    end
+    local v25
+    v24, v25 = v22(v23, v24)
+    if v24 ~= nil then
+    else
+    end
+    if not _G.AutoDoors then
+        return
+    end
+	
+end
+v2:AddToggle({
+    text = "Auto Skills & Perks",
+    flag = "toggle",
+    state = false,
+    callback = function(p26)
+        _G.Skills = p26
+        print("Skills: ", p26)
+        if p26 then
+            Skills()
+        end
+    end
+})
+function Skills()
+    spawn(function()
+        _G.Skills = true
+        while _G.Skills do
+            wait()
+            pcall(function()
+                local v27 = {
+                    buffer.fromstring("\8\3\1"),
+                    {
+                        os.time()
+                    }
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("ByteNetReliable"):FireServer(unpack(v27))
+                local v28 = {
+                    buffer.fromstring("\8\5\1"),
+                    {
+                        os.time()
+                    }
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("ByteNetReliable"):FireServer(unpack(v28))
+                local v29 = {
+                    buffer.fromstring("\8\6\1"),
+                    {
+                        os.time()
+                    }
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("ByteNetReliable"):FireServer(unpack(v29))
+                local v30 = {
+                    buffer.fromstring("\8\7\1"),
+                    {
+                        os.time()
+                    }
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("ByteNetReliable"):FireServer(unpack(v30))
+                local v31 = {
+                    buffer.fromstring("\f")
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("ByteNetReliable"):FireServer(unpack(v31))
+                wait(1)
+            end)
+        end
+    end)
+end
+v2:AddToggle({
+    text = "Collect Coins",
+    flag = "toggle",
+    state = false,
+    callback = function(p32)
+        _G.Coins = p32
+        print("Coins: ", p32)
+        if p32 then
+            Coins()
+        end
+    end
+})
+function Coins()
+    spawn(function()
+        _G.Coins = true
+        while _G.Coins do
+            wait()
+            pcall(function()
+                local v33, v34, v35 = pairs(workspace.DropItems:GetChildren())
+                while true do
+                    local v36
+                    v35, v36 = v33(v34, v35)
+                    if v35 == nil then
+                        break
+                    end
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v36.CFrame
+                    wait()
+                end
+                wait()
+            end)
+        end
+    end)
+end
+v2:AddToggle({
+    text = "Auto Escape",
+    flag = "toggle",
+    state = false,
+    callback = function(p37)
+        _G.Escape = p37
+        print("Escape: ", p37)
+        if p37 then
+            Escape()
+        end
+    end
+})
+function Escape()
+    spawn(function()
+        _G.Escape = true
+        while _G.Escape do
+            wait()
+            pcall(function()
+                local v38, v39, v40 = pairs(workspace:GetDescendants())
+                while true do
+                    local v41
+                    v40, v41 = v38(v39, v40)
+                    if v40 == nil then
+                        break
+                    end
+                    if v41.Name == "RadioObjective" and v41.ProximityPrompt.Enabled == true then
+                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v41.CFrame
+                        wait(0.2)
+                        fireproximityprompt(v41.ProximityPrompt)
+                    end
+                end
+                if game:GetService("Players").LocalPlayer.PlayerGui.MainScreen.ObjectiveDisplay.ObjectiveElement.List.Description.Text == "ESCAPE" then
+                    _G.Mobs = false
+                    _G.Coins = false
+                    wait(0.5)
+                    local v42, v43, v44 = pairs(workspace:GetDescendants())
+                    while true do
+                        local v45
+                        v44, v45 = v42(v43, v44)
+                        if v44 == nil then
+                            break
+                        end
+                        if v45.Name == "HeliObjective" and v45.ProximityPrompt.Enabled == true then
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v45.CFrame
+                            wait(0.2)
+                            fireproximityprompt(v45.ProximityPrompt)
+                        end
+                    end
+                end
+                local v46, v47, v48 = pairs(workspace:GetDescendants())
+                while true do
+                    local v49
+                    v48, v49 = v46(v47, v48)
+                    if v48 == nil then
+                        break
+                    end
+                    if v49.Name == "gen" and v49.pom.Enabled == true then
+                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v49.CFrame
+                        wait(0.2)
+                        fireproximityprompt(v49.pom)
+                    end
+                end
+                wait(2)
+            end)
+        end
+    end)
+end
+v2:AddLabel({
+    text = "Made by ZeeHUB"
+})
+v1:Init()
+game:GetService("UserInputService").JumpRequest:Connect(function()
+    game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+end)
