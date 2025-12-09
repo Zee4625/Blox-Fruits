@@ -1,0 +1,59 @@
+-- ts file was generated at discord.gg/25ms
+
+
+if game:GetService("CoreGui"):FindFirstChild("ToraScript") then
+    game:GetService("CoreGui").ToraScript:Destroy()
+end
+local v1 = loadstring(game:HttpGet("https://raw.githubusercontent.com/liebertsx/Tora-Library/main/src/librarynew", true))()
+local v2 = v1:CreateWindow("Brainrot Zombie Tower")
+v2:AddButton({
+    text = "Give Crystals",
+    flag = "button",
+    callback = function()
+        game.MarketplaceService:SignalPromptProductPurchaseFinished(game.Players.LocalPlayer.UserId, 3367369214, true)
+    end
+})
+v2:AddButton({
+    text = "Give Impossible Pack",
+    flag = "button",
+    callback = function()
+        game.MarketplaceService:SignalPromptProductPurchaseFinished(game.Players.LocalPlayer.UserId, 3367366651, true)
+    end
+})
+v2:AddButton({
+    text = "Ammo Refill",
+    flag = "button",
+    callback = function()
+        game.MarketplaceService:SignalPromptProductPurchaseFinished(game.Players.LocalPlayer.UserId, 3346591026, true)
+    end
+})
+v2:AddButton({
+    text = "NUKE (Kill Mobs)",
+    flag = "button",
+    callback = function()
+        game.MarketplaceService:SignalPromptProductPurchaseFinished(game.Players.LocalPlayer.UserId, 3346590672, true)
+    end
+})
+v2:AddButton({
+    text = "Inf Jump",
+    flag = "button",
+    callback = function()
+        game:GetService("UserInputService").JumpRequest:Connect(function()
+            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+        end)
+    end
+})
+v2:AddSlider({
+    text = "Walk Speed",
+    flag = "slider1",
+    value = 16,
+    min = 16,
+    max = 100,
+    callback = function(p3)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = p3
+    end
+})
+v2:AddLabel({
+    text = "By ZeeHUB"
+})
+v1:Init()
