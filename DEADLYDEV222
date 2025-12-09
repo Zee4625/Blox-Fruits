@@ -1,0 +1,1563 @@
+-- ts file was generated at discord.gg/25ms
+
+
+if not NXPDD_LOADED then
+    pcall(function()
+        getgenv().NXPDD_LOADED = true
+    end)
+    if not game:IsLoaded() then
+        game.Loaded:Wait()
+    end
+    local _, vu1 = pcall(function()
+        return loadstring(game:HttpGet("https://github.com/YueMikoDns/Zain/releases/latest/download/main.lua"))()
+    end)
+    local vu3 = cloneref or (clonereference or function(p2)
+        return p2
+    end)
+    local vu4 = {
+        RunService = vu3(game:GetService("RunService")),
+        Players = vu3(game:GetService("Players")),
+        Workspace = vu3(game:GetService("Workspace")),
+        TweenService = vu3(game:GetService("TweenService")),
+        HttpService = vu3(game:GetService("HttpService")),
+        UserInputService = vu3(game:GetService("UserInputService")),
+        UserService = vu3(game:GetService("UserService"))
+    }
+    local vu5 = true
+    function SafeNotify(p6)
+        if vu5 then
+            vu1:Notify({
+                Title = p6.Title or "Notification",
+                Content = p6.Content or "",
+                Duration = p6.Duration or 3,
+                Icon = p6.Icon or ""
+            })
+        end
+    end
+    vu1:Localization({
+        Enabled = false
+    })
+    local vu7 = vu1:CreateWindow({
+        Title = "ZeeHUB X DeadyDelivery",
+        Icon = "rbxassetid://112283432563836",
+        IconSize = 46,
+        Author = "Welcome",
+        NewElements = true,
+        Folder = "NextPhase",
+        Background = vu1:Gradient({
+            ["0"] = {
+                Color = Color3.fromHex("#0f0c29"),
+                Transparency = 1
+            },
+            ["100"] = {
+                Color = Color3.fromHex("#302b63"),
+                Transparency = 0.9
+            }
+        }, {
+            Rotation = 45
+        }),
+        Resizable = true,
+        HideSearchBar = false,
+        SideBarWidth = 150,
+        BackgroundImageTransparency = 0.42,
+        OpenButton = {
+            Title = "Open NextPhase UI",
+            CornerRadius = UDim.new(1, 0),
+            StrokeThickness = 3,
+            Enabled = false,
+            Draggable = true,
+            OnlyMobile = false,
+            Color = ColorSequence.new(Color3.fromHex("#30FF6A"), Color3.fromHex("#e7ff2f"))
+        }
+    })
+    vu7:EditOpenButton({
+        Enabled = false
+    })
+    local v8 = {
+        Main = vu7:Tab({
+            Title = "Main",
+            Icon = "atom"
+        }),
+        Malicious = vu7:Tab({
+            Title = "Malicious",
+            Icon = "sigma"
+        }),
+        Info = vu7:Tab({
+            Title = "Info",
+            Icon = "info"
+        }),
+        Settings = vu7:Tab({
+            Title = "Setting",
+            Icon = "brush"
+        })
+    }
+    local vu9 = vu4.Workspace.GameSystem.Loots:WaitForChild("World")
+    local vu10 = {}
+    local vu11 = {}
+    local vu12 = nil
+    local vu13 = nil
+    local vu14 = nil
+    local vu15 = vu4.Workspace.CurrentCamera
+    local vu16 = {
+        EspType = {
+            Tracer = false,
+            Name = false,
+            Distance = false,
+            Price = true
+        },
+        MonsterEspType = {
+            Box = false,
+            Name = true,
+            Distance = false
+        },
+        NpcEspType = {
+            Box = true,
+            Name = true,
+            Distance = true
+        },
+        EspItemColor = {
+            TracerColor = Color3.fromRGB(255, 255, 255),
+            TextColor = Color3.fromRGB(255, 255, 255)
+        },
+        EspMonsterColor = {
+            BoxColor = Color3.fromRGB(255, 0, 0),
+            TextColor = Color3.fromRGB(255, 0, 0)
+        },
+        EspNpcColor = {
+            BoxColor = Color3.fromRGB(0, 255, 0),
+            TextColor = Color3.fromRGB(0, 255, 0)
+        }
+    }
+    v8.Main:Dropdown({
+        Title = "Item Esp",
+        Values = {
+            "Tracer",
+            "Name",
+            "Distance",
+            "Price"
+        },
+        Value = {
+            "Price"
+        },
+        Multi = true,
+        AllowNone = false,
+        Callback = function(p17)
+            local v18, v19, v20 = pairs(vu16.EspType)
+            while true do
+                v20 = v18(v19, v20)
+                if v20 == nil then
+                    break
+                end
+                vu16.EspType[v20] = false
+            end
+            local v21, v22, v23 = pairs(p17)
+            while true do
+                local v24
+                v23, v24 = v21(v22, v23)
+                if v23 == nil then
+                    break
+                end
+                if vu16.EspType[v24] ~= nil then
+                    vu16.EspType[v24] = true
+                end
+            end
+        end
+    })
+    local function vu26()
+        local v25 = Drawing.new("Line")
+        v25.Thickness = 1
+        v25.Transparency = 1
+        v25.Visible = false
+        return v25
+    end
+    local function vu28()
+        local v27 = Drawing.new("Text")
+        v27.Size = 14
+        v27.Center = true
+        v27.Outline = true
+        v27.Visible = false
+        return v27
+    end
+    local function vu34(p29)
+        local v30, v31, v32 = ipairs(p29:GetDescendants())
+        while true do
+            local v33
+            v32, v33 = v30(v31, v32)
+            if v32 == nil then
+                break
+            end
+            if v33:IsA("BasePart") and v33.Name == "Interactable" then
+                return v33
+            end
+        end
+    end
+    local function vu47()
+        local v35, v36, v37 = pairs(vu10)
+        while true do
+            local v38
+            v37, v38 = v35(v36, v37)
+            if v37 == nil then
+                break
+            end
+            if v37:IsDescendantOf(vu9) and vu34(v37) then
+                local v39 = vu34(v37)
+                local v40, v41 = vu15:WorldToViewportPoint(v39.Position)
+                if v41 then
+                    local v42 = v37:FindFirstChild("LootUI", true).Frame.Price.Text
+                    local v43 = v37:FindFirstChild("LootUI", true).Frame.ItemName.Text
+                    local v44 = tonumber(v42:match("%d+"))
+                    local v45 = (v39.Position - vu15.CFrame.Position).Magnitude
+                    if vu16.EspType.Tracer and vu14 <= v44 then
+                        v38.Color = vu16.EspItemColor.TracerColor
+                        v38.From = Vector2.new(vu15.ViewportSize.X / 2, vu15.ViewportSize.Y)
+                        v38.To = Vector2.new(v40.X, v40.Y)
+                        v38.Visible = true
+                    else
+                        v38.Visible = false
+                    end
+                    vu11[v37].Color = vu16.EspItemColor.TextColor
+                    vu11[v37].Position = Vector2.new(v40.X, v40.Y - 15)
+                    local v46 = {}
+                    if vu16.EspType.Name then
+                        table.insert(v46, v43)
+                    end
+                    if vu16.EspType.Distance then
+                        table.insert(v46, string.format("[%.0f]", v45))
+                    end
+                    if vu16.EspType.Price then
+                        table.insert(v46, string.format("Price: %s", v42))
+                    end
+                    if # v46 <= 0 or vu14 > v44 then
+                        vu11[v37].Visible = false
+                    else
+                        vu11[v37].Text = table.concat(v46, " ")
+                        vu11[v37].Visible = true
+                    end
+                else
+                    v38.Visible = false
+                    vu11[v37].Visible = false
+                end
+            else
+                v38:Remove()
+                vu11[v37]:Remove()
+                vu10[v37] = nil
+                vu11[v37] = nil
+            end
+        end
+    end
+    local function vu53()
+        local v48 = vu9
+        local v49, v50, v51 = ipairs(v48:GetChildren())
+        while true do
+            local v52
+            v51, v52 = v49(v50, v51)
+            if v51 == nil then
+                break
+            end
+            if not vu10[v52] then
+                vu10[v52] = vu26()
+                vu11[v52] = vu28()
+            end
+        end
+    end
+    local function vu62()
+        if vu13 then
+            vu13:Disconnect()
+        end
+        if vu12 then
+            vu12:Disconnect()
+        end
+        local v54, v55, v56 = pairs(vu10)
+        while true do
+            local v57
+            v56, v57 = v54(v55, v56)
+            if v56 == nil then
+                break
+            end
+            v57:Remove()
+        end
+        local v58, v59, v60 = pairs(vu11)
+        while true do
+            local v61
+            v60, v61 = v58(v59, v60)
+            if v60 == nil then
+                break
+            end
+            v61:Remove()
+        end
+        vu11 = {}
+        vu10 = {}
+    end
+    v8.Main:Toggle({
+        Title = "Item Esp",
+        Type = "Checkbox",
+        Value = false,
+        Callback = function(p63)
+            if p63 then
+                vu53()
+                vu12 = vu9.ChildAdded:Connect(function(p64)
+                    if not vu10[p64] then
+                        vu10[p64] = vu26()
+                        vu11[p64] = vu28()
+                    end
+                end)
+                vu13 = vu4.RunService.RenderStepped:Connect(vu47)
+            else
+                vu62()
+            end
+        end
+    })
+    local vu65 = nil
+    vu65 = v8.Main:Input({
+        Title = "Price",
+        Desc = "only if Price is >",
+        Value = "0",
+        InputIcon = "dollar-sign",
+        Type = "Input",
+        Placeholder = "Price ...",
+        Callback = function(p66)
+            if string.match(p66, "^%d+$") then
+                vu14 = tonumber(p66)
+            elseif vu65 then
+                vu65:Highlight()
+                vu65:Set("0")
+                vu14 = tonumber(p66)
+            end
+        end
+    })
+    local v67 = v8.Main:Section({
+        Title = "Color",
+        Box = true
+    })
+    v67:Colorpicker({
+        Title = "Tracer",
+        Default = Color3.fromRGB(255, 255, 255),
+        Transparency = 0,
+        Locked = false,
+        Callback = function(p68)
+            vu16.EspItemColor.TracerColor = p68
+        end
+    })
+    v67:Colorpicker({
+        Title = "Text",
+        Default = Color3.fromRGB(255, 255, 255),
+        Transparency = 0,
+        Locked = false,
+        Callback = function(p69)
+            vu16.EspItemColor.TextColor = p69
+        end
+    })
+    v8.Main:Divider()
+    v8.Main:Space()
+    v8.Main:Divider()
+    local vu70 = {}
+    local vu71 = {}
+    local function vu73()
+        local v72 = Drawing.new("Square")
+        v72.Thickness = 1
+        v72.Transparency = 1
+        v72.Color = Color3.fromRGB(255, 255, 255)
+        v72.Filled = false
+        v72.Visible = false
+        return v72
+    end
+    local function vu75(p74)
+        return p74:FindFirstChild("BZ") and (p74:FindFirstChild("CBZ") and (p74:FindFirstChild("CBY") and p74:FindFirstChild("Trail"))) and "Turkey" or (p74:FindFirstChild("none") and (p74:FindFirstChild("Y0") and (p74:FindFirstChild("Y1") and (p74:FindFirstChild("Y2") and (p74:FindFirstChild("Y3") and (p74:FindFirstChild("RW") and p74:FindFirstChild("RN")))))) and "Pit Worm" or (p74:FindFirstChild("HumanoidRootPart") and (p74.HumanoidRootPart:FindFirstChild("LayerCount") and (p74.HumanoidRootPart.LayerCount:FindFirstChild("Frame") and (p74.HumanoidRootPart.LayerCount.Frame:FindFirstChild("Frame") and p74.HumanoidRootPart.LayerCount.Frame.Frame:FindFirstChild("Name")))) and "Mimic" or (p74:FindFirstChild("1C1") and (p74:FindFirstChild("1C2") and (p74:FindFirstChild("1C3") and (p74:FindFirstChild("1C4") and (p74:FindFirstChild("1C5") and (p74:FindFirstChild("2C1") and (p74:FindFirstChild("2C2") and (p74:FindFirstChild("2C3") and (p74:FindFirstChild("2C4") and (p74:FindFirstChild("2C5") and (p74:FindFirstChild("3C1") and (p74:FindFirstChild("3C2") and (p74:FindFirstChild("3C3") and (p74:FindFirstChild("3C4") and (p74:FindFirstChild("3C5") and (p74:FindFirstChild("4C1") and (p74:FindFirstChild("4C2") and (p74:FindFirstChild("4C3") and (p74:FindFirstChild("4C4") and (p74:FindFirstChild("4C5") and (p74:FindFirstChild("Door") and p74:FindFirstChild("Y"))))))))))))))))))))) and "Fake Fridge" or (p74:FindFirstChild("LeLower_Leg") and (p74:FindFirstChild("LeftUpper_Leg") and (p74:FindFirstChild("RightLower_Leg") and (p74:FindFirstChild("RightUpper_Leg") and p74:FindFirstChild("HumanoidRootPart")))) and "Walking Food" or (p74:FindFirstChild("Waist1") and (p74:FindFirstChild("Waist2") and (p74:FindFirstChild("Neck") and (p74:FindFirstChild("Value") and p74:FindFirstChild("AnimSaves")))) and "Forsaken" or (p74:FindFirstChild("Bubble") and (p74:FindFirstChild("Value") and (p74:FindFirstChild("Mouth") and (p74:FindFirstChild("Folder") and p74:FindFirstChild("Checker")))) and "Crocodile" or (p74:FindFirstChild("Tail") and (p74:FindFirstChild("WB2") and (p74:FindFirstChild("WB3") and (p74:FindFirstChild("1") and p74:FindFirstChild("Folder")))) and "Cat" or (p74:FindFirstChild("WB1") and (p74:FindFirstChild("WB2") and (p74:FindFirstChild("WB3") and (p74:FindFirstChild("YER") and (p74:FindFirstChild("YY") and (p74:FindFirstChild("ZED") and (p74:FindFirstChild("ZY") and (p74:FindFirstChild("AttachmentPoint") and p74:FindFirstChild("Folder")))))))) and p74.Folder:FindFirstChild("Mouth") and "SneakRat" or (p74:FindFirstChild("LeftArm") and (p74:FindFirstChild("RightArm") and (p74:FindFirstChild("Tail") and (p74:FindFirstChild("Body") and (p74:FindFirstChild("Left Foot") and (p74:FindFirstChild("Right Foot") and (p74:FindFirstChild("Waist") and (p74:FindFirstChild("Left Knee") and (p74:FindFirstChild("Left Leg") and (p74:FindFirstChild("Right Knee") and p74:FindFirstChild("Right Leg")))))))))) and "Guest666" or "Unknown")))))))))
+    end
+    local function vu87()
+        local v76, v77, v78 = pairs(vu70)
+        while true do
+            local v79
+            v78, v79 = v76(v77, v78)
+            if v78 == nil then
+                break
+            end
+            if v78:IsDescendantOf(vu4.Workspace) then
+                local v80 = v78.PrimaryPart or v78:FindFirstChild("HumanoidRootPart", true) or (v78:FindFirstChild("Checker", true) or v78:FindFirstChild("Hitbox", true))
+                local v81, v82 = vu15:WorldToViewportPoint(v80.Position)
+                if v82 then
+                    local v83 = vu75(v78) or "Unknown"
+                    local v84 = (vu15.CFrame.Position - v80.Position).Magnitude or 0
+                    local v85 = Vector2.new(2000 / v84, 3000 / v84)
+                    v79.Size = v85
+                    v79.Position = Vector2.new(v81.X - v85.X / 2, v81.Y - v85.Y / 2)
+                    v79.Color = vu16.EspMonsterColor.BoxColor
+                    if vu16.MonsterEspType.Box then
+                        v79.Visible = true
+                    else
+                        v79.Visible = false
+                    end
+                    local v86 = {}
+                    if vu16.MonsterEspType.Name then
+                        table.insert(v86, v83)
+                    end
+                    if vu16.MonsterEspType.Distance then
+                        table.insert(v86, string.format("[%.0f]", v84))
+                    end
+                    vu71[v78].Color = vu16.EspMonsterColor.TextColor
+                    vu71[v78].Position = Vector2.new(v81.X, v81.Y - 15)
+                    if # v86 <= 0 then
+                        vu71[v78].Visible = false
+                    else
+                        vu71[v78].Visible = true
+                        vu71[v78].Text = table.concat(v86, " ")
+                    end
+                else
+                    v79.Visible = false
+                    vu71[v78].Visible = false
+                end
+            else
+                v79:Remove()
+                vu71[v78]:Remove()
+                vu70[v78] = nil
+                vu71[v78] = nil
+            end
+        end
+    end
+    local function vu92()
+        local v88, v89, v90 = ipairs(vu4.Workspace.GameSystem.Monsters:GetChildren())
+        while true do
+            local v91
+            v90, v91 = v88(v89, v90)
+            if v90 == nil then
+                break
+            end
+            if not vu70[v91] then
+                vu70[v91] = vu73()
+                vu71[v91] = vu28()
+            end
+        end
+    end
+    local vu93 = nil
+    local vu94 = nil
+    v8.Main:Dropdown({
+        Title = "Monster Esp",
+        Values = {
+            "Box",
+            "Name",
+            "Distance"
+        },
+        Value = {
+            "Name"
+        },
+        Multi = true,
+        AllowNone = false,
+        Callback = function(p95)
+            local v96, v97, v98 = pairs(vu16.MonsterEspType)
+            while true do
+                v98 = v96(v97, v98)
+                if v98 == nil then
+                    break
+                end
+                vu16.MonsterEspType[v98] = false
+            end
+            local v99, v100, v101 = pairs(p95)
+            while true do
+                local v102
+                v101, v102 = v99(v100, v101)
+                if v101 == nil then
+                    break
+                end
+                if vu16.MonsterEspType[v102] ~= nil then
+                    vu16.MonsterEspType[v102] = true
+                end
+            end
+        end
+    })
+    v8.Main:Toggle({
+        Title = "Monster Esp",
+        Type = "Checkbox",
+        Value = false,
+        Callback = function(p103)
+            if p103 then
+                vu92()
+                vu93 = vu4.Workspace.GameSystem.Monsters.ChildAdded:Connect(function(p104)
+                    if not vu70[p104] then
+                        vu70[p104] = vu73()
+                        vu71[p104] = vu28()
+                    end
+                end)
+                vu94 = vu4.RunService.RenderStepped:Connect(vu87)
+            else
+                if vu93 then
+                    vu93:Disconnect()
+                    vu93 = nil
+                end
+                if vu94 then
+                    vu94:Disconnect()
+                    vu94 = nil
+                end
+                local v105, v106, v107 = pairs(vu70)
+                while true do
+                    local v108
+                    v107, v108 = v105(v106, v107)
+                    if v107 == nil then
+                        break
+                    end
+                    v108:Remove()
+                end
+                local v109, v110, v111 = pairs(vu71)
+                while true do
+                    local v112
+                    v111, v112 = v109(v110, v111)
+                    if v111 == nil then
+                        break
+                    end
+                    v112:Remove()
+                end
+                vu71 = {}
+                vu70 = {}
+            end
+        end
+    })
+    local v113 = v8.Main:Section({
+        Title = "Color",
+        Box = true
+    })
+    v113:Colorpicker({
+        Title = "Box",
+        Default = Color3.fromRGB(255, 0, 0),
+        Transparency = 0,
+        Locked = false,
+        Callback = function(p114)
+            vu16.EspMonsterColor.BoxColor = p114
+        end
+    })
+    v113:Colorpicker({
+        Title = "Text",
+        Default = Color3.fromRGB(255, 0, 0),
+        Transparency = 0,
+        Locked = false,
+        Callback = function(p115)
+            vu16.EspMonsterColor.TextColor = p115
+        end
+    })
+    v8.Main:Divider()
+    v8.Main:Space()
+    v8.Main:Divider()
+    local vu116 = {}
+    local vu117 = {}
+    local function vu129()
+        local v118, v119, v120 = pairs(vu116)
+        while true do
+            local v121
+            v120, v121 = v118(v119, v120)
+            if v120 == nil then
+                break
+            end
+            if v120:IsDescendantOf(vu4.Workspace) then
+                local v122 = v120.PrimaryPart or v120:FindFirstChild("HumanoidRootPart", true) or (v120:FindFirstChild("Checker", true) or v120:FindFirstChild("Hitbox", true))
+                local v123, v124 = vu15:WorldToViewportPoint(v122.Position)
+                if v124 then
+                    local v125 = v120.Name or "Unknown Npc"
+                    local v126 = (vu15.CFrame.Position - v122.Position).Magnitude or 0
+                    local v127 = Vector2.new(2000 / v126, 3000 / v126)
+                    v121.Size = v127
+                    v121.Position = Vector2.new(v123.X - v127.X / 2, v123.Y - v127.Y / 2)
+                    v121.Color = vu16.EspNpcColor.BoxColor
+                    if vu16.NpcEspType.Box then
+                        v121.Visible = true
+                    else
+                        v121.Visible = false
+                    end
+                    local v128 = {}
+                    if vu16.NpcEspType.Name then
+                        table.insert(v128, v125)
+                    end
+                    if vu16.NpcEspType.Distance then
+                        table.insert(v128, string.format("[%.0f]", v126))
+                    end
+                    vu117[v120].Color = vu16.EspNpcColor.TextColor
+                    vu117[v120].Position = Vector2.new(v123.X, v123.Y - 15)
+                    if # v128 <= 0 then
+                        vu117[v120].Visible = false
+                    else
+                        vu117[v120].Visible = true
+                        vu117[v120].Text = table.concat(v128, " ")
+                    end
+                else
+                    v121.Visible = false
+                    vu117[v120].Visible = false
+                end
+            else
+                v121:Remove()
+                vu117[v120]:Remove()
+                vu116[v120] = nil
+                vu117[v120] = nil
+            end
+        end
+    end
+    local function vu134()
+        local v130, v131, v132 = ipairs(vu4.Workspace.GameSystem.NPCModels:GetChildren())
+        while true do
+            local v133
+            v132, v133 = v130(v131, v132)
+            if v132 == nil then
+                break
+            end
+            if not vu116[v133] then
+                vu116[v133] = vu73()
+                vu117[v133] = vu28()
+            end
+        end
+    end
+    local vu135 = nil
+    local vu136 = nil
+    v8.Main:Dropdown({
+        Title = "Npc Esp",
+        Values = {
+            "Box",
+            "Name",
+            "Distance"
+        },
+        Value = {
+            "Box",
+            "Name",
+            "Distance"
+        },
+        Multi = true,
+        AllowNone = false,
+        Callback = function(p137)
+            local v138, v139, v140 = pairs(vu16.NpcEspType)
+            while true do
+                v140 = v138(v139, v140)
+                if v140 == nil then
+                    break
+                end
+                vu16.NpcEspType[v140] = false
+            end
+            local v141, v142, v143 = pairs(p137)
+            while true do
+                local v144
+                v143, v144 = v141(v142, v143)
+                if v143 == nil then
+                    break
+                end
+                if vu16.NpcEspType[v144] ~= nil then
+                    vu16.NpcEspType[v144] = true
+                end
+            end
+        end
+    })
+    v8.Main:Toggle({
+        Title = "Npc Esp",
+        Type = "Checkbox",
+        Value = false,
+        Callback = function(p145)
+            if p145 then
+                vu134()
+                vu136 = vu4.Workspace.GameSystem.NPCModels.ChildAdded:Connect(function(p146)
+                    if not vu116[p146] then
+                        vu116[p146] = vu73()
+                        vu117[p146] = vu28()
+                    end
+                end)
+                vu135 = vu4.RunService.RenderStepped:Connect(vu129)
+            else
+                if vu135 then
+                    vu135:Disconnect()
+                    vu135 = nil
+                end
+                if vu136 then
+                    vu136:Disconnect()
+                    vu136 = nil
+                end
+                local v147, v148, v149 = pairs(vu116)
+                while true do
+                    local v150
+                    v149, v150 = v147(v148, v149)
+                    if v149 == nil then
+                        break
+                    end
+                    v150:Remove()
+                end
+                local v151, v152, v153 = pairs(vu117)
+                while true do
+                    local v154
+                    v153, v154 = v151(v152, v153)
+                    if v153 == nil then
+                        break
+                    end
+                    v154:Remove()
+                end
+                vu117 = {}
+                vu116 = {}
+            end
+        end
+    })
+    local v155 = v8.Main:Section({
+        Title = "Color",
+        Box = true
+    })
+    v155:Colorpicker({
+        Title = "Box",
+        Default = Color3.fromRGB(0, 255, 0),
+        Transparency = 0,
+        Locked = false,
+        Callback = function(p156)
+            vu16.EspNpcColor.BoxColor = p156
+        end
+    })
+    v155:Colorpicker({
+        Title = "Text",
+        Default = Color3.fromRGB(0, 255, 0),
+        Transparency = 0,
+        Locked = false,
+        Callback = function(p157)
+            vu16.EspNpcColor.TextColor = p157
+        end
+    })
+    v8.Main:Divider()
+    v8.Main:Space()
+    v8.Main:Divider()
+    local vu158 = vu3(game:GetService("Lighting")).Atmosphere.Density
+    local vu159 = vu3(game:GetService("Lighting")).GlobalShadows
+    local vu160 = vu3(game:GetService("Lighting")).ClockTime
+    local vu161 = vu3(game:GetService("Lighting")).Brightness
+    local vu162 = vu3(game:GetService("Lighting")).FogEnd
+    local vu163 = vu3(game:GetService("Lighting")).OutdoorAmbient
+    v8.Main:Toggle({
+        Title = "Full Bright",
+        Icon = "sun",
+        Type = "Toggle",
+        Value = false,
+        Callback = function(p164)
+            if p164 then
+                vu3(game:GetService("Lighting")).Atmosphere.Density = 0
+                vu3(game:GetService("Lighting")).GlobalShadows = false
+                vu3(game:GetService("Lighting")).ClockTime = 12
+                vu3(game:GetService("Lighting")).Brightness = 4
+                vu3(game:GetService("Lighting")).FogEnd = 100000
+                vu3(game:GetService("Lighting")).OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+            else
+                vu3(game:GetService("Lighting")).Atmosphere.Density = vu158 or 0.1
+                vu3(game:GetService("Lighting")).GlobalShadows = vu159 or true
+                vu3(game:GetService("Lighting")).ClockTime = vu160 or 0
+                vu3(game:GetService("Lighting")).Brightness = vu161 or 3.5
+                vu3(game:GetService("Lighting")).FogEnd = vu162 or 0
+                vu3(game:GetService("Lighting")).OutdoorAmbient = vu163
+            end
+        end
+    })
+    local _ = vu4.Players.LocalPlayer
+    local vu165 = vu4.Workspace.GameSystem.Loots:WaitForChild("World")
+    local vu166 = vu4.Workspace["\231\148\181\230\162\175"].Left4["\229\141\135\233\153\141\229\143\176"].Ground["\231\148\181\230\162\175\229\136\176\232\190\190\231\131\159\233\155\190"].p
+    local vu167 = vu4.Workspace["\231\148\181\230\162\175"].Left4.ElevatorCenter
+    local v168 = vu3(game:GetService("ReplicatedStorage"))
+    local _ = v168.Remote_Event
+    local vu169 = require(v168.Shared.Core.TEvent)
+    local vu170 = {
+        BoiTsThePowerOfFORCEPull = 180,
+        MonsterForceRadius = 30,
+        MonsterForceStrengthBoi = 100
+    }
+    local function vu176(p171)
+        local v172, v173, v174 = ipairs(vu4.Players:GetPlayers())
+        while true do
+            local v175
+            v174, v175 = v172(v173, v174)
+            if v174 == nil then
+                break
+            end
+            if v175.Character and p171:IsDescendantOf(v175.Character) then
+                return true
+            end
+        end
+        return false
+    end
+    local vu177 = {}
+    local vu178 = nil
+    local vu179 = nil
+    local vu180 = nil
+    local function vu183(p181)
+        local v182 = p181:IsA("BasePart") and (not p181.Anchored and (p181.Parent and p181:IsDescendantOf(vu165)))
+        if v182 then
+            v182 = not vu176(p181)
+        end
+        return v182
+    end
+    local function vu185(p184)
+        if vu183(p184) and not table.find(vu177, p184) then
+            p184.CanCollide = false
+            sethiddenproperty(p184, "NetworkOwnershipRule", Enum.NetworkOwnership.Manual)
+            table.insert(vu177, p184)
+        end
+    end
+    local function vu188(p186)
+        local v187 = table.find(vu177, p186)
+        if v187 then
+            table.remove(vu177, v187)
+        end
+    end
+    v8.Malicious:Toggle({
+        Title = "Bring Item",
+        Desc = "Bring Item to elevator",
+        Type = "Checkbox",
+        Value = false,
+        Callback = function(p189)
+            if p189 then
+                local v190 = vu165
+                local v191, v192, v193 = ipairs(v190:GetDescendants())
+                while true do
+                    local v194
+                    v193, v194 = v191(v192, v193)
+                    if v193 == nil then
+                        break
+                    end
+                    vu185(v194)
+                end
+                vu178 = vu165.DescendantAdded:Connect(vu185)
+                vu179 = vu165.DescendantRemoving:Connect(vu188)
+                vu180 = vu4.RunService.Heartbeat:Connect(function()
+                    local v195, v196, v197 = ipairs(vu4.Players:GetPlayers())
+                    while true do
+                        local v198
+                        v197, v198 = v195(v196, v197)
+                        if v197 == nil then
+                            break
+                        end
+                        if v198 ~= vu4.Players.LocalPlayer then
+                            sethiddenproperty(v198, "MaximumSimulationRadius", 0.1)
+                            sethiddenproperty(v198, "SimulationRadius", 0.1)
+                            v198.MaximumSimulationRadius = 0.1
+                            v198.SimulationRadius = 0.1
+                        end
+                    end
+                    setsimulationradius(math.huge)
+                    if vu166 and # vu177 ~= 0 then
+                        local _ = vu166.Position
+                        for v199 = # vu177, 1, - 1 do
+                            local v200 = vu177[v199]
+                            if v200 and (v200.Parent and (v200:IsA("BasePart") and not v200.Anchored)) then
+                                local v201 = vu166.Position
+                                if (v200.Position - v201).Magnitude > 3 then
+                                    v200.Velocity = (v201 - v200.Position).Unit * vu170.BoiTsThePowerOfFORCEPull
+                                    v200.CanCollide = false
+                                else
+                                    v200.Velocity = Vector3.zero
+                                    v200.CanCollide = true
+                                    table.remove(vu177, v199)
+                                end
+                            else
+                                table.remove(vu177, v199)
+                            end
+                        end
+                    end
+                end)
+            else
+                if vu178 then
+                    vu178:Disconnect()
+                end
+                if vu179 then
+                    vu179:Disconnect()
+                end
+                if vu180 then
+                    vu180:Disconnect()
+                end
+                local v202, v203, v204 = ipairs(vu177)
+                while true do
+                    local v205
+                    v204, v205 = v202(v203, v204)
+                    if v204 == nil then
+                        break
+                    end
+                    if v205 and v205.Parent then
+                        v205.CanCollide = true
+                        v205.Velocity = Vector3.zero
+                    end
+                end
+                table.clear(vu177)
+            end
+        end
+    })
+    v8.Malicious:Slider({
+        Title = "Bring Strength",
+        Step = 1,
+        Value = {
+            Min = 1,
+            Max = 300,
+            Default = 180
+        },
+        Callback = function(p206)
+            vu170.BoiTsThePowerOfFORCEPull = p206
+        end
+    })
+    v8.Malicious:Divider()
+    v8.Malicious:Space()
+    v8.Malicious:Divider()
+    local vu207 = nil
+    local vu223 = v8.Malicious:Toggle({
+        Title = "Get tf out of my way",
+        Desc = "No oNe Can SoTp mE!",
+        Type = "Checkbox",
+        Value = false,
+        Callback = function(p208)
+            if p208 then
+                vu207 = vu4.RunService.Heartbeat:Connect(function()
+                    local v209, v210, v211 = ipairs(vu4.Players:GetPlayers())
+                    while true do
+                        local v212
+                        v211, v212 = v209(v210, v211)
+                        if v211 == nil then
+                            break
+                        end
+                        if v212 ~= vu4.Players.LocalPlayer then
+                            sethiddenproperty(v212, "MaximumSimulationRadius", 0.1)
+                            sethiddenproperty(v212, "SimulationRadius", 0.1)
+                            v212.MaximumSimulationRadius = 0.1
+                            v212.SimulationRadius = 0.1
+                        end
+                    end
+                    setsimulationradius(math.huge)
+                    local v213 = vu4.Players.LocalPlayer.Character
+                    if v213 then
+                        local v214 = v213:FindFirstChild("HumanoidRootPart")
+                        if v214 then
+                            local v215 = v214.Position
+                            local v216, v217, v218 = pairs(vu4.Workspace.GameSystem.Monsters:GetChildren())
+                            while true do
+                                local v219
+                                v218, v219 = v216(v217, v218)
+                                if v218 == nil then
+                                    break
+                                end
+                                if v219:IsA("Model") then
+                                    local v220 = v219.PrimaryPart or v219:FindFirstChildWhichIsA("BasePart", true)
+                                    if v220 then
+                                        local v221 = v220.Position - v215
+                                        local v222 = v221.Magnitude
+                                        if v222 <= (vu170.MonsterForceRadius or 30) and 0 < v222 then
+                                            v220.AssemblyLinearVelocity = v221.Unit * (vu170.Strength or 100)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    else
+                        return
+                    end
+                end)
+            elseif vu207 then
+                vu207:Disconnect()
+                vu207 = nil
+            end
+        end
+    })
+    v8.Malicious:Slider({
+        Title = "Push Radius",
+        Step = 1,
+        Value = {
+            Min = 1,
+            Max = 300,
+            Default = 30
+        },
+        Callback = function(p224)
+            vu170.MonsterForceRadius = p224
+        end
+    })
+    v8.Malicious:Slider({
+        Title = "Push Strength",
+        Step = 1,
+        Value = {
+            Min = 1,
+            Max = 500,
+            Default = 100
+        },
+        Callback = function(p225)
+            vu170.Strength = p225
+        end
+    })
+    v8.Malicious:Divider()
+    v8.Malicious:Space()
+    v8.Malicious:Divider()
+    local vu226 = nil
+    local vu227 = {}
+    local vu228 = nil
+    local vu229 = nil
+    local vu230 = nil
+    local function vu233(p231)
+        local v232 = p231:IsA("BasePart") and (not p231.Anchored and p231.Parent)
+        if v232 then
+            v232 = p231:IsDescendantOf(vu4.Workspace.GameSystem.NPCModels)
+        end
+        return v232
+    end
+    local function vu235(p234)
+        if vu233(p234) and not table.find(vu227, p234) then
+            p234.CanCollide = false
+            sethiddenproperty(p234, "NetworkOwnershipRule", Enum.NetworkOwnership.Manual)
+            table.insert(vu227, p234)
+        end
+    end
+    local function vu238(p236)
+        local v237 = table.find(vu227, p236)
+        if v237 then
+            table.remove(vu227, v237)
+        end
+    end
+    v8.Malicious:Toggle({
+        Title = "Auto Rescue Npc",
+        Desc = "Just Rescue, Not Bring",
+        Type = "Checkbox",
+        Value = false,
+        Callback = function(p239)
+            if p239 then
+                local v240, v241, v242 = ipairs(vu4.Workspace.GameSystem.NPCModels:GetChildren())
+                while true do
+                    local v243
+                    v242, v243 = v240(v241, v242)
+                    if v242 == nil then
+                        break
+                    end
+                    if v243:IsA("Model") then
+                        vu169.FireRemote("Interactable", v243)
+                        task.wait(0.1)
+                    end
+                end
+                vu226 = vu4.Workspace.GameSystem.NPCModels.ChildAdded:Connect(function(p244)
+                    if p244:IsA("Model") then
+                        vu169.FireRemote("Interactable", p244)
+                    end
+                end)
+            elseif vu226 then
+                vu226:Disconnect()
+                vu226 = nil
+            end
+        end
+    })
+    v8.Malicious:Toggle({
+        Title = "Bring Npc",
+        Desc = "Bring Npc to elevator",
+        Type = "Checkbox",
+        Value = false,
+        Callback = function(p245)
+            if p245 then
+                local v246, v247, v248 = ipairs(vu4.Workspace.GameSystem.NPCModels:GetDescendants())
+                while true do
+                    local v249
+                    v248, v249 = v246(v247, v248)
+                    if v248 == nil then
+                        break
+                    end
+                    vu235(v249)
+                end
+                vu228 = vu4.Workspace.GameSystem.NPCModels.DescendantAdded:Connect(vu235)
+                vu229 = vu4.Workspace.GameSystem.NPCModels.DescendantRemoving:Connect(vu238)
+                vu230 = vu4.RunService.Heartbeat:Connect(function()
+                    setsimulationradius(math.huge)
+                    if vu166 and # vu227 ~= 0 then
+                        local _ = vu166.Position
+                        for v250 = # vu227, 1, - 1 do
+                            local v251 = vu227[v250]
+                            if v251 and (v251.Parent and (v251:IsA("BasePart") and not v251.Anchored)) then
+                                local v252 = vu166.Position
+                                if (v251.Position - v252).Magnitude > 3 then
+                                    v251.Velocity = (v252 - v251.Position).Unit * 300
+                                    v251.CanCollide = false
+                                else
+                                    v251.Velocity = Vector3.zero
+                                    v251.CanCollide = true
+                                    table.remove(vu227, v250)
+                                end
+                            else
+                                table.remove(vu227, v250)
+                            end
+                        end
+                    end
+                end)
+            else
+                if vu228 then
+                    vu228:Disconnect()
+                end
+                if vu229 then
+                    vu229:Disconnect()
+                end
+                if vu230 then
+                    vu230:Disconnect()
+                end
+                local v253, v254, v255 = ipairs(vu227)
+                while true do
+                    local v256
+                    v255, v256 = v253(v254, v255)
+                    if v255 == nil then
+                        break
+                    end
+                    if v256 and v256.Parent then
+                        v256.CanCollide = true
+                        v256.Velocity = Vector3.zero
+                    end
+                end
+                table.clear(vu227)
+            end
+        end
+    })
+    v8.Malicious:Divider()
+    v8.Malicious:Space()
+    v8.Malicious:Divider()
+    local function vu258(p257)
+        if (p257:IsA("Model") or p257:IsA("Tool")) and (p257:HasTag("Interactable") and p257:GetAttribute("en")) then
+            vu169.FireRemote("Interactable", p257)
+        end
+    end
+    local vu259 = nil
+    v8.Malicious:Toggle({
+        Title = "Auto open",
+        Desc = "Chest,Fridge Smth like that",
+        Type = "Checkbox",
+        Value = false,
+        Callback = function(p260)
+            if p260 then
+                task.spawn(function()
+                    local v261, v262, v263 = pairs(vu4.Workspace.GameSystem.InteractiveItem:GetChildren())
+                    while true do
+                        local v264
+                        v263, v264 = v261(v262, v263)
+                        if v263 == nil then
+                            break
+                        end
+                        vu258(v264)
+                    end
+                end)
+                vu259 = vu4.Workspace.GameSystem.InteractiveItem.ChildAdded:Connect(vu258)
+            elseif vu259 then
+                vu259:Disconnect()
+                vu259 = nil
+            end
+        end
+    })
+    local vu265 = nil
+    v8.Malicious:Toggle({
+        Title = "Auto Pickup",
+        Type = "Checkbox",
+        Value = false,
+        Callback = function(p266)
+            if p266 then
+                vu265 = vu4.RunService.Heartbeat:Connect(function()
+                    local v267, v268, v269 = pairs(vu4.Workspace.GameSystem.Loots.World:GetChildren())
+                    while true do
+                        local v270
+                        v269, v270 = v267(v268, v269)
+                        if v269 == nil then
+                            break
+                        end
+                        local vu271 = false
+                        local function v272()
+                            vu271 = true
+                        end
+                        if v270:IsA("Model") or v270:IsA("Tool") then
+                            local v273
+                            if v270:GetAttribute("left") ~= true then
+                                v273 = false
+                            else
+                                v273 = true
+                                local v274 = v270:FindFirstChild("z1", true)
+                                if v274 and v274:IsA("BasePart") then
+                                    local v275 = v274.Color
+                                    if math.round(v275.R * 255) == 226 and (math.round(v275.G * 255) == 178 and math.round(v275.B * 255) == 58) then
+                                        v273 = false
+                                    end
+                                end
+                            end
+                            local v276 = not v273 and (v270.PrimaryPart or (v270:FindFirstChild("Interactable", true) or v270:FindFirstChild("Handle", true)))
+                            if v276 then
+                                local v277 = vu4.Players.LocalPlayer.Character
+                                if not v277 then
+                                    v272()
+                                end
+                                local v278 = v277:FindFirstChild("HumanoidRootPart")
+                                if not v278 then
+                                    v272()
+                                end
+                                local v279 = v278.Position
+                                if (v270:GetAttribute("sz") or 25) >= (v276.Position - v279).Magnitude then
+                                    vu258(v270)
+                                end
+                            end
+                        end
+                        if vu271 then
+                            break
+                        end
+                    end
+                end)
+            elseif vu265 then
+                vu265:Disconnect()
+                vu265 = nil
+            end
+        end
+    })
+    local vu280 = false
+    v8.Malicious:Toggle({
+        Title = "Auto Collect Egg",
+        Type = "Checkbox",
+        Value = false,
+        Callback = function(p281)
+            vu280 = p281
+            task.spawn(function()
+                while vu280 do
+                    local vu282 = false
+                    local function v283()
+                        vu282 = true
+                    end
+                    local v284 = vu4.Players.LocalPlayer.Character
+                    if v284 then
+                        v284 = v284:FindFirstChild("HumanoidRootPart")
+                    end
+                    if v284 then
+                        local v285, v286, v287 = pairs(vu4.Workspace.GameSystem.Loots.World:GetChildren())
+                        while true do
+                            local v288
+                            v287, v288 = v285(v286, v287)
+                            if v287 == nil then
+                                break
+                            end
+                            if not vu280 then
+                                v283()
+                            end
+                            local v289 = v288:FindFirstChild("Egg", true)
+                            if v289 and (v289.Parent and v289.Parent.Parent) and v289.Parent.Parent:IsA("Tool") then
+                                local v290 = v289.Parent.Parent
+                                local v291 = v290.Name
+                                local v292 = v290.PrimaryPart or v290:FindFirstChildWhichIsA("BasePart")
+                                if not v292 then
+                                    break
+                                end
+                                local v293 = not vu223 or vu223.Value
+                                if not v293 then
+                                    vu223:Set(true)
+                                end
+                                v284.CFrame = v292.CFrame
+                                task.wait(0.1)
+                                if (v292.Position - v284.Position).Magnitude <= 5 then
+                                    for _ = 1, 10 do
+                                        if vu4.Workspace.GameSystem.Loots.Player:FindFirstChild(v291, true) then
+                                            v283()
+                                        end
+                                        vu258(v290)
+                                        task.wait(0.1)
+                                    end
+                                    if vu4.Workspace.GameSystem.Loots.Player:FindFirstChild(v291, true) then
+                                        v284.CFrame = vu166.CFrame or vu167.CFrame
+                                        if vu223 and v293 ~= nil then
+                                            vu223:Set(v293)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        task.wait(0.5)
+                    else
+                        task.wait()
+                    end
+                    if vu282 then
+                        break
+                    end
+                end
+            end)
+        end
+    })
+    v8.Malicious:Button({
+        Title = "Teleport to Elevator",
+        Locked = false,
+        Callback = function()
+            local v294 = vu4.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            local v295 = vu4.Workspace["\231\148\181\230\162\175"].Left4.ElevatorCenter
+            if v294 then
+                v294.CFrame = vu166.CFrame or v295.CFrame
+            end
+        end
+    })
+    v8.Info:Paragraph({
+        Title = "Latest Dev Testing:",
+        Desc = "07/12/2025\nExecutor: Delta\nPlatform: Mobile\nStatus: All Working",
+        Color = "Grey",
+        Locked = false
+    })
+    v8.Info:Divider()
+    v8.Info:Paragraph({
+        Title = "Why don\226\128\153t functions like bring or push work?",
+        Desc = "It\226\128\153s because if you\226\128\153re playing with other players and someone is closer to that object than you are, you won\226\128\153t be able to bring it (network ownership). The fix is to move closer to the object than the other player.",
+        Color = "Grey",
+        Locked = false
+    })
+    local v296, v297, v298 = pairs(vu1:GetThemes())
+    local v299 = vu3
+    local v300 = {}
+    while true do
+        local v301
+        v298, v301 = v296(v297, v298)
+        if v298 == nil then
+            break
+        end
+        table.insert(v300, v298)
+    end
+    table.sort(v300)
+    v8.Settings:Dropdown({
+        Title = "Theme",
+        Values = v300,
+        Value = "Dark",
+        Callback = function(p302)
+            vu1:SetTheme(p302)
+        end
+    })
+    v8.Settings:Slider({
+        Title = "Transparency",
+        Value = {
+            Min = 0,
+            Max = 1,
+            Default = 0.2
+        },
+        Step = 0.1,
+        Callback = function(p303)
+            vu7:ToggleTransparency(tonumber(p303) > 0)
+            vu1.TransparencyValue = tonumber(p303)
+        end
+    })
+    KeybindValue = "LeftControl"
+    v8.Settings:Keybind({
+        Title = "Keybind",
+        Value = "LeftControl",
+        Callback = function(p304)
+            vu7:SetToggleKey(Enum.KeyCode[p304])
+            KeybindValue = p304
+        end
+    })
+    local vu305 = nil
+    local vu306 = nil
+    local vu307 = nil
+    local vu308 = "NextPhase/NextPhase/Backgrounds"
+    if not isfolder(vu308) then
+        makefolder(vu308)
+    end
+    local vu309 = {
+        "None"
+    }
+    local vu310 = nil
+    local function vu319()
+        table.clear(vu309)
+        table.insert(vu309, "None")
+        local v311 = listfiles(vu308)
+        local v312, v313, v314 = ipairs(v311)
+        while true do
+            local v315
+            v314, v315 = v312(v313, v314)
+            if v314 == nil then
+                break
+            end
+            if not isfolder(v315) then
+                local v316 = v315:match("%.([^.]+)$")
+                if v316 then
+                    local v317 = v316:lower()
+                    if v317 == "png" or (v317 == "jpg" or (v317 == "jpeg" or v317 == "webp")) then
+                        local v318 = v315:match("([^/\\]+)$")
+                        table.insert(vu309, v318)
+                    end
+                end
+            end
+        end
+    end
+    local function vu320()
+        if vu310 then
+            vu319()
+            if # vu309 ~= 0 then
+                vu310:Refresh(vu309)
+                vu310:Select(vu309[1])
+            else
+                vu310:Refresh(vu309)
+                vu310:Select()
+            end
+        end
+    end
+    v8.Settings:Input({
+        Title = "imageName",
+        Value = "",
+        InputIcon = "link",
+        Type = "Input",
+        Placeholder = "Enter Name...",
+        Callback = function(p321)
+            vu306 = p321
+        end
+    })
+    v8.Settings:Input({
+        Title = "url",
+        Value = "",
+        InputIcon = "link",
+        Type = "Input",
+        Placeholder = "Enter Url...",
+        Callback = function(p322)
+            vu305 = p322
+        end
+    })
+    v8.Settings:Button({
+        Title = "Create Background",
+        Locked = false,
+        Callback = function()
+            if not isfolder(vu308) then
+                makefolder(vu308)
+            end
+            task.wait()
+            if vu305 and vu305 ~= "" then
+                if vu306 and vu306 ~= "" then
+                    local v323 = not http_request and (not request and fluxus)
+                    if v323 then
+                        v323 = fluxus.request
+                    end
+                    if v323 then
+                        local v324 = v323({
+                            Url = vu305,
+                            Method = "GET"
+                        })
+                        if v324 and v324.StatusCode == 200 then
+                            local v325 = vu308 .. "/" .. vu306 .. "." .. (vu305:match("^.+%.(%w+)$") or "png")
+                            writefile(v325, v324.Body)
+                            SafeNotify({
+                                Title = "Create Success",
+                                Content = "Saved At: " .. v325,
+                                Duration = 5,
+                                Icon = "check"
+                            })
+                            if not vu310 then
+                                return
+                            end
+                            vu320()
+                        else
+                            SafeNotify({
+                                Title = "Error",
+                                Content = "Can\'t Save Image",
+                                Duration = 5,
+                                Icon = "x"
+                            })
+                        end
+                    else
+                        SafeNotify({
+                            Title = "Error",
+                            Content = "executer request Error",
+                            Duration = 3,
+                            Icon = "x"
+                        })
+                    end
+                else
+                    SafeNotify({
+                        Title = "Error",
+                        Content = "Image Not Found",
+                        Duration = 3,
+                        Icon = "x"
+                    })
+                    return
+                end
+            else
+                SafeNotify({
+                    Title = "Error",
+                    Content = "Link Not Found",
+                    Duration = 3,
+                    Icon = "x"
+                })
+                return
+            end
+        end
+    })
+    vu310 = v8.Settings:Dropdown({
+        Title = "BackgroundImage",
+        Values = vu309,
+        Value = "",
+        Callback = function(p326)
+            if p326 == "None" then
+                vu307 = p326
+            else
+                vu307 = getcustomasset(vu308 .. "/" .. p326)
+            end
+        end
+    })
+    vu320()
+    v8.Settings:Button({
+        Title = "Refresh Dropdown",
+        Locked = false,
+        Callback = function()
+            vu310:Refresh(vu309)
+            vu310:Select()
+        end
+    })
+    v8.Settings:Button({
+        Title = "Change Background",
+        Locked = false,
+        Callback = function()
+            if vu307 then
+                if vu307 ~= "None" then
+                    vu7:SetBackgroundImage(vu307)
+                else
+                    vu7:SetBackgroundImage(nil)
+                end
+            else
+                SafeNotify({
+                    Title = "Error",
+                    Content = "Image not found",
+                    Duration = 3,
+                    Icon = "x"
+                })
+            end
+        end
+    })
+    v8.Settings:Slider({
+        Title = "Image Transparency",
+        Value = {
+            Min = 0,
+            Max = 1,
+            Default = 0.42
+        },
+        Step = 0.01,
+        Callback = function(p327)
+            vu7:SetBackgroundImageTransparency(tonumber(p327))
+        end
+    })
+    vu7:SelectTab(1)
+    local vu328 = Instance.new("ScreenGui")
+    vu328.Name = "NextPhaseMinimize"
+    local v329 = not v299(game:GetService("CoreGui")) and gethui
+    if v329 then
+        v329 = gethui()
+    end
+    vu328.Parent = v329
+    local v330 = Instance.new("ImageButton")
+    v330.Size = UDim2.new(0, 50, 0, 50)
+    v330.Position = UDim2.new(0, 10, 0, 10)
+    v330.Image = "rbxassetid://97921168551227"
+    v330.BackgroundTransparency = 1
+    v330.Active = true
+    v330.Parent = vu328
+    local v331 = Instance.new("UICorner")
+    v331.CornerRadius = UDim.new(0, 10)
+    v331.Parent = v330
+    function ToggleWindow()
+        vu7:Toggle()
+    end
+    v330.MouseButton1Click:Connect(ToggleWindow)
+    function enableDragging(pu332)
+        local vu333 = false
+        local vu334 = nil
+        local vu335 = nil
+        pu332.InputBegan:Connect(function(p336)
+            if p336.UserInputType == Enum.UserInputType.MouseButton1 or p336.UserInputType == Enum.UserInputType.Touch then
+                vu333 = true
+                vu334 = p336.Position
+                vu335 = pu332.Position
+            end
+        end)
+        pu332.InputChanged:Connect(function(p337)
+            if vu333 and (p337.UserInputType == Enum.UserInputType.MouseMovement or p337.UserInputType == Enum.UserInputType.Touch) then
+                local v338 = p337.Position - vu334
+                pu332.Position = UDim2.new(vu335.X.Scale, vu335.X.Offset + v338.X, vu335.Y.Scale, vu335.Y.Offset + v338.Y)
+            end
+        end)
+        pu332.InputEnded:Connect(function(p339)
+            if p339.UserInputType == Enum.UserInputType.MouseButton1 or p339.UserInputType == Enum.UserInputType.Touch then
+                vu333 = false
+            end
+        end)
+    end
+    enableDragging(v330)
+    vu7:OnDestroy(function()
+        pcall(function()
+            getgenv().NXPDD_LOADED = false
+        end)
+        vu328:Destroy()
+    end)
+end
