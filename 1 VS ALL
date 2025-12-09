@@ -1,0 +1,163 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/liebertsx/Tora-Library/main/src/librarynew",true))()
+
+local tab = library:CreateWindow("1 vs all-ZeeHUB")
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DamagePlayer = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("DamagePlayer")
+local ClaimDailyQuest = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ClaimDailyQuest")
+local UnlockWeapon = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("UnlockWeapon")
+local localPlayer = Players.LocalPlayer
+
+local validWeapons = {
+    "Axe","Banana","Bat","Baton","Bone","Bottle","Chicken","Classic","Fish","Hanger","Katana","Knife",
+    "Korblox","Kukri","Kunai","Minecraft","Pan","Pillow","Rolling Pin","Ruler","Slappers","Toy","Turkey",
+    "Comet","Eye","Gloves","Moth","Sinister","Soul Reaper","Starlight","Butterfly","Flame","Hollow Night",
+    "Kirito","Mjolnir","Saber","Wind Blade","Zoro","Berserk","Bloodmoon","Dark Blade","Purple Void","Asta"
+}
+
+local running = false
+local waitTime = 0.2
+local loopThread
+
+tab:AddToggle({
+    text = "Toggle Auto Kill",
+    flag = "toggle",
+    callback = function(v)
+        running = v
+        if running then
+            loopThread = task.spawn(function()
+                while running do
+                    task.wait(waitTime)
+                    local localChar = localPlayer.Character
+                    local localRoot = localChar and localChar:FindFirstChild("HumanoidRootPart")
+                    if localRoot then
+                        for _, player in pairs(Players:GetPlayers()) do
+                            if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                                for _, weapon in ipairs(validWeapons) do
+                                    local weaponModel = localChar:FindFirstChild(weapon)
+                                    if weaponModel and weaponModel:FindFirstChild("WeaponData") and weaponModel.WeaponData:FindFirstChild("Hit") then
+                                        local args = {
+                                            {player},
+                                            20,
+                                            {
+                                                AttackSpeed = 0,
+                                                HitSound = weaponModel.WeaponData.Hit
+                                            }
+                                        }
+                                        DamagePlayer:FireServer(unpack(args))
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
+tab:AddBox({
+    text = "Speed (1-1000)",
+    flag = "waittime",
+    callback = function(value)
+        local num = tonumber(value)
+        if num and num >= 1 and num <= 1000 then
+            waitTime = 1 / num
+        end
+    end
+})
+
+local autoMoneyRunning = false
+local autoMoneyThread
+
+tab:AddToggle({
+    text = "Auto Money",
+    flag = "automoney",
+    callback = function(v)
+        autoMoneyRunning = v
+        if autoMoneyRunning then
+            autoMoneyThread = task.spawn(function()
+                while autoMoneyRunning do
+                    task.wait(0.05)
+                    ClaimDailyQuest:FireServer()
+                end
+            end)
+        end
+    end
+})
+
+tab:AddBox({
+    text = "Type a weapon you want to unlock",
+    flag = "weaponname",
+    callback = function(value)
+        if value and value ~= "" then
+            local inputLower = string.lower(value)
+            for _, weapon in ipairs(validWeapons) do
+                if inputLower == string.lower(weapon) then
+                    local args = { weapon }
+                    UnlockWeapon:FireServer(unpack(args))
+                    print("Unlocked:", weapon)
+                    return
+                end
+            end
+            print("Invalid weapon name! Must match one of the list.")
+        end
+    end
+})
+
+local walkSpeedEnabled = false
+local walkSpeedValue = 16
+
+tab:AddToggle({
+    text = "Enable WalkSpeed",
+    flag = "walkspeedtoggle",
+    callback = function(v)
+        walkSpeedEnabled = v
+        if walkSpeedEnabled and localPlayer.Character and localPlayer.Character:FindFirstChildOfClass("Humanoid") then
+            localPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = walkSpeedValue
+        end
+    end
+})
+
+tab:AddSlider({
+    text = "WalkSpeed",
+    flag = "walkspeed",
+    min = 16,
+    max = 200,
+    callback = function(value)
+        walkSpeedValue = value
+        if walkSpeedEnabled and localPlayer.Character and localPlayer.Character:FindFirstChildOfClass("Humanoid") then
+            localPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = walkSpeedValue
+        end
+    end
+})
+
+local jumpPowerEnabled = false
+local jumpPowerValue = 50
+
+tab:AddToggle({
+    text = "Enable JumpPower",
+    flag = "jumppowertoggle",
+    callback = function(v)
+        jumpPowerEnabled = v
+        if jumpPowerEnabled and localPlayer.Character and localPlayer.Character:FindFirstChildOfClass("Humanoid") then
+            localPlayer.Character:FindFirstChildOfClass("Humanoid").JumpPower = jumpPowerValue
+        end
+    end
+})
+
+tab:AddSlider({
+    text = "JumpPower",
+    flag = "jumppower",
+    min = 50,
+    max = 300,
+    callback = function(value)
+        jumpPowerValue = value
+        if jumpPowerEnabled and localPlayer.Character and localPlayer.Character:FindFirstChildOfClass("Humanoid") then
+            localPlayer.Character:FindFirstChildOfClass("Humanoid").JumpPower = jumpPowerValue
+        end
+    end
+})
+
+library:Init()
