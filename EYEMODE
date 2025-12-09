@@ -1,0 +1,197 @@
+-- FULL SCRIPT ACTUALIZAT
+
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local humanoid = char:WaitForChild("Humanoid")
+local camera = workspace.CurrentCamera
+local runService = game:GetService("RunService")
+local uis = game:GetService("UserInputService")
+
+-- setări
+local normalWalk = 16
+local normalJump = 50
+local soulSpeed = 0.6
+local camRotSpeed = 2 -- viteza de rotire camera când apeși ←/→
+
+local eyeMode = false
+local soulPart = nil
+local lookX = 0
+local lookY = 0
+
+local camHold = false
+
+---------------------------------------------------------------------
+-- CREARE GUI
+---------------------------------------------------------------------
+local gui = Instance.new("ScreenGui")
+gui.Name = "EyeModeGUI"
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local function createButton(text, pos, size)
+	local btn = Instance.new("TextButton")
+	btn.Size = size
+	btn.Position = pos
+	btn.Text = text
+	btn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	btn.TextColor3 = Color3.fromRGB(0,255,255)
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 20
+	btn.Parent = gui
+	return btn
+end
+
+---------------------------------------------------------------------
+-- BUTOANE PRINCIPALE
+---------------------------------------------------------------------
+local eyeButton = createButton("Eye Mode", UDim2.new(0.05,0,0.75,0), UDim2.new(0,120,0,50))
+local tpButton = createButton("TP to Eye", UDim2.new(0.05,0,0.65,0), UDim2.new(0,120,0,50))
+tpButton.Visible = false
+
+---------------------------------------------------------------------
+-- SĂGEȚI MIȘCARE
+---------------------------------------------------------------------
+local moveButtons = {}
+moveButtons.Up = createButton("↑", UDim2.new(0.9,0,0.65,0), UDim2.new(0,60,0,60))
+moveButtons.Down = createButton("↓", UDim2.new(0.9,0,0.78,0), UDim2.new(0,60,0,60))
+moveButtons.Left = createButton("←", UDim2.new(0.86,0,0.72,0), UDim2.new(0,60,0,60))
+moveButtons.Right = createButton("→", UDim2.new(0.94,0,0.72,0), UDim2.new(0,60,0,60))
+moveButtons.Up3D = createButton("⬆", UDim2.new(0.88,0,0.59,0), UDim2.new(0,60,0,60))
+moveButtons.Down3D = createButton("⬇", UDim2.new(0.88,0,0.84,0), UDim2.new(0,60,0,60))
+-- ascunde la început
+for _,b in pairs(moveButtons) do b.Visible = false end
+
+-- input tracking
+local arrowInput = {Up=false,Down=false,Left=false,Right=false,Up3D=false,Down3D=false}
+
+for name,button in pairs(moveButtons) do
+	button.MouseButton1Down:Connect(function() arrowInput[name] = true end)
+	button.MouseButton1Up:Connect(function() arrowInput[name] = false end)
+end
+
+---------------------------------------------------------------------
+-- BUTOANE ROTIRE CAMERA STANGA/DREAPTA
+---------------------------------------------------------------------
+local camLeftBtn = createButton("Cam ←", UDim2.new(0.05,0,0.55,0), UDim2.new(0,80,0,50))
+local camRightBtn = createButton("Cam →", UDim2.new(0.15,0,0.55,0), UDim2.new(0,80,0,50))
+camLeftBtn.Visible = false
+camRightBtn.Visible = false
+
+local camLeft = false
+local camRight = false
+
+camLeftBtn.MouseButton1Down:Connect(function() camLeft = true end)
+camLeftBtn.MouseButton1Up:Connect(function() camLeft = false end)
+
+camRightBtn.MouseButton1Down:Connect(function() camRight = true end)
+camRightBtn.MouseButton1Up:Connect(function() camRight = false end)
+
+---------------------------------------------------------------------
+-- CAMERA POV MOUSE LOOK
+---------------------------------------------------------------------
+uis.InputChanged:Connect(function(input)
+	if eyeMode and camHold and input.UserInputType == Enum.UserInputType.MouseMovement then
+		lookX = lookX - input.Delta.X * 0.3
+		lookY = math.clamp(lookY - input.Delta.Y * 0.3, -80, 80)
+	end
+end)
+
+uis.InputBegan:Connect(function(input)
+	if eyeMode and input.KeyCode == Enum.KeyCode.Space then
+		camHold = true
+	end
+end)
+uis.InputEnded:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.Space then
+		camHold = false
+	end
+end)
+
+---------------------------------------------------------------------
+-- TP TO EYE
+---------------------------------------------------------------------
+tpButton.MouseButton1Click:Connect(function()
+	if soulPart then
+		char:SetPrimaryPartCFrame(CFrame.new(soulPart.Position))
+	end
+end)
+
+---------------------------------------------------------------------
+-- ACTIVARE / DEZACTIVARE EYE MODE
+---------------------------------------------------------------------
+eyeButton.MouseButton1Click:Connect(function()
+	eyeMode = not eyeMode
+
+	if eyeMode then
+		-- blocare caracter
+		humanoid.WalkSpeed = 0
+		humanoid.JumpPower = 0
+		humanoid.AutoRotate = false
+
+		-- suflet
+		soulPart = Instance.new("Part")
+		soulPart.Shape = Enum.PartType.Ball
+		soulPart.Size = Vector3.new(1,1,1)
+		soulPart.Color = Color3.fromRGB(0,150,255)
+		soulPart.Material = Enum.Material.Neon
+		soulPart.Anchored = true
+		soulPart.CanCollide = false
+		soulPart.Parent = workspace
+
+		soulPart.Position = camera.CFrame.Position + camera.CFrame.LookVector * 3
+
+		-- arată butoanele
+		for _,b in pairs(moveButtons) do b.Visible = true end
+		tpButton.Visible = true
+		camLeftBtn.Visible = true
+		camRightBtn.Visible = true
+
+		camera.CameraType = Enum.CameraType.Scriptable
+
+		runService:BindToRenderStep("SoulMove", Enum.RenderPriority.Camera.Value + 1, function()
+			local rot = CFrame.Angles(0, math.rad(lookX), 0) *
+			            CFrame.Angles(math.rad(lookY), 0, 0)
+
+			local forward = rot.LookVector
+			local rightV = rot.RightVector
+			local upV = rot.UpVector
+
+			-- miscare suflet
+			local move = Vector3.new()
+			if arrowInput.Up then move += forward end
+			if arrowInput.Down then move -= forward end
+			if arrowInput.Left then move -= rightV end
+			if arrowInput.Right then move += rightV end
+			if arrowInput.Up3D then move += upV end
+			if arrowInput.Down3D then move -= upV end
+			soulPart.Position += move * soulSpeed
+
+			-- rotire camera stânga/dreapta doar camera
+			if camLeft then lookX = lookX - camRotSpeed end
+			if camRight then lookX = lookX + camRotSpeed end
+
+			camera.CFrame = CFrame.new(soulPart.Position) * rot
+		end)
+
+	else
+		-- revine caracter
+		humanoid.WalkSpeed = normalWalk
+		humanoid.JumpPower = normalJump
+		humanoid.AutoRotate = true
+
+		-- ascunde butoanele
+		for _,b in pairs(moveButtons) do b.Visible = false end
+		tpButton.Visible = false
+		camLeftBtn.Visible = false
+		camRightBtn.Visible = false
+
+		runService:UnbindFromRenderStep("SoulMove")
+
+		if soulPart then
+			soulPart:Destroy()
+			soulPart = nil
+		end
+
+		camera.CameraType = Enum.CameraType.Custom
+		camera.CameraSubject = humanoid
+	end
+end)
