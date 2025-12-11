@@ -1,0 +1,307 @@
+-- ts file was generated at discord.gg/25ms
+
+
+if game:GetService("CoreGui"):FindFirstChild("ToraScript") then
+    game:GetService("CoreGui").ToraScript:Destroy()
+end
+local v1 = loadstring(game:HttpGet("https://raw.githubusercontent.com/liebertsx/Tora-Library/main/src/librarynew", true))()
+local v2 = v1:CreateWindow("Arise Crossover")
+local vu3 = nil
+v2:AddList({
+    text = "Action",
+    flag = "list",
+    value = "==Select Action==",
+    values = {
+        "Arise",
+        "Destroy"
+    },
+    callback = function(p4)
+        if p4 == "Arise" then
+            vu3 = "EnemyCapture"
+        elseif p4 == "Destroy" then
+            vu3 = "EnemyDestroy"
+        end
+    end
+})
+v2:AddToggle({
+    text = "Auto Attack",
+    flag = "toggle",
+    state = false,
+    callback = function(p5)
+        _G.Attack = p5
+        print("Attack: ", p5)
+        if p5 then
+            Attack()
+        end
+    end
+})
+function Attack()
+    spawn(function()
+        _G.Attack = true
+        local vu6 = nil
+        while _G.Attack do
+            wait()
+            pcall(function()
+                local vu7 = game:GetService("Players").LocalPlayer
+                local v8 = workspace.__Main.__Pets[vu7.UserId]
+                local v9, v10, v11 = ipairs(v8:GetChildren())
+                local v12 = {}
+                while true do
+                    local v13
+                    v11, v13 = v9(v10, v11)
+                    if v11 == nil then
+                        break
+                    end
+                    if v13:IsA("Model") and v13:FindFirstChild("PrimaryPart") then
+                        v12[v13.Name] = v13.PrimaryPart.Position
+                    end
+                end
+                local function v21()
+                    local v14 = math.huge
+                    local v15, v16, v17 = pairs(workspace.__Main.__Enemies.Server:GetDescendants())
+                    local v18 = nil
+                    while true do
+                        local v19
+                        v17, v19 = v15(v16, v17)
+                        if v17 == nil then
+                            break
+                        end
+                        if v19:IsA("Part") and (v19:GetAttribute("HP") and v19:GetAttribute("HP") > 0) then
+                            local v20 = vu7:DistanceFromCharacter(v19.CFrame.p)
+                            if v20 < v14 then
+                                v18 = v19
+                                v14 = v20
+                            end
+                        end
+                    end
+                    return v18
+                end
+                local v22 = v21()
+                if vu6 and (vu6:GetAttribute("HP") and vu6:GetAttribute("HP") <= 0) then
+                    local v23 = {
+                        {
+                            {
+                                Event = vu3,
+                                Enemy = vu6.Name
+                            },
+                            "\4"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").BridgeNet2.dataRemoteEvent:FireServer(unpack(v23))
+                    vu6 = nil
+                    v22 = v21()
+                    task.wait(0.5)
+                end
+                if v22 and v22 ~= vu6 then
+                    task.wait(1)
+                    for _ = 1, 2 do
+                        local v24 = {
+                            {
+                                {
+                                    PetPos = v12,
+                                    AttackType = "All",
+                                    Event = "Attack",
+                                    Enemy = v22.Name
+                                },
+                                "\7"
+                            }
+                        }
+                        game:GetService("ReplicatedStorage").BridgeNet2.dataRemoteEvent:FireServer(unpack(v24))
+                        wait(1)
+                    end
+                    vu6 = v22
+                end
+                if vu6 then
+                    local v25 = {
+                        {
+                            {
+                                Event = "PunchAttack",
+                                Enemy = vu6.Name
+                            },
+                            "\4"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").BridgeNet2.dataRemoteEvent:FireServer(unpack(v25))
+                end
+            end)
+        end
+    end)
+end
+v2:AddToggle({
+    text = "Auto Mobs (Nearest)",
+    flag = "toggle",
+    state = false,
+    callback = function(p26)
+        _G.Mobs = p26
+        print("Mobs: ", p26)
+        if p26 then
+            Mobs()
+        end
+    end
+})
+function Mobs()
+    spawn(function()
+        _G.Mobs = true
+        local vu27 = nil
+        while _G.Mobs do
+            wait()
+            pcall(function()
+                local vu28 = game:GetService("Players").LocalPlayer
+                local v29 = workspace.__Main.__Pets[vu28.UserId]
+                local v30, v31, v32 = ipairs(v29:GetChildren())
+                local v33 = {}
+                while true do
+                    local v34
+                    v32, v34 = v30(v31, v32)
+                    if v32 == nil then
+                        break
+                    end
+                    if v34:IsA("Model") and v34:FindFirstChild("PrimaryPart") then
+                        v33[v34.Name] = v34.PrimaryPart.Position
+                    end
+                end
+                local function v42()
+                    local v35 = math.huge
+                    local v36, v37, v38 = pairs(workspace.__Main.__Enemies.Server:GetDescendants())
+                    local v39 = nil
+                    while true do
+                        local v40
+                        v38, v40 = v36(v37, v38)
+                        if v38 == nil then
+                            break
+                        end
+                        if v40:IsA("Part") and (v40:GetAttribute("HP") and v40:GetAttribute("HP") > 0) then
+                            local v41 = vu28:DistanceFromCharacter(v40.CFrame.p)
+                            if v41 < v35 then
+                                v39 = v40
+                                v35 = v41
+                            end
+                        end
+                    end
+                    return v39
+                end
+                local v43 = v42()
+                if vu27 and (vu27:GetAttribute("HP") and vu27:GetAttribute("HP") <= 0) then
+                    local v44 = {
+                        {
+                            {
+                                Event = vu3,
+                                Enemy = vu27.Name
+                            },
+                            "\4"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").BridgeNet2.dataRemoteEvent:FireServer(unpack(v44))
+                    vu27 = nil
+                    v43 = v42()
+                    task.wait(0.5)
+                end
+                if v43 and v43 ~= vu27 then
+                    task.wait(0.5)
+                    vu28.Character:FindFirstChildOfClass("Humanoid").RootPart.CFrame = v43.CFrame * CFrame.new(0, 3, - 5) * CFrame.Angles(0, math.rad(180), 0)
+                    vu27 = v43
+                end
+                if vu27 then
+                    local v45 = {
+                        {
+                            {
+                                Event = "PunchAttack",
+                                Enemy = vu27.Name
+                            },
+                            "\4"
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").BridgeNet2.dataRemoteEvent:FireServer(unpack(v45))
+                end
+            end)
+        end
+    end)
+end
+v2:AddBox({
+    text = "Select Mobs",
+    flag = "box",
+    value = "Mobs Name",
+    callback = function(p46)
+        mobsname = p46
+    end
+})
+v2:AddToggle({
+    text = "Auto Mobs (Select)",
+    flag = "toggle",
+    state = false,
+    callback = function(p47)
+        _G.Mobs2 = p47
+        print("Mobs2: ", p47)
+        if p47 then
+            Mobs2()
+        end
+    end
+})
+function Mobs2()
+    spawn(function()
+        _G.Mobs2 = true
+        local vu48 = nil
+        local vu49 = 0
+        while _G.Mobs2 do
+            wait()
+            pcall(function()
+                local vu50 = game:GetService("Players").LocalPlayer
+                local v59 = (function()
+                    local v51 = math.huge
+                    local v52, v53, v54 = pairs(workspace.__Main.__Enemies.Client:GetDescendants())
+                    local v55 = nil
+                    while true do
+                        local v56
+                        v54, v56 = v52(v53, v54)
+                        if v54 == nil then
+                            break
+                        end
+                        if v56.Name == "HealthBar" and v56.Main.Title.Text == mobsname then
+                            local v57 = v56.Main.Bar.Amount.Text
+                            if v57 == "0 HP" then
+                                if v57 == "0 HP" then
+                                    wait(1)
+                                end
+                            else
+                                local v58 = vu50:DistanceFromCharacter(v56.Parent.HumanoidRootPart.CFrame.p)
+                                if v58 < v51 then
+                                    v55 = v56
+                                    v51 = v58
+                                end
+                            end
+                        end
+                    end
+                    return v55
+                end)()
+                if v59 and v59 ~= vu48 then
+                    vu48 = v59
+                    vu49 = tick()
+                    vu50.Character:FindFirstChildOfClass("Humanoid").RootPart.CFrame = v59.Parent.HumanoidRootPart.CFrame * CFrame.new(0, 3, - 5) * CFrame.Angles(0, math.rad(180), 0)
+                end
+            end)
+        end
+    end)
+end
+v2:AddSlider({
+    text = "Walk Speed",
+    flag = "slider1",
+    value = 16,
+    min = 16,
+    max = 300,
+    callback = function(p60)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = p60
+    end
+})
+v2:AddButton({
+    text = "Inf Jump",
+    flag = "button",
+    callback = function()
+        game:GetService("UserInputService").JumpRequest:Connect(function()
+            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+        end)
+    end
+})
+v2:AddLabel({
+    text = "By ZeeHUB"
+})
+v1:Init()
