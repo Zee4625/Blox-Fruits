@@ -1,0 +1,144 @@
+-- Script Final Robust de Căutare și Highlight ESP
+local Workspace = game:GetService("Workspace")
+
+-- DEFINIȚII CULORI ȘI ȚINTE
+-- Cheia este Numele Animatronicului (Modelul Părinte, ex: "Bonnie"),
+-- Valoarea este un tabel cu Culori și o listă de Nume de Rig-uri posibile.
+local ANIMATRONIC_CONFIGS = {
+    ["Foxy"] = {
+        Color = Color3.fromRGB(255, 0, 0),       -- Roșu
+        RigNames = {"Rig_Foxy", "Rig"}
+    },
+    ["Freddy"] = {
+        Color = Color3.fromRGB(160, 82, 45),     -- Maro
+        RigNames = {"Rig_Freddy", "Rig"}
+    },
+    ["Bonnie"] = {
+        Color = Color3.fromRGB(0, 0, 255),       -- Albastru
+        RigNames = {"Rig_WitheredBonnie", "Rig"}
+    },
+    ["Chica"] = {
+        Color = Color3.fromRGB(255, 255, 0),     -- Galben
+        RigNames = {"Rig_WitheredChica", "Rig"}
+    }
+}
+
+-- Lista numelor Părinte pe care le căutăm, extrasă din CONFIGS
+local PARENT_NAMES = {}
+for name, _ in pairs(ANIMATRONIC_CONFIGS) do
+    table.insert(PARENT_NAMES, name)
+end
+
+-- =================================================================
+-- FUNCȚII HELPER
+-- =================================================================
+
+-- Funcție pentru a crea și aplica Highlight-ul (de tip ESP)
+local function applyESPHighlight(instance, color)
+    if not instance or (not instance:IsA("BasePart") and not instance:IsA("Model") and not instance:IsA("Folder")) then
+        return false
+    end
+
+    local existingHighlight = instance:FindFirstChild("ESPHighlighter")
+    if existingHighlight then
+        existingHighlight:Destroy()
+    end
+
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "ESPHighlighter"
+    
+    highlight.FillColor = color
+    highlight.OutlineColor = Color3.new(0, 0, 0)
+    highlight.FillTransparency = 0.88
+    
+    highlight.Adornee = instance
+    highlight.Parent = instance 
+    
+    return true
+end
+
+-- Funcție principală care încearcă cele 3 variante de structură pentru un singur animatronic
+local function highlightAnimatronic(parentModel)
+    local animatronicName = parentModel.Name
+    local config = ANIMATRONIC_CONFIGS[animatronicName]
+    if not config then return false end -- Nu este o țintă validă
+
+    -- 1. Încearcă V1 & V2: Căutăm Rig-ul specificat în RigNames
+    for _, rigName in ipairs(config.RigNames) do
+        local targetInstance = parentModel:FindFirstChild(rigName)
+        if targetInstance then
+            if applyESPHighlight(targetInstance, config.Color) then
+                print(string.format("[SUCCESS - RIG] Highlight aplicat pe Rig '%s' din modelul '%s'.", rigName, animatronicName))
+                return true
+            end
+        end
+    end
+    
+    -- 2. Încearcă V3: Aplică highlight-ul direct pe Modelul Părinte
+    if applyESPHighlight(parentModel, config.Color) then
+        print(string.format("[SUCCESS - MODEL] Highlight aplicat pe Modelul Părinte '%s'.", animatronicName))
+        return true
+    end
+
+    warn(string.format("[FAIL - GENERAL] %s: Nicio variantă de Highlight nu a funcționat. Verificați structura internă.", animatronicName))
+    return false
+end
+
+-- =================================================================
+-- LOGICĂ DE CĂUTARE GLOBALĂ ȘI URMĂRIRE
+-- =================================================================
+
+-- Funcție de verificare pentru a evita tratarea aceluiași obiect de două ori
+local highlightedObjects = {}
+
+-- Funcție care verifică dacă un obiect este un animatronic țintă
+local function isTargetAnimatronic(instance)
+    -- Verifică dacă obiectul are un nume de animatronic și nu a fost deja tratat
+    return table.find(PARENT_NAMES, instance.Name) and not highlightedObjects[instance]
+end
+
+-- Funcția de procesare care se rulează la fiecare încărcare sau adăugare de obiect
+local function processInstance(instance)
+    if isTargetAnimatronic(instance) and instance:IsA("Model") then
+        if highlightAnimatronic(instance) then
+            -- Marchează obiectul ca fiind procesat
+            highlightedObjects[instance] = true
+        end
+    end
+end
+
+-- 1. Inițializare: Căutăm toate obiectele existente în Workspace
+local function initializeHighlights()
+    print("Începe căutarea globală a animatronicilor în Workspace...")
+    
+    -- Folosim GetDescendants pentru a căuta în absolut tot (inclusiv Game.Animatronics.Animatronics)
+    for _, descendant in ipairs(Workspace:GetDescendants()) do
+        processInstance(descendant)
+    end
+    
+    print("Căutare inițială încheiată.")
+end
+
+
+-- 2. Urmărim obiectele adăugate dinamic
+Workspace.ChildAdded:Connect(function(child)
+    -- Tratează cazul în care modelul este adăugat direct la Workspace
+    processInstance(child)
+end)
+
+-- De asemenea, urmărim când se adaugă un obiect în orice alt obiect din Workspace
+-- pentru a prinde modelele care apar în containere adânci (ex: în Game.Animatronics...)
+-- ATENȚIE: Această buclă poate fi intensivă în resurse, dar este cea mai sigură metodă de a prinde orice.
+
+for _, descendant in ipairs(Workspace:GetDescendants()) do
+    if descendant:IsA("Model") or descendant:IsA("Folder") then
+        descendant.ChildAdded:Connect(function(child)
+            processInstance(child)
+        end)
+    end
+end
+
+
+-- Dăm un timp scurt de așteptare pentru a ne asigura că Workspace este încărcat
+wait(1) 
+initializeHighlights()
