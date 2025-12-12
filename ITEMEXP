@@ -1,0 +1,264 @@
+--[[
+    SCRIPT: Object Inspector (LocalScript)
+    LOCATION: StarterPlayer/StarterPlayerScripts
+    FUNCTIONALITY: Creates an on-screen GUI that allows the player
+                     to inspect the object they are looking at, displaying
+                     complex details including path, class, and child objects.
+]]
+
+-- Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+-- Player and Camera References
+local Player = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- Raycasting Settings
+local RAYCAST_MAX_DISTANCE = 100 -- Maximum inspection distance (100 studs)
+local RAYCAST_PARAMS = RaycastParams.new()
+-- Ignore the player character in the raycast
+RAYCAST_PARAMS.FilterType = Enum.RaycastFilterType.Exclude
+
+-- Reference to the current Highlight (for object visual emphasis)
+local currentHighlight = nil
+local currentTarget = nil -- The currently targeted object
+
+-- Flag to track inspection state
+local isInspectionActive = false
+
+-- =================================================================
+-- 1. GUI CREATION AND STYLING
+-- =================================================================
+
+-- Main container
+local InspectionGUI = Instance.new("ScreenGui")
+InspectionGUI.Name = "ObjectInspectorGUI"
+InspectionGUI.DisplayOrder = 10 -- Ensure it's above other GUIs
+InspectionGUI.Parent = Player:WaitForChild("PlayerGui")
+
+-- Inspection Button (which the player will press)
+local InspectButton = Instance.new("TextButton")
+InspectButton.Name = "InspectButton"
+InspectButton.Size = UDim2.new(0, 100, 0, 40)
+InspectButton.Position = UDim2.new(0.5, -50, 1, -60) -- Bottom, centered
+InspectButton.Text = "INSPECT"
+InspectButton.Font = Enum.Font.SourceSansBold
+InspectButton.TextSize = 18
+InspectButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255) -- Blue
+InspectButton.TextColor3 = Color3.new(1, 1, 1) -- White
+InspectButton.BorderSizePixel = 0
+InspectButton.Parent = InspectionGUI
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0, 5)
+ButtonCorner.Parent = InspectButton
+
+-- Text Box for results
+local OutputTextBox = Instance.new("TextLabel")
+OutputTextBox.Name = "OutputTextBox"
+OutputTextBox.Size = UDim2.new(0.4, 0, 0.35, 0)
+OutputTextBox.Position = UDim2.new(0.01, 0, 0.05, 0) -- Top-left
+OutputTextBox.Text = "Press 'INSPECT' or the 'E' key to analyze the targeted object."
+OutputTextBox.Font = Enum.Font.SourceSans
+OutputTextBox.TextSize = 14
+OutputTextBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark Grey/Black
+OutputTextBox.BackgroundTransparency = 0.1
+OutputTextBox.TextColor3 = Color3.new(1, 1, 1) -- White
+OutputTextBox.TextWrapped = true
+OutputTextBox.TextXAlignment = Enum.TextXAlignment.Left
+OutputTextBox.TextYAlignment = Enum.TextYAlignment.Top
+OutputTextBox.BorderSizePixel = 0
+OutputTextBox.Visible = true
+OutputTextBox.Parent = InspectionGUI
+
+-- Text Padding (optional, improves readability)
+local TextPadding = Instance.new("UITextSizeConstraint")
+TextPadding.MaxTextSize = 10000 -- Ensure text doesn't scale too much
+TextPadding.Parent = OutputTextBox
+
+-- =================================================================
+-- 2. RAYCASTING AND HIGHLIGHT LOGIC
+-- =================================================================
+
+-- Function to create/update the Highlight
+local function updateHighlight(instance)
+    if currentHighlight and currentHighlight.Adornee == instance then
+        -- Highlight is already on the correct object
+        return
+    end
+    
+    -- Destroy the previous Highlight
+    if currentHighlight then
+        currentHighlight:Destroy()
+        currentHighlight = nil
+    end
+
+    -- Create a new Highlight if we have a base object
+    if instance and (instance:IsA("BasePart") or instance:IsA("Model") or instance:IsA("Folder")) then
+        local highlight = Instance.new("Highlight")
+        highlight.FillColor = Color3.fromRGB(255, 255, 0) -- Bright Yellow
+        highlight.OutlineColor = Color3.fromRGB(255, 0, 0) -- Red Outline
+        highlight.Adornee = instance
+        highlight.Parent = Camera -- Good practice for cleanup
+        currentHighlight = highlight
+    end
+end
+
+-- Function to clear the Highlight and reset the state
+local function clearInspection()
+    if currentHighlight then
+        currentHighlight:Destroy()
+        currentHighlight = nil
+    end
+    currentTarget = nil
+    isInspectionActive = false
+    OutputTextBox.Text = "Press 'INSPECT' or the 'E' key to analyze the targeted object."
+    InspectButton.Text = "INSPECT"
+    InspectButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
+end
+
+-- Function to generate a detailed description
+local function generateDescription(instance)
+    if not instance then
+        return "No object is targeted within range."
+    end
+
+    local description = "### Object Details ###\n\n"
+    
+    -- Build the full object path
+    local path = ""
+    local function buildPath(inst)
+        if inst.Parent and inst.Parent ~= game and inst.Parent:IsA("Instance") then
+            return buildPath(inst.Parent) .. "." .. inst.Name
+        elseif inst.Parent == game then
+            return inst.Name
+        else
+            return inst.Name
+        end
+    end
+    path = buildPath(instance)
+    description = description .. "**Path:** " .. path .. "\n"
+    description = description .. "**Class:** " .. instance.ClassName .. "\n"
+
+    -- Add specific properties
+    if instance:IsA("BasePart") then
+        description = description .. "**Material:** " .. tostring(instance.Material) .. "\n"
+        description = description .. "**Anchored:** " .. tostring(instance.Anchored) .. "\n"
+        description = description .. "**Color:** R:" .. math.floor(instance.Color.R * 255) .. ", G:" .. math.floor(instance.Color.G * 255) .. ", B:" .. math.floor(instance.Color.B * 255) .. "\n"
+    end
+    
+    -- List of notable child objects
+    local childrenDescriptions = {}
+    for _, child in ipairs(instance:GetChildren()) do
+        local childInfo = child.ClassName .. " named '" .. child.Name .. "'"
+
+        -- Additional details for specific types
+        if child:IsA("ParticleEmitter") then
+            childInfo = childInfo .. " (Particle Emitter)"
+        elseif child:IsA("Sound") then
+            childInfo = childInfo .. " (Sound)"
+        elseif child:IsA("RemoteEvent") or child:IsA("RemoteFunction") then
+            childInfo = childInfo .. " (Remote Communication)"
+        elseif child:IsA("Script") or child:IsA("LocalScript") or child:IsA("ModuleScript") then
+            childInfo = childInfo .. " (Script)"
+        elseif child:IsA("Animation") and child.AnimationId then
+            childInfo = childInfo .. " (Animation ID: " .. child.AnimationId .. ")"
+        end
+
+        table.insert(childrenDescriptions, childInfo)
+    end
+
+    description = description .. "\n### Child Objects (" .. #childrenDescriptions .. ") ###"
+    if #childrenDescriptions > 0 then
+        description = description .. "\n- " .. table.concat(childrenDescriptions, "\n- ")
+    else
+        description = description .. "\nNo notable child objects."
+    end
+
+    return description
+end
+
+-- =================================================================
+-- 3. LOOPS AND EVENTS
+-- =================================================================
+
+-- Real-time Raycasting (for visual feedback)
+RunService.Heartbeat:Connect(function()
+    if not Camera.CFrame then return end
+    
+    -- Get the ray's origin (camera) and direction (where it's looking)
+    local viewportPoint = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    local ray = Camera:ViewportPointToRay(viewportPoint.X, viewportPoint.Y)
+
+    -- Exclude the player character from RaycastParams (if not already)
+    if Player.Character and not table.find(RAYCAST_PARAMS.FilterDescendantsInstances, Player.Character) then
+        RAYCAST_PARAMS.FilterDescendantsInstances = {Player.Character}
+    end
+
+    -- Perform the Raycast
+    local raycastResult = workspace:Raycast(ray.Origin, ray.Direction * RAYCAST_MAX_DISTANCE, RAYCAST_PARAMS)
+
+    if raycastResult and raycastResult.Instance then
+        local target = raycastResult.Instance
+        
+        -- If we are not in inspection mode, only show the highlight
+        if not isInspectionActive then
+            updateHighlight(target)
+            InspectButton.Text = "INSPECT (" .. target.Name .. ")"
+            InspectButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
+        end
+        currentTarget = target
+    else
+        -- If the ray hits nothing
+        if not isInspectionActive then
+            updateHighlight(nil)
+            InspectButton.Text = "INSPECT"
+            InspectButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Grey when not targeting
+        end
+        currentTarget = nil
+    end
+end)
+
+
+-- Main inspection/deactivation function
+local function toggleInspection()
+    if isInspectionActive then
+        -- Deactivate inspection
+        clearInspection()
+    else
+        -- Activate inspection
+        if currentTarget then
+            isInspectionActive = true
+            updateHighlight(currentTarget) -- Ensure it is highlighted
+            
+            -- Generate and display the description
+            local description = generateDescription(currentTarget)
+            OutputTextBox.Text = description
+            
+            -- Change button appearance to indicate it's active
+            InspectButton.Text = "CLOSE (E)"
+            InspectButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85) -- Red for closing
+        else
+            -- No object targeted
+            OutputTextBox.Text = "No object found within inspection range."
+        end
+    end
+end
+
+-- Connect the function to the button click
+InspectButton.MouseButton1Click:Connect(toggleInspection)
+
+-- Connect to the 'E' key (or another key of choice)
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    -- Ensure we don't process input if the user is typing in chat, etc.
+    if gameProcessedEvent then return end
+
+    if input.KeyCode == Enum.KeyCode.E then
+        toggleInspection()
+    end
+end)
+
+-- Cleanup: Ensure the highlight is destroyed when the game closes
+game:GetService("Debris"):AddItem(currentHighlight, 0.1)
