@@ -1,144 +1,321 @@
--- Script Final Robust de Căutare și Highlight ESP
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
 
--- DEFINIȚII CULORI ȘI ȚINTE
--- Cheia este Numele Animatronicului (Modelul Părinte, ex: "Bonnie"),
--- Valoarea este un tabel cu Culori și o listă de Nume de Rig-uri posibile.
-local ANIMATRONIC_CONFIGS = {
-    ["Foxy"] = {
-        Color = Color3.fromRGB(255, 0, 0),       -- Roșu
-        RigNames = {"Rig_Foxy", "Rig"}
-    },
-    ["Freddy"] = {
-        Color = Color3.fromRGB(160, 82, 45),     -- Maro
-        RigNames = {"Rig_Freddy", "Rig"}
-    },
-    ["Bonnie"] = {
-        Color = Color3.fromRGB(0, 0, 255),       -- Albastru
-        RigNames = {"Rig_WitheredBonnie", "Rig"}
-    },
-    ["Chica"] = {
-        Color = Color3.fromRGB(255, 255, 0),     -- Galben
-        RigNames = {"Rig_WitheredChica", "Rig"}
-    }
+local UPDATE_RATE = 0.05
+local ESP_ENABLED = true
+local TEXT_SIZE = 14
+
+local ESPColors = {
+    Goldenfreddy = Color3.fromRGB(255, 215, 0),
+    Puppet = Color3.fromRGB(255, 255, 255),
+    Freddy = Color3.fromRGB(165, 42, 42),
+    Foxy = Color3.fromRGB(255, 0, 0),
+    Cupcake = Color3.fromRGB(255, 105, 180),
+    Chica = Color3.fromRGB(255, 255, 0),
+    Bonnie = Color3.fromRGB(0, 100, 255)
 }
 
--- Lista numelor Părinte pe care le căutăm, extrasă din CONFIGS
-local PARENT_NAMES = {}
-for name, _ in pairs(ANIMATRONIC_CONFIGS) do
-    table.insert(PARENT_NAMES, name)
+local ESPs = {}
+local AllAnimatronics = {}
+
+function getModelID(model)
+    return tostring(model:GetFullName()) .. "_" .. tostring(model:GetDebugId())
 end
 
--- =================================================================
--- FUNCȚII HELPER
--- =================================================================
-
--- Funcție pentru a crea și aplica Highlight-ul (de tip ESP)
-local function applyESPHighlight(instance, color)
-    if not instance or (not instance:IsA("BasePart") and not instance:IsA("Model") and not instance:IsA("Folder")) then
-        return false
-    end
-
-    local existingHighlight = instance:FindFirstChild("ESPHighlighter")
-    if existingHighlight then
-        existingHighlight:Destroy()
-    end
-
+function createColoredHighlight(model)
+    local color = ESPColors[model.Name] or Color3.new(1, 1, 1)
+    
     local highlight = Instance.new("Highlight")
-    highlight.Name = "ESPHighlighter"
-    
+    highlight.Name = model.Name .. "_Highlight_" .. getModelID(model)
+    highlight.Adornee = model
     highlight.FillColor = color
-    highlight.OutlineColor = Color3.new(0, 0, 0)
-    highlight.FillTransparency = 0.67
+    highlight.OutlineColor = color
+    highlight.FillTransparency = 0.3
+    highlight.OutlineTransparency = 0
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.Enabled = ESP_ENABLED
+    highlight.Parent = model
     
-    highlight.Adornee = instance
-    highlight.Parent = instance 
-    
-    return true
+    return highlight
 end
 
--- Funcție principală care încearcă cele 3 variante de structură pentru un singur animatronic
-local function highlightAnimatronic(parentModel)
-    local animatronicName = parentModel.Name
-    local config = ANIMATRONIC_CONFIGS[animatronicName]
-    if not config then return false end -- Nu este o țintă validă
+function createESP(model)
+    if not model:IsA("Model") then return end
+    
+    local color = ESPColors[model.Name] or Color3.new(1, 1, 1)
+    
+    local highlight = createColoredHighlight(model)
+    
+    local nameText = Drawing.new("Text")
+    nameText.Text = model.Name
+    nameText.Color = color
+    nameText.Size = TEXT_SIZE
+    nameText.Outline = true
+    nameText.OutlineColor = Color3.new(0, 0, 0)
+    nameText.Visible = ESP_ENABLED
+    nameText.ZIndex = 10
+    
+    local distanceText = Drawing.new("Text")
+    distanceText.Text = "0"
+    distanceText.Color = color
+    distanceText.Size = TEXT_SIZE - 2
+    distanceText.Outline = true
+    distanceText.OutlineColor = Color3.new(0, 0, 0)
+    distanceText.Visible = ESP_ENABLED
+    distanceText.ZIndex = 10
+    
+    local boxTop = Drawing.new("Line")
+    local boxRight = Drawing.new("Line")
+    local boxBottom = Drawing.new("Line")
+    local boxLeft = Drawing.new("Line")
+    
+    local boxLines = {boxTop, boxRight, boxBottom, boxLeft}
+    
+    for _, line in ipairs(boxLines) do
+        line.Color = color
+        line.Thickness = 2
+        line.Visible = ESP_ENABLED
+        line.ZIndex = 5
+    end
+    
+    local targetPart = model:FindFirstChild("HumanoidRootPart") or 
+                      model:FindFirstChild("Head") or 
+                      model.PrimaryPart or
+                      model:FindFirstChildWhichIsA("BasePart")
+    
+    ESPs[model] = {
+        Highlight = highlight,
+        Name = nameText,
+        Distance = distanceText,
+        BoxLines = boxLines,
+        Part = targetPart,
+        Color = color,
+        ModelID = getModelID(model),
+        LastKnownPosition = targetPart and targetPart.Position or Vector3.new(0, 0, 0)
+    }
+    
+    AllAnimatronics[model] = true
+    
+    return ESPs[model]
+end
 
-    -- 1. Încearcă V1 & V2: Căutăm Rig-ul specificat în RigNames
-    for _, rigName in ipairs(config.RigNames) do
-        local targetInstance = parentModel:FindFirstChild(rigName)
-        if targetInstance then
-            if applyESPHighlight(targetInstance, config.Color) then
-                print(string.format("[SUCCESS - RIG] Highlight aplicat pe Rig '%s' din modelul '%s'.", rigName, animatronicName))
-                return true
+function updateESP()
+    if not ESP_ENABLED then return end
+    
+    local playerRoot = nil
+    local playerPos = Vector3.new(0, 0, 0)
+    
+    if LocalPlayer.Character then
+        playerRoot = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if playerRoot then
+            playerPos = playerRoot.Position
+        end
+    end
+    
+    for model, espData in pairs(ESPs) do
+        local modelInWorkspace = model.Parent ~= nil
+        
+        local targetPart = espData.Part
+        if modelInWorkspace then
+            if not targetPart or not targetPart.Parent then
+                targetPart = model:FindFirstChild("HumanoidRootPart") or 
+                           model:FindFirstChild("Head") or 
+                           model.PrimaryPart or
+                           model:FindFirstChildWhichIsA("BasePart")
+                if targetPart then
+                    espData.Part = targetPart
+                    espData.LastKnownPosition = targetPart.Position
+                end
+            end
+        end
+        
+        local distance = 0
+        local displayPos = espData.LastKnownPosition
+        
+        if targetPart and targetPart.Parent then
+            displayPos = targetPart.Position
+            espData.LastKnownPosition = displayPos
+        end
+        
+        if playerRoot then
+            distance = (playerPos - displayPos).Magnitude
+        end
+        
+        if espData.Highlight then
+            espData.Highlight.Enabled = ESP_ENABLED and modelInWorkspace
+        end
+        
+        local headPos = displayPos + Vector3.new(0, 3, 0)
+        local headVector, headOnScreen = Camera:WorldToViewportPoint(headPos)
+        
+        if headOnScreen then
+            local headScreen = Vector2.new(headVector.X, headVector.Y)
+            
+            local sizeMultiplier = 100 / (1 + distance * 0.1)
+            local height = math.max(15, math.min(60, sizeMultiplier))
+            local width = height / 2
+            
+            local footScreen = Vector2.new(headScreen.X, headScreen.Y + height)
+            
+            local topLeft = Vector2.new(headScreen.X - width/2, headScreen.Y)
+            local topRight = Vector2.new(headScreen.X + width/2, headScreen.Y)
+            local bottomLeft = Vector2.new(headScreen.X - width/2, footScreen.Y)
+            local bottomRight = Vector2.new(headScreen.X + width/2, footScreen.Y)
+            
+            local box = espData.BoxLines
+            box[1].From = topLeft
+            box[1].To = topRight
+            box[2].From = topRight
+            box[2].To = bottomRight
+            box[3].From = bottomRight
+            box[3].To = bottomLeft
+            box[4].From = bottomLeft
+            box[4].To = topLeft
+            
+            espData.Name.Position = Vector2.new(headScreen.X, headScreen.Y - 25)
+            espData.Name.Visible = true
+            espData.Name.Text = model.Name
+            espData.Name.Color = espData.Color
+            
+            espData.Distance.Text = string.format("%.0f", distance)
+            espData.Distance.Position = Vector2.new(headScreen.X, headScreen.Y - 10)
+            espData.Distance.Visible = true
+            espData.Distance.Color = espData.Color
+            
+            for _, line in ipairs(box) do
+                line.Visible = true
+                line.Color = espData.Color
+            end
+            
+        else
+            espData.Name.Visible = false
+            espData.Distance.Visible = false
+            for _, line in ipairs(espData.BoxLines) do
+                line.Visible = false
+            end
+        end
+    end
+end
+
+function toggleESP()
+    ESP_ENABLED = not ESP_ENABLED
+    
+    for model, espData in pairs(ESPs) do
+        if espData.Highlight then
+            espData.Highlight.Enabled = ESP_ENABLED and model.Parent ~= nil
+        end
+        espData.Name.Visible = ESP_ENABLED
+        espData.Distance.Visible = ESP_ENABLED
+        
+        if ESP_ENABLED then
+            local targetPart = espData.Part or model:FindFirstChildWhichIsA("BasePart")
+            if targetPart then
+                local headPos = targetPart.Position + Vector3.new(0, 3, 0)
+                local headVector, headOnScreen = Camera:WorldToViewportPoint(headPos)
+                
+                for _, line in ipairs(espData.BoxLines) do
+                    line.Visible = headOnScreen
+                end
+            end
+        else
+            for _, line in ipairs(espData.BoxLines) do
+                line.Visible = false
+            end
+        end
+    end
+end
+
+function scanForAnimatronics()
+    local function searchRecursively(parent)
+        for _, child in ipairs(parent:GetChildren()) do
+            if ESPColors[child.Name] and child:IsA("Model") and not ESPs[child] then
+                createESP(child)
+            end
+            if child:IsA("Model") or child:IsA("Folder") then
+                searchRecursively(child)
             end
         end
     end
     
-    -- 2. Încearcă V3: Aplică highlight-ul direct pe Modelul Părinte
-    if applyESPHighlight(parentModel, config.Color) then
-        print(string.format("[SUCCESS - MODEL] Highlight aplicat pe Modelul Părinte '%s'.", animatronicName))
-        return true
+    searchRecursively(Workspace)
+end
+
+local UserInputService = game:GetService("UserInputService")
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not processed and input.KeyCode == Enum.KeyCode.F6 then
+        toggleESP()
     end
-
-    warn(string.format("[FAIL - GENERAL] %s: Nicio variantă de Highlight nu a funcționat. Verificați structura internă.", animatronicName))
-    return false
-end
-
--- =================================================================
--- LOGICĂ DE CĂUTARE GLOBALĂ ȘI URMĂRIRE
--- =================================================================
-
--- Funcție de verificare pentru a evita tratarea aceluiași obiect de două ori
-local highlightedObjects = {}
-
--- Funcție care verifică dacă un obiect este un animatronic țintă
-local function isTargetAnimatronic(instance)
-    -- Verifică dacă obiectul are un nume de animatronic și nu a fost deja tratat
-    return table.find(PARENT_NAMES, instance.Name) and not highlightedObjects[instance]
-end
-
--- Funcția de procesare care se rulează la fiecare încărcare sau adăugare de obiect
-local function processInstance(instance)
-    if isTargetAnimatronic(instance) and instance:IsA("Model") then
-        if highlightAnimatronic(instance) then
-            -- Marchează obiectul ca fiind procesat
-            highlightedObjects[instance] = true
-        end
-    end
-end
-
--- 1. Inițializare: Căutăm toate obiectele existente în Workspace
-local function initializeHighlights()
-    print("Începe căutarea globală a animatronicilor în Workspace...")
-    
-    -- Folosim GetDescendants pentru a căuta în absolut tot (inclusiv Game.Animatronics.Animatronics)
-    for _, descendant in ipairs(Workspace:GetDescendants()) do
-        processInstance(descendant)
-    end
-    
-    print("Căutare inițială încheiată.")
-end
-
-
--- 2. Urmărim obiectele adăugate dinamic
-Workspace.ChildAdded:Connect(function(child)
-    -- Tratează cazul în care modelul este adăugat direct la Workspace
-    processInstance(child)
 end)
 
--- De asemenea, urmărim când se adaugă un obiect în orice alt obiect din Workspace
--- pentru a prinde modelele care apar în containere adânci (ex: în Game.Animatronics...)
--- ATENȚIE: Această buclă poate fi intensivă în resurse, dar este cea mai sigură metodă de a prinde orice.
-
-for _, descendant in ipairs(Workspace:GetDescendants()) do
-    if descendant:IsA("Model") or descendant:IsA("Folder") then
-        descendant.ChildAdded:Connect(function(child)
-            processInstance(child)
-        end)
-    end
+local function initializeESP()
+    scanForAnimatronics()
 end
 
+if LocalPlayer.Character then
+    initializeESP()
+else
+    LocalPlayer.CharacterAdded:Wait()
+    initializeESP()
+end
 
--- Dăm un timp scurt de așteptare pentru a ne asigura că Workspace este încărcat
-wait(1) 
-initializeHighlights()
+local lastUpdate = 0
+RunService.RenderStepped:Connect(function(deltaTime)
+    lastUpdate = lastUpdate + deltaTime
+    
+    if lastUpdate >= UPDATE_RATE then
+        if ESP_ENABLED then
+            updateESP()
+        end
+        lastUpdate = 0
+        
+        if tick() % 5 < UPDATE_RATE then
+            local function checkForNewModels(parent)
+                for _, child in ipairs(parent:GetChildren()) do
+                    if ESPColors[child.Name] and child:IsA("Model") and not ESPs[child] then
+                        createESP(child)
+                    end
+                    if child:IsA("Model") or child:IsA("Folder") then
+                        checkForNewModels(child)
+                    end
+                end
+            end
+            checkForNewModels(Workspace)
+        end
+    end
+end)
+
+local statusText = Drawing.new("Text")
+statusText.Text = "ESP: ON | F6"
+statusText.Color = Color3.new(0, 1, 0)
+statusText.Size = 16
+statusText.Position = Vector2.new(10, 10)
+statusText.Outline = true
+statusText.OutlineColor = Color3.new(0, 0, 0)
+statusText.Visible = true
+
+RunService.RenderStepped:Connect(function()
+    local visibleCount = 0
+    for _, espData in pairs(ESPs) do
+        if espData.Name.Visible then visibleCount = visibleCount + 1 end
+    end
+    
+    statusText.Text = string.format("ESP: %s | %d", ESP_ENABLED and "ON" or "OFF", visibleCount)
+end)
+
+game:BindToClose(function()
+    for model, espData in pairs(ESPs) do
+        if espData.Highlight then
+            espData.Highlight:Destroy()
+        end
+        espData.Name:Remove()
+        espData.Distance:Remove()
+        for _, line in ipairs(espData.BoxLines) do
+            line:Remove()
+        end
+    end
+    ESPs = {}
+    statusText:Remove()
+end)
