@@ -49,7 +49,7 @@ local function applyESPHighlight(instance, color)
     
     highlight.FillColor = color
     highlight.OutlineColor = Color3.new(0, 0, 0)
-    highlight.FillTransparency = 0.88
+    highlight.FillTransparency = 0.76
     
     highlight.Adornee = instance
     highlight.Parent = instance 
