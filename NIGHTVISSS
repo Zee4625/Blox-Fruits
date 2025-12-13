@@ -1,0 +1,79 @@
+-- LocalScript: Night Vision Toggle (Activare/Dezactivare)
+
+local Lighting = game:GetService("Lighting")
+local UserInputService = game:GetService("UserInputService")
+
+-- Configurarea efectului Night Vision
+local NIGHT_VISION_COLOR = Color3.fromRGB(150, 255, 150) -- Verde deschis
+local FOG_END_CLEARED = 100000 -- Distanță mare pentru a șterge ceața
+
+-- Variabile de stare și backup
+local isNightVisionActive = false
+local originalSettings = {
+    Ambient = Lighting.Ambient,
+    OutdoorAmbient = Lighting.OutdoorAmbient,
+    Brightness = Lighting.Brightness,
+    FogStart = Lighting.FogStart,
+    FogEnd = Lighting.FogEnd
+}
+
+--------------------------------------------------------------------------------
+-- Funcții de Activare/Dezactivare
+--------------------------------------------------------------------------------
+
+local function applyNightVision()
+    -- Aplică culorile și luminozitatea Night Vision
+    Lighting.Brightness = 1.0
+    Lighting.Ambient = NIGHT_VISION_COLOR
+    Lighting.OutdoorAmbient = NIGHT_VISION_COLOR
+
+    -- Șterge orice urmă de ceață care ar putea afecta vizibilitatea
+    Lighting.FogStart = FOG_END_CLEARED - 1
+    Lighting.FogEnd = FOG_END_CLEARED
+    
+    isNightVisionActive = true
+    print("Night Vision: ACTIVAT")
+end
+
+local function restoreOriginalLighting()
+    -- Restaurează setările inițiale de iluminare
+    Lighting.Brightness = originalSettings.Brightness
+    Lighting.Ambient = originalSettings.Ambient
+    Lighting.OutdoorAmbient = originalSettings.OutdoorAmbient
+    Lighting.FogStart = originalSettings.FogStart
+    Lighting.FogEnd = originalSettings.FogEnd
+    
+    isNightVisionActive = false
+    print("Night Vision: DEZACTIVAT")
+end
+
+--------------------------------------------------------------------------------
+-- Logică de Comutare (Toggle)
+--------------------------------------------------------------------------------
+
+local function onInputBegan(input, gameProcessedEvent)
+    -- Ignoră input-ul dacă utilizatorul tastează în Chat sau GUI
+    if gameProcessedEvent then return end
+
+    -- Verifică dacă tasta apăsată este 'N'
+    if input.KeyCode == Enum.KeyCode.N then
+        if isNightVisionActive then
+            restoreOriginalLighting()
+        else
+            -- Salvează setările curente înainte de a aplica Night Vision, 
+            -- doar dacă nu a fost activat deja, pentru a avea un backup curat
+            originalSettings.Ambient = Lighting.Ambient
+            originalSettings.OutdoorAmbient = Lighting.OutdoorAmbient
+            originalSettings.Brightness = Lighting.Brightness
+            originalSettings.FogStart = Lighting.FogStart
+            originalSettings.FogEnd = Lighting.FogEnd
+            
+            applyNightVision()
+        end
+    end
+end
+
+-- Conectează funcția de comutare la apăsările de taste
+UserInputService.InputBegan:Connect(onInputBegan)
+
+print("Night Vision Script: Gata de utilizare. Apasă 'N' pentru a activa/dezactiva.")
