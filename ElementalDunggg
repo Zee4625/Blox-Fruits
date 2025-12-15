@@ -1,0 +1,3295 @@
+-- ts file was generated at discord.gg/25ms
+
+
+local vu1 = "v2.3"
+repeat
+    task.wait()
+until game:IsLoaded()
+repeat
+    task.wait()
+until game.Workspace:FindFirstChild(game.Players.LocalPlayer.Name)
+repeat
+    task.wait()
+until game:GetService("ReplicatedStorage"):FindFirstChild("ReplicatedStorage"):FindFirstChild("Packages"):FindFirstChild("Knit")
+local vu2 = "Janina"
+local vu3 = game:GetService("Players").LocalPlayer.Name .. "_ElementalDungeon.json"
+Settings = {}
+function saveSettings()
+    local v4 = game:GetService("HttpService")
+    if not isfolder(vu2) then
+        makefolder(vu2)
+    end
+    writefile(vu2 .. "/" .. vu3, v4:JSONEncode(Settings))
+    Settings = ReadSetting()
+    warn("Settings Saved!")
+end
+function ReadSetting()
+    local v6, v7 = pcall(function()
+        local v5 = game:GetService("HttpService")
+        if not isfolder(vu2) then
+            makefolder(vu2)
+        end
+        return v5:JSONDecode(readfile(vu2 .. "/" .. vu3))
+    end)
+    if v6 then
+        return v7
+    end
+    saveSettings()
+    return ReadSetting()
+end
+Settings = ReadSetting()
+function MainScript()
+    local vu8 = loadstring(game:HttpGet("https://raw.githubusercontent.com/xpa1n/library/main/FluentLibrary.lua"))()
+    local v9 = vu8:CreateWindow({
+        Title = "ZeeHub | Elemental Dungeons ",
+        SubTitle = vu1,
+        TabWidth = 160,
+        Size = UDim2.fromOffset(580, 460),
+        Acrylic = true,
+        Theme = "Dark",
+        MinimizeKey = Enum.KeyCode.LeftControl
+    })
+    local v10 = {
+        dungeon = v9:AddTab({
+            Title = "Dungeon",
+            Icon = "swords"
+        }),
+        mastery = v9:AddTab({
+            Title = "Mastery",
+            Icon = "star"
+        }),
+        lobby = v9:AddTab({
+            Title = "Lobby",
+            Icon = "users"
+        }),
+        autoselltab = v9:AddTab({
+            Title = "Auto Sell",
+            Icon = "dollar-sign"
+        }),
+        misc = v9:AddTab({
+            Title = "Misc",
+            Icon = "chevron-right"
+        }),
+        credits = v9:AddTab({
+            Title = "Credits",
+            Icon = "info"
+        }),
+        Settings = v9:AddTab({
+            Title = "UI Settings",
+            Icon = "settings"
+        })
+    }
+    print("Loading Script (2)")
+    local vu11 = game:GetService("RunService")
+    local v12 = v10.dungeon:AddSection("Dungeon Settings")
+    v12:AddParagraph({
+        Title = "Enable \'Auto Load\' in Misc Tab for automatic loading!"
+    })
+    local vu13 = v12:AddToggle("AutoNextDungeon", {
+        Title = "Auto Next Difficulty",
+        Default = Settings.AutoNextDungeon or false
+    })
+    local v14 = vu13
+    vu13.OnChanged(v14, function()
+        Settings.AutoNextDungeon = vu13.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.AutoNextDungeon and (Settings.AutoRetry == false or Settings.AutoRetry == nil) then
+                autonextdungeonfunction()
+            end
+        end
+    end))
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if game.PlaceId == 10515146389 and (Settings.AutoNextDungeon and Settings.AutoRetry) then
+                autonextdungeonfunction()
+            end
+        end
+    end))
+    function autonextdungeonfunction()
+        wait(5)
+        if (Settings.AutoRetry == false or Settings.AutoRetry == nil) and game:GetService("Players").LocalPlayer.PlayerGui.DungeonComplete.Main.Visible == true then
+            wait(2)
+            local v15 = {
+                game:GetService("Players").LocalPlayer
+            }
+            game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.DungeonService.RF.TeleportToLobby:InvokeServer(unpack(v15))
+        end
+        pcall(function()
+            local v16 = game:GetService("Players").LocalPlayer.PlayerGui.Main.PlayerBar.LevelLabel.Text
+            local v17 = tonumber(string.match(v16, "%d+"))
+            if v17 then
+                if 0 <= v17 and v17 <= 4 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "BeginnersDungeon",
+                        "Medium",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 5 <= v17 and v17 <= 14 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "BeginnersDungeon",
+                        "Hard",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 15 <= v17 and v17 <= 34 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "BeginnersDungeon",
+                        "Hell",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 35 <= v17 and v17 <= 44 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "JungleDungeon",
+                        "Medium",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 45 <= v17 and v17 <= 54 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "JungleDungeon",
+                        "Hard",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 55 <= v17 and v17 <= 74 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "JungleDungeon",
+                        "Hell",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 75 <= v17 and v17 <= 84 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "ArcticBastionDungeon",
+                        "Easy",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 85 <= v17 and v17 <= 94 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "ArcticBastionDungeon",
+                        "Medium",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 95 <= v17 and v17 <= 104 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "ArcticBastionDungeon",
+                        "Hard",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 105 <= v17 and v17 <= 119 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "ArcticBastionDungeon",
+                        "Hell",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 120 <= v17 and v17 <= 129 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "UnderwaterDungeon",
+                        "Easy",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 130 <= v17 and v17 <= 139 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "UnderwaterDungeon",
+                        "Medium",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 140 <= v17 and v17 <= 149 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "UnderwaterDungeon",
+                        "Hard",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 150 <= v17 and v17 <= 169 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "UnderwaterDungeon",
+                        "Hell",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 170 <= v17 and v17 <= 184 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "FireDungeon",
+                        "Medium",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif 185 <= v17 and v17 <= 199 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "FireDungeon",
+                        "Hard",
+                        "Private",
+                        "Normal"
+                    }))
+                elseif v17 >= 200 then
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                        "FireDungeon",
+                        "Hell",
+                        "Private",
+                        "Normal"
+                    }))
+                else
+                    print("Unknown level")
+                end
+            end
+            wait()
+            local v18 = game:GetService("Players").LocalPlayer.PlayerGui.Party.Main.AllStuffFrame.PartyMenu.Start
+            if v18 then
+                local v19 = getconnections(v18.Activated)
+                local v20, v21, v22 = pairs(v19)
+                while true do
+                    local v23
+                    v22, v23 = v20(v21, v22)
+                    if v22 == nil then
+                        break
+                    end
+                    v23.Function(v18)
+                end
+            else
+                warn("Button not found")
+            end
+        end)
+    end
+    v12:AddDropdown("DungeonName", {
+        Title = "Choose Dungeon",
+        Values = {
+            "BeginnersDungeon",
+            "JungleDungeon",
+            "ArcticBastionDungeon",
+            "UnderwaterDungeon",
+            "FireDungeon"
+        },
+        Multi = false,
+        Default = Settings.DungeonName or ""
+    }):OnChanged(function(p24)
+        Settings.DungeonName = p24
+        saveSettings()
+    end)
+    v12:AddDropdown("DungeonDifficulty", {
+        Title = "Choose Difficulty",
+        Values = {
+            "Easy",
+            "Medium",
+            "Hard",
+            "Hell",
+            "Hardcore",
+            "Infinite"
+        },
+        Multi = false,
+        Default = Settings.DungeonDifficulty or ""
+    }):OnChanged(function(p25)
+        Settings.DungeonDifficulty = p25
+        saveSettings()
+    end)
+    local vu26 = v12:AddToggle("AutoStart", {
+        Title = "Auto Farm Selected Dungeon",
+        Default = Settings.AutoStart or false
+    })
+    local v27 = vu26
+    vu26.OnChanged(v27, function()
+        Settings.AutoStart = vu26.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if (Settings.AutoNextDungeon == false or Settings.AutoNextDungeon == nil) and ((Settings.AutoRetry == false or Settings.AutoRetry == nil) and Settings.AutoStart) then
+                autostartfunction()
+            end
+        end
+    end))
+    function autostartfunction()
+        wait(5)
+        if (Settings.AutoRetry == false or Settings.AutoRetry == nil) and game:GetService("Players").LocalPlayer.PlayerGui.DungeonComplete.Main.Visible == true then
+            wait(2)
+            local v28 = {
+                game:GetService("Players").LocalPlayer
+            }
+            game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.DungeonService.RF.TeleportToLobby:InvokeServer(unpack(v28))
+        end
+        pcall(function()
+            wait()
+            local v29 = {
+                Settings.DungeonName,
+                Settings.DungeonDifficulty,
+                "Private",
+                "Normal"
+            }
+            game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack(v29))
+            wait()
+            local v30 = game:GetService("Players").LocalPlayer.PlayerGui.Party.Main.AllStuffFrame.PartyMenu.Start
+            if v30 then
+                local v31 = getconnections(v30.Activated)
+                local v32, v33, v34 = pairs(v31)
+                while true do
+                    local v35
+                    v34, v35 = v32(v33, v34)
+                    if v34 == nil then
+                        break
+                    end
+                    v35.Function(v30)
+                end
+            else
+                warn("Button not found")
+            end
+        end)
+    end
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if game.PlaceId == 10515146389 and (Settings.AutoRetry and (Settings.AutoStart and not Settings.AutoNextDungeon)) then
+                autostartfunction()
+            end
+        end
+    end))
+    local vu36 = v12:AddToggle("AutoRetry", {
+        Title = "Auto Retry",
+        Default = Settings.AutoRetry or false
+    })
+    local v37 = vu36
+    vu36.OnChanged(v37, function()
+        Settings.AutoRetry = vu36.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.AutoRetry and game.PlaceId ~= 10515146389 and game:GetService("Players").LocalPlayer.PlayerGui.DungeonComplete.Main.Visible == true then
+                wait(2)
+                game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.VoteOn:InvokeServer(unpack({
+                    "Retry"
+                }))
+            end
+        end
+    end))
+    local vu38 = v12:AddToggle("AutoChallenge", {
+        Title = "Auto Challenge",
+        Default = Settings.AutoChallenge or false
+    })
+    local v39 = vu38
+    vu38.OnChanged(v39, function()
+        Settings.AutoChallenge = vu38.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.AutoChallenge then
+                if game.PlaceId ~= 10515146389 then
+                    if game:GetService("Players").LocalPlayer.PlayerGui.DungeonComplete.Main.Visible == true then
+                        wait(2)
+                        local v40 = {
+                            game:GetService("Players").LocalPlayer
+                        }
+                        game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.DungeonService.RF.TeleportToLobby:InvokeServer(unpack(v40))
+                    end
+                else
+                    local _ = game:GetService("Players").LocalPlayer
+                    local v41, v42, v43 = pairs({
+                        "BeginnersDungeon",
+                        "JungleDungeon",
+                        "ArcticBastionDungeon",
+                        "UnderwaterDungeon",
+                        "FireDungeon"
+                    })
+                    while true do
+                        local v44
+                        v43, v44 = v41(v42, v43)
+                        if v43 == nil then
+                            break
+                        end
+                        game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.PartyService.RF.CreateParty:InvokeServer(unpack({
+                            v44,
+                            "Nightmare",
+                            "Private",
+                            "Challenges"
+                        }))
+                        local v45 = game:GetService("Players").LocalPlayer.PlayerGui.Party.Main.AllStuffFrame.PartyMenu.Start
+                        if v45 then
+                            local v46 = getconnections(v45.Activated)
+                            local v47, v48, v49 = pairs(v46)
+                            while true do
+                                local v50
+                                v49, v50 = v47(v48, v49)
+                                if v49 == nil then
+                                    break
+                                end
+                                v50.Function(v45)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end))
+    local v51 = v10.dungeon:AddSection("Autofarm Settings")
+    local vu52 = v51:AddToggle("AutoFarmMobNearest", {
+        Title = "Auto Dungeon Mobs (Teleport)",
+        Default = Settings.Nearest or false
+    })
+    local v53 = vu52
+    vu52.OnChanged(v53, function()
+        Settings.Nearest = vu52.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.Nearest and game.PlaceId ~= 10515146389 then
+                AutoTeleportMob()
+            end
+        end
+    end))
+    local vu54 = Settings.FarmMethod or "Behind"
+    local vu55 = nil
+    local vu56 = Settings.Tween or 35
+    local vu57 = Settings.FarmStyle or "Tween [Safer]"
+    function AutoTeleportMob()
+        pcall(function()
+            if Settings.AutoHide == true then
+                AutoHideee()
+            end
+            if Settings.AutoHeal then
+                AutoHeal()
+            end
+            if Settings.AutoPickUp then
+                AutoPickUpLoot()
+            end
+            AutoDodgeBossS()
+            AutoDodgeBossR()
+            local v69 = (function()
+                if vu55 and (vu55:FindFirstChild("HumanoidRootPart") and vu55.Humanoid.Health > 0) then
+                    return vu55
+                end
+                local v58 = game.Players.LocalPlayer.Character
+                if not v58 then
+                    return nil
+                end
+                local v59 = v58:FindFirstChild("HumanoidRootPart")
+                if not v59 then
+                    return nil
+                end
+                local v60 = game:GetService("Workspace").Mobs
+                local v61 = math.huge
+                local v62, v63, v64 = pairs(v60:GetChildren())
+                while true do
+                    local v65
+                    v64, v65 = v62(v63, v64)
+                    if v64 == nil then
+                        break
+                    end
+                    if v65:IsA("Model") and (v65:FindFirstChild("HumanoidRootPart") and (v65.Humanoid.Health > 0 and (v65.Name ~= "Dummy" and v65.HumanoidRootPart.Anchored ~= true))) then
+                        local v66 = v65.HumanoidRootPart.Position
+                        local v67 = v59.Position
+                        local _ = v66.Y - v67.Y
+                        local v68 = (v66 - v67).Magnitude
+                        if v68 < v61 then
+                            vu55 = v65
+                            v61 = v68
+                        end
+                    end
+                end
+                return vu55
+            end)()
+            local vu70 = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            local function v77(p71)
+                local v72 = vu70.Position
+                local v73 = (p71.Position - v72).Magnitude / vu56
+                local v74 = TweenInfo.new(v73, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0)
+                local vu75 = game:GetService("TweenService"):Create(vu70, v74, {
+                    CFrame = p71
+                })
+                local v76 = vu75
+                vu75.Play(v76)
+                vu75.Completed:Connect(function()
+                    vu75:Destroy()
+                end)
+            end
+            if v69 and (vu70 and v69:FindFirstChild("HumanoidRootPart")) then
+                local v78 = v69.HumanoidRootPart.CFrame
+                local _ = v69.PrimaryPart.Position
+                if v69:IsA("Model") and (v69:FindFirstChild("HumanoidRootPart") and v69.Humanoid.Health > 0) then
+                    if vu57 == "Tween [Safer]" then
+                        if vu54 ~= "Behind" then
+                            if vu54 ~= "Above" then
+                                if vu54 == "Under" then
+                                    v77(v78 * CFrame.new(0, - Settings.FarmDistance, 0))
+                                end
+                            else
+                                v77(v78 * CFrame.new(0, Settings.FarmDistance, 0))
+                            end
+                        else
+                            v77(v78 * CFrame.new(0, 0, Settings.FarmDistance))
+                        end
+                    end
+                    if vu57 == "Teleport" then
+                        if vu54 ~= "Behind" then
+                            if vu54 ~= "Above" then
+                                if vu54 == "Under" then
+                                    vu70.CFrame = v78 * CFrame.new(0, - Settings.FarmDistance, 0)
+                                    local v79 = (v69.PrimaryPart.Position - vu70.Position).unit
+                                    local v80 = CFrame.new(Vector3.new(), v79)
+                                    vu70.CFrame = CFrame.new(vu70.Position) * v80
+                                end
+                            else
+                                vu70.CFrame = v78 * CFrame.new(0, Settings.FarmDistance, 0)
+                                local v81 = (v69.PrimaryPart.Position - vu70.Position).unit
+                                local v82 = CFrame.new(Vector3.new(), v81)
+                                vu70.CFrame = CFrame.new(vu70.Position) * v82
+                            end
+                        else
+                            vu70.CFrame = v78 * CFrame.new(0, 0, Settings.FarmDistance)
+                            local v83 = (v69.PrimaryPart.Position - vu70.Position).unit
+                            local v84 = CFrame.new(Vector3.new(), v83)
+                            vu70.CFrame = CFrame.new(vu70.Position) * v84
+                        end
+                    end
+                end
+            end
+        end)
+    end
+    local vu85 = v51:AddToggle("mouseclick", {
+        Title = "\226\154\148\239\184\143  Hit Mobs",
+        Default = Settings.HitMobs or false
+    })
+    local v86 = vu85
+    vu85.OnChanged(v86, function()
+        Settings.HitMobs = vu85.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.HitMobs then
+                hitmobs()
+            end
+        end
+    end))
+    function hitmobs()
+        pcall(function()
+            local v87 = game:GetService("Players").LocalPlayer:FindFirstChild("Backpack")
+            workspace:FindFirstChild("Mobs")
+            local v88, v89, v90 = pairs(v87:GetChildren())
+            while true do
+                local v91
+                v90, v91 = v88(v89, v90)
+                if v90 == nil then
+                    break
+                end
+                if v91:IsA("Tool") and v91:FindFirstChild("Handle") then
+                    game:service("VirtualInputManager"):SendKeyEvent(true, "One", false, game)
+                end
+            end
+            local v92 = game:GetService("VirtualUser")
+            local v93 = game.Players.LocalPlayer:GetMouse()
+            v92:CaptureController()
+            v92:ClickButton1(Vector2.new(v93.x, v93.y))
+        end)
+    end
+    v51:AddDropdown("FarmStyleDropdown", {
+        Title = "Farm Style",
+        Values = {
+            "Tween [Safer]",
+            "Teleport"
+        },
+        Multi = false,
+        Default = vu57
+    }):OnChanged(function(p94)
+        Settings.FarmStyle = p94
+        vu57 = Settings.FarmStyle
+        saveSettings()
+    end)
+    v51:AddDropdown("FarmMethodDropdown", {
+        Title = "Farm Method",
+        Values = {
+            "Behind [Best]",
+            "Above",
+            "Under"
+        },
+        Multi = false,
+        Default = vu54
+    }):OnChanged(function(p95)
+        Settings.FarmMethod = p95
+        if Settings.FarmMethod == "Behind [Best]" then
+            Settings.FarmMethod = "Behind"
+        end
+        vu54 = Settings.FarmMethod
+        saveSettings()
+    end)
+    local vu96 = Settings.FarmDistance or 5
+    v51:AddSlider("FarmDistanceSlider", {
+        Title = "Auto Farm Distance",
+        Default = vu96,
+        Min = 0,
+        Max = 60,
+        Rounding = 0,
+        Callback = function(p97)
+            Settings.FarmDistance = p97
+            saveSettings()
+            vu96 = p97
+        end
+    })
+    v51:AddSlider("FarmSpeedSlider", {
+        Title = "Farm Speed",
+        Default = vu56,
+        Min = 10,
+        Max = 40,
+        Rounding = 0,
+        Callback = function(p98)
+            Settings.Tween = p98
+            saveSettings()
+            vu56 = Settings.Tween
+        end
+    })
+    local vu99 = v10.dungeon:AddSection("Loot Settings"):AddToggle("AutoPickUpLootToggle", {
+        Title = "\226\173\144  Auto Pick Up Loot",
+        Default = Settings.AutoPickUp or false
+    })
+    local v100 = vu99
+    vu99.OnChanged(v100, function()
+        Settings.AutoPickUp = vu99.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.AutoPickUp and (Settings.Nearest == false or Settings.Nearest == nil) then
+                vu11.RenderStepped:wait()
+                AutoPickUpLoot()
+            end
+        end
+    end))
+    local vu101 = v10.dungeon:AddToggle("IgnoreWhiteLoot", {
+        Title = "Ignore Common Loot",
+        Default = Settings.IgnoreWhite or false
+    })
+    local v102 = vu101
+    vu101.OnChanged(v102, function()
+        Settings.IgnoreWhite = vu101.Value
+        saveSettings()
+    end)
+    local vu103 = v10.dungeon:AddToggle("IgnoreGreenLoot", {
+        Title = "Ignore Uncommon Loot",
+        Default = Settings.IgnoreGreen or false
+    })
+    local v104 = vu103
+    vu103.OnChanged(v104, function()
+        Settings.IgnoreGreen = vu103.Value
+        saveSettings()
+    end)
+    local vu105 = v10.dungeon:AddToggle("IgnoreBlueLoot", {
+        Title = "Ignore Rare Loot",
+        Default = Settings.IgnoreBlue or false
+    })
+    local v106 = vu105
+    vu105.OnChanged(v106, function()
+        Settings.IgnoreBlue = vu105.Value
+        saveSettings()
+    end)
+    function AutoPickUpLoot()
+        pcall(function()
+            local v107 = game.Players.LocalPlayer.Character
+            if v107 and v107:FindFirstChild("HumanoidRootPart") then
+                local v108 = v107.HumanoidRootPart
+                local v109 = game:GetService("Players").LocalPlayer.PlayerGui.Inventory.Main.InventoryFrame.ItemsStored.Text
+                local v110, v111, v112 = pairs(game:GetService("Workspace").Camera.Drops:GetChildren())
+                while true do
+                    local v113
+                    v112, v113 = v110(v111, v112)
+                    if v112 == nil then
+                        break
+                    end
+                    if v113:IsA("Model") and (v113.Name == "Drop" and (not v113:FindFirstChild("Potion") and v113:FindFirstChild("Center"))) and (v113.Center:FindFirstChild("ProximityPrompt") and (v109 ~= "75 / 75 Items Stored" and (v109 ~= "100 / 100 Items Stored" and v109 ~= "125 / 125 Items Stored"))) then
+                        local v114 = game:GetService("Workspace").Camera.Drops.Drop.Center.A1.PointLight.Color
+                        local v115 = math.floor(v114.R * 255)
+                        local v116 = math.floor(v114.G * 255)
+                        local v117 = math.floor(v114.B * 255)
+                        if v115 == 110 and (v116 == 255 and (v117 == 108 and (Settings.IgnoreGreen == nil or Settings.IgnoreGreen == false))) then
+                            print("pick up green")
+                            v108.CFrame = v113.Center.CFrame
+                            local v118 = tick()
+                            repeat
+                                v108.CFrame = v113.Center.CFrame
+                                vu11.RenderStepped:wait()
+                                fireproximityprompt(v113.Center.ProximityPrompt)
+                            until tick() - v118 >= 5 or not v113.Center.ProximityPrompt.Enabled
+                        elseif v115 == 111 and (v116 == 241 and (v117 == 255 and (Settings.IgnoreBlue == nil or Settings.IgnoreBlue == false))) then
+                            print("pick up blue")
+                            v108.CFrame = v113.Center.CFrame
+                            local v119 = tick()
+                            repeat
+                                v108.CFrame = v113.Center.CFrame
+                                vu11.RenderStepped:wait()
+                                fireproximityprompt(v113.Center.ProximityPrompt)
+                            until tick() - v119 >= 5 or not v113.Center.ProximityPrompt.Enabled
+                        elseif v115 == 255 and (v116 == 240 and (v117 == 246 and (Settings.IgnoreWhite == nil or Settings.IgnoreWhite == false))) then
+                            print("pick up white")
+                            v108.CFrame = v113.Center.CFrame
+                            local v120 = tick()
+                            v108.CFrame = v113.Center.CFrame
+                            vu11.RenderStepped:wait()
+                            fireproximityprompt(v113.Center.ProximityPrompt)
+                            if tick() - v120 < 5 and v113.Center.ProximityPrompt.Enabled then
+                            end
+                        else
+                            if (v115 ~= 110 or (v116 ~= 255 or v117 ~= 108)) and ((v115 ~= 111 or (v116 ~= 241 or v117 ~= 255)) and ((v115 ~= 255 or (v116 ~= 240 or v117 ~= 246)) and (v115 ~= 255 or (v116 ~= 0 or v117 ~= 0)))) then
+                                print("pick up other")
+                                v108.CFrame = v113.Center.CFrame
+                                local v121 = tick()
+                                repeat
+                                    v108.CFrame = v113.Center.CFrame
+                                    vu11.RenderStepped:wait()
+                                    fireproximityprompt(v113.Center.ProximityPrompt)
+                                until tick() - v121 >= 5 or not v113.Center.ProximityPrompt.Enabled
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+    local v122 = v10.dungeon:AddSection("Heal Settings")
+    local vu123 = Settings.Healer or 40
+    local vu124 = v122:AddToggle("AutoHealToggle", {
+        Title = "\226\157\164\239\184\143 Auto Heal (Pickup Potions & Use)",
+        Default = Settings.AutoHeal or false
+    })
+    local v125 = vu124
+    vu124.OnChanged(v125, function()
+        Settings.AutoHeal = vu124.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.AutoHeal and (Settings.Nearest == false or Settings.Nearest == nil) then
+                AutoHeal()
+            end
+        end
+    end))
+    function AutoHeal()
+        pcall(function()
+            local v126 = game.Players.LocalPlayer
+            local v127 = v126.Character
+            local v128 = v126.PlayerGui.Main.PlayerBar.Main.PotionBar.Amount.Text
+            local v129 = game:GetService("Players").LocalPlayer.PlayerGui.Main.PlayerBar.Main.PotionBar
+            if v127 and v127:FindFirstChild("HumanoidRootPart") then
+                local v130 = v127.HumanoidRootPart
+                local _ = game:GetService("Players").LocalPlayer.PlayerGui.Inventory.Main.InventoryFrame.ItemsStored.Text
+                local v131, v132, v133 = pairs(game:GetService("Workspace").Camera.Drops:GetChildren())
+                while true do
+                    local v134
+                    v133, v134 = v131(v132, v133)
+                    if v133 == nil then
+                        break
+                    end
+                    if v134:IsA("Model") and (v134.Name == "Drop" and (v134:FindFirstChild("Potion") and v134:FindFirstChild("Center"))) and (v134.Center:FindFirstChild("ProximityPrompt") and (v128 ~= "2/2" or v129.Visible ~= true)) then
+                        v130.CFrame = v134.Center.CFrame
+                        local v135 = tick()
+                        repeat
+                            task.wait()
+                            v130.CFrame = v134.Center.CFrame
+                            fireproximityprompt(v134.Center.ProximityPrompt)
+                        until tick() - v135 >= 5 or not v134.Center.ProximityPrompt.Enabled
+                    end
+                end
+            end
+        end)
+        pcall(function()
+            local v136 = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+            if v136.Health / v136.MaxHealth < vu123 * 0.01 and game:GetService("Players").LocalPlayer.PlayerGui.Main.PlayerBar.Main.PotionBar.Visible then
+                game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.HealingService.RF.UseHeal:InvokeServer()
+            end
+        end)
+    end
+    v122:AddSlider("HealAtSlider", {
+        Title = "Heal When Hp Is Under (%)",
+        Default = vu123,
+        Min = 10,
+        Max = 100,
+        Rounding = 0,
+        Callback = function(p137)
+            Settings.Healer = p137
+            saveSettings()
+            vu123 = p137
+        end
+    })
+    local v138 = v10.dungeon:AddSection("Sword Settings")
+    local vu139 = v138:AddToggle("AutoElementalizeBladeToggle", {
+        Title = "Auto Elementalize Blade (Need to buy it first)",
+        Default = Settings.AutoElementalizeBlade or false
+    })
+    local v140 = vu139
+    vu139.OnChanged(v140, function()
+        Settings.AutoElementalizeBlade = vu139.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.AutoElementalizeBlade then
+                pcall(function()
+                    local v141, v142, v143 = pairs(game:GetService("Players").LocalPlayer.Character:GetChildren())
+                    while true do
+                        local v144
+                        v143, v144 = v141(v142, v143)
+                        if v143 == nil then
+                            break
+                        end
+                        if v144:IsA("Tool") and not v144:FindFirstChild("Part") then
+                            wait()
+                            game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.WeaponService.RF.EnchantedBlade:InvokeServer()
+                        end
+                    end
+                end)
+            end
+        end
+    end))
+    local vu145 = v138:AddToggle("AutoUseSwordSkillToggle", {
+        Title = "Auto Use Sword Skill",
+        Default = Settings.AutoUseSwordSkill or false
+    })
+    local v146 = vu145
+    vu145.OnChanged(v146, function()
+        Settings.AutoUseSwordSkill = vu145.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.AutoUseSwordSkill then
+                pcall(function()
+                    local v147 = game:GetService("Players").LocalPlayer
+                    local v148 = workspace:FindFirstChild("Mobs")
+                    local v149, v150, v151 = pairs(v148:GetChildren())
+                    while true do
+                        local v152
+                        v151, v152 = v149(v150, v151)
+                        if v151 == nil then
+                            break
+                        end
+                        if v152:FindFirstChild("Humanoid") and (v152:FindFirstChild("HumanoidRootPart") and (v152.Humanoid.Health > 0 and (v147.Character.HumanoidRootPart.Position - v152.HumanoidRootPart.Position).Magnitude < 50)) then
+                            local v153 = v152.HumanoidRootPart.Position
+                            if v147 then
+                                local v154 = {
+                                    game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Sword:FindFirstChild("Lightning Katana").PlasmaRay,
+                                    {
+                                        Direction = (v153 - v147.Character.HumanoidRootPart.Position).Unit,
+                                        Position = v153,
+                                        Origin = v147.Character.HumanoidRootPart.Position
+                                    },
+                                    "Start"
+                                }
+                                game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v154))
+                                local v155 = {
+                                    game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Sword:FindFirstChild("Lightning Katana").PlasmaRay,
+                                    {
+                                        Direction = (v153 - v147.Character.HumanoidRootPart.Position).Unit,
+                                        Position = v153,
+                                        Origin = v147.Character.HumanoidRootPart.Position
+                                    },
+                                    "End"
+                                }
+                                game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v155))
+                            end
+                            if v147 then
+                                local v156 = {
+                                    game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Sword:FindFirstChild("Poseidon\'s Trident").Throw,
+                                    {
+                                        Direction = (v153 - v147.Character.HumanoidRootPart.Position).Unit,
+                                        Position = v153,
+                                        Origin = v147.Character.HumanoidRootPart.Position
+                                    },
+                                    "Start"
+                                }
+                                game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v156))
+                                local v157 = {
+                                    game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Sword:FindFirstChild("Poseidon\'s Trident").Throw,
+                                    {
+                                        Direction = (v153 - v147.Character.HumanoidRootPart.Position).Unit,
+                                        Position = v153,
+                                        Origin = v147.Character.HumanoidRootPart.Position
+                                    },
+                                    "End"
+                                }
+                                game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v157))
+                            end
+                        end
+                    end
+                end)
+                task.wait(0.5)
+            end
+        end
+    end))
+    local v158 = v10.dungeon:AddSection("Boss Settings")
+    local vu159 = v158:AddToggle("AutoDodge1", {
+        Title = "Auto Dodge Boss Skill",
+        Default = Settings.AutoDodgeSkill or false
+    })
+    local v160 = vu159
+    vu159.OnChanged(v160, function()
+        Settings.AutoDodgeSkill = vu159.Value
+        saveSettings()
+    end)
+    function AutoDodgeBossS()
+        pcall(function()
+            if Settings.AutoDodgeSkill then
+                local v161 = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                CFrame.new(0, 0, 0)
+                local v162 = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+                local v163 = game:GetService("Workspace").Effects
+                while v163:FindFirstChild("RedLines") or v163:FindFirstChild("RedCircles") do
+                    task.wait()
+                    if v161 then
+                        v161.CFrame = CFrame.new(100, 100, 100)
+                    end
+                end
+                if v161 then
+                    v161.CFrame = v162
+                end
+            end
+        end)
+    end
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.Nearest == false or Settings.Nearest == nil then
+                AutoDodgeBossS()
+            else
+                task.wait()
+            end
+        end
+    end))
+    local vu164 = v158:AddToggle("AutoDodge2", {
+        Title = "Auto Dodge Boss Rage",
+        Default = Settings.AutoDodgeSkillRage or false
+    })
+    local v165 = vu164
+    vu164.OnChanged(v165, function()
+        Settings.AutoDodgeSkillRage = vu164.Value
+        saveSettings()
+    end)
+    function AutoDodgeBossR()
+        pcall(function()
+            if Settings.AutoDodgeSkillRage then
+                local v166 = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                CFrame.new(0, 0, 0)
+                local v167 = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+                local v168 = game:GetService("Workspace").Effects
+                while v168:FindFirstChild("EngragedExplosion") do
+                    task.wait()
+                    if v166 then
+                        v166.CFrame = CFrame.new(100, 100, 100)
+                    end
+                end
+                if v166 then
+                    v166.CFrame = v167
+                end
+            end
+        end)
+    end
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.Nearest == false or Settings.Nearest == nil then
+                AutoDodgeBossR()
+            else
+                task.wait()
+            end
+        end
+    end))
+    local v169 = v10.dungeon:AddSection("Anti-Die")
+    local vu170 = v169:AddToggle("AutoHideToggle", {
+        Title = "Anti-Die (Only Use on Hardcore/Infinite Dungeons)",
+        Default = Settings.AutoHide or false
+    })
+    local v171 = vu170
+    vu170.OnChanged(v171, function()
+        Settings.AutoHide = vu170.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.AutoHide == true and (Settings.Nearest == false or Settings.Nearest == nil) then
+                AutoHideee()
+            end
+        end
+    end))
+    local vu172 = Settings.HideLow or 25
+    local vu173 = Settings.ShowUP or 75
+    function AutoHideee()
+        pcall(function()
+            local v174 = game.Players.LocalPlayer.Character
+            local v175 = v174:WaitForChild("Humanoid")
+            local v176 = v174:WaitForChild("HumanoidRootPart")
+            local v177 = v176.CFrame
+            local v178 = false
+            if Settings.AutoHide then
+                local v179 = v175.Health / v175.MaxHealth
+                if v179 < vu172 * 0.01 then
+                    v178 = true
+                    repeat
+                        v179 = v175.Health / v175.MaxHealth
+                        v176.CFrame = CFrame.new(Vector3.new(100, 100, 100))
+                        task.wait()
+                    until vu173 * 0.01 < v179
+                end
+                if vu173 * 0.01 < v179 and v178 then
+                    v176.CFrame = v177
+                end
+            end
+        end)
+    end
+    v169:AddSlider("HideSlider", {
+        Title = "Hide At HP Lower Then (%)",
+        Default = vu172,
+        Min = 1,
+        Max = 99,
+        Rounding = 0,
+        Callback = function(p180)
+            Settings.HideLow = p180
+            saveSettings()
+            vu172 = p180
+        end
+    })
+    v169:AddSlider("HideShowSlider", {
+        Title = "Return to Auto Farm at (%)",
+        Default = vu173,
+        Min = 1,
+        Max = 99,
+        Rounding = 0,
+        Callback = function(p181)
+            Settings.ShowUP = p181
+            saveSettings()
+            vu173 = p181
+        end
+    })
+    local v182 = v10.dungeon:AddSection("Infinite")
+    v182:AddInput("Input", {
+        Title = "Reset At \'X\' Wave",
+        Default = Settings.Leaveatxwave,
+        Placeholder = "Enter Wave Number",
+        Numeric = true,
+        Finished = true,
+        Callback = function(p183)
+            Settings.Leaveatxwave = p183
+            saveSettings()
+        end
+    })
+    local vu184 = v182:AddToggle("autoleaveatxwavetoggle", {
+        Title = "Toggle Reset At \'X\' Wave",
+        Default = Settings.leaveatwave or false
+    })
+    local v185 = vu184
+    vu184.OnChanged(v185, function()
+        Settings.leaveatwave = vu184.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            pcall(function()
+                if Settings.leaveatwave == true and game.PlaceId ~= 10515146389 then
+                    local v186 = game:GetService("Players").LocalPlayer.PlayerGui.Main.Timers.WaveLabel.Text
+                    if string.find(v186, Settings.Leaveatxwave) then
+                        player = game.Players.LocalPlayer
+                        player.Character.Humanoid.Health = 0
+                    end
+                end
+            end)
+        end
+    end))
+    local v187 = v10.dungeon:AddSection("Others")
+    v187:AddParagraph({
+        Title = "Collect chests only work after dungeon is completed!"
+    })
+    v187:AddButton({
+        Title = "Collect Dungeon Chests",
+        Callback = function()
+            pcall(function()
+                local v188 = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                local v189 = game.Workspace.CurrentCamera
+                v189.CFrame = CFrame.new(Vector3.new(0, 100, 0), Vector3.new(0, 0, 0))
+                v189.FieldOfView = 80
+                local v190, v191, v192 = pairs(game:GetService("Workspace"):GetChildren())
+                while true do
+                    local v193
+                    v192, v193 = v190(v191, v192)
+                    if v192 == nil then
+                        break
+                    end
+                    if v193.Name == "Gold Chest" or (v193.Name == "Loot Chest" or v193.Name == "Rich Chest" and (v193:IsA("Model") and v193:FindFirstChild("Primary"))) then
+                        v188.CFrame = v193.Primary.CFrame
+                        wait()
+                        fireproximityprompt(v193.Primary.ProximityPrompt)
+                    end
+                end
+            end)
+        end
+    })
+    v187:AddButton({
+        Title = "Teleport to Chance Altar (If Available)",
+        Callback = function()
+            pcall(function()
+                local v194 = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                local v195, v196, v197 = pairs(game:GetService("Workspace"):GetChildren())
+                while true do
+                    local v198
+                    v197, v198 = v195(v196, v197)
+                    if v197 == nil then
+                        break
+                    end
+                    if v198.Name == "Chance Altar" and v198:IsA("Model") then
+                        if v198:FindFirstChild("Primary") then
+                            v194.CFrame = v198.Primary.CFrame
+                        else
+                            vu8:Notify({
+                                Title = "Chance Altar Is Available but Didn\'t Spawn Yet!",
+                                Content = "",
+                                Duration = 4
+                            })
+                        end
+                        return
+                    end
+                end
+                vu8:Notify({
+                    Title = "Chance Altar Is Not Available!",
+                    Content = "",
+                    Duration = 4
+                })
+            end)
+        end
+    })
+    v187:AddButton({
+        Title = "Teleport to Inf Boss Altar (If Available)",
+        Callback = function()
+            pcall(function()
+                local v199 = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                local v200, v201, v202 = pairs(game:GetService("Workspace"):GetChildren())
+                while true do
+                    local v203
+                    v202, v203 = v200(v201, v202)
+                    if v202 == nil then
+                        break
+                    end
+                    if v203.Name == "Inf Boss Altar" and v203:IsA("Model") then
+                        if v203:FindFirstChild("Primary") then
+                            v199.CFrame = v203.Primary.CFrame
+                        else
+                            vu8:Notify({
+                                Title = "Inf Boss Altar Is Available but Didn\'t Spawn Yet!",
+                                Content = "",
+                                Duration = 4
+                            })
+                        end
+                        return
+                    end
+                end
+                vu8:Notify({
+                    Title = "Inf Boss Altar Is Not Available!",
+                    Content = "",
+                    Duration = 4
+                })
+            end)
+        end
+    })
+    print("Loading Script (1)")
+    v1 = require(game:GetService("ReplicatedStorage"):WaitForChild("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"))
+    local v204 = v1.GetController("DataController"):GetReplica()
+    local v205, v206, v207 = pairs(v204.Data.Main.EquippedItems.Elements)
+    local v208 = nil
+    while true do
+        local v209, v210 = v205(v206, v207)
+        if v209 == nil then
+            break
+        end
+        v207 = v209
+        if v210 then
+            v208 = v210
+        end
+    end
+    if v208 == nil then
+        v10.mastery:AddParagraph({
+            Title = "You don\'t have an element!"
+        })
+        v10.mastery:AddParagraph({
+            Title = "Get an Element First and Rejoin/Re-execute"
+        })
+    end
+    if v208 ~= nil then
+        local vu211 = v10.mastery:AddToggle("AutoMastery", {
+            Title = "\226\173\144  Auto Use All Abilities",
+            Default = Settings.Mastery or false
+        })
+        local v212 = vu211
+        vu211.OnChanged(v212, function()
+            Settings.Mastery = vu211.Value
+            saveSettings()
+        end)
+        coroutine.resume(coroutine.create(function()
+            while task.wait() do
+                if Settings.Mastery then
+                    AutoUseAbility()
+                    task.wait(1)
+                end
+            end
+        end))
+        function AutoUseAbility()
+            pcall(function()
+                local v213 = game:GetService("Players").LocalPlayer
+                local v214 = workspace:FindFirstChild("Mobs")
+                local v215, v216, v217 = pairs(v214:GetChildren())
+                while true do
+                    local v218
+                    v217, v218 = v215(v216, v217)
+                    if v217 == nil then
+                        break
+                    end
+                    if v218:FindFirstChild("Humanoid") and (v218:FindFirstChild("HumanoidRootPart") and (v218.Humanoid.Health > 0 and (v213.Character.HumanoidRootPart.Position - v218.HumanoidRootPart.Position).Magnitude < 50)) then
+                        local v219 = v218.HumanoidRootPart.Position
+                        v1 = require(game:GetService("ReplicatedStorage"):WaitForChild("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"))
+                        local v220 = v1.GetController("DataController"):GetReplica()
+                        local v221, v222, v223 = pairs(v220.Data.Main.EquippedItems.Elements)
+                        local v224 = nil
+                        while true do
+                            local v225
+                            v223, v225 = v221(v222, v223)
+                            if v223 == nil then
+                                break
+                            end
+                            v224 = v225
+                        end
+                        if v213 then
+                            local v226 = game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Elements[v224]
+                            if v226 then
+                                local v227, v228, v229 = pairs(v226:GetChildren())
+                                while true do
+                                    local v230
+                                    v229, v230 = v227(v228, v229)
+                                    if v229 == nil then
+                                        break
+                                    end
+                                    local v231 = {
+                                        v226[v230.Name],
+                                        {
+                                            Direction = (v219 - v213.Character.HumanoidRootPart.Position).Unit,
+                                            Position = v219,
+                                            Origin = v213.Character.HumanoidRootPart.Position
+                                        },
+                                        "Start"
+                                    }
+                                    game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v231))
+                                    if v230.Name == "DragonsBreath" then
+                                        wait(5)
+                                    end
+                                    local v232 = {
+                                        v226[v230.Name],
+                                        {
+                                            Direction = (v219 - v213.Character.HumanoidRootPart.Position).Unit,
+                                            Position = v219,
+                                            Origin = v213.Character.HumanoidRootPart.Position
+                                        },
+                                        "End"
+                                    }
+                                    game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v232))
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        v10.mastery:AddSection("Or")
+        local vu233 = game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Elements[v208]:GetChildren()
+        local vu234 = {
+            "DragonsBreath",
+            "GravityZone",
+            "MeteorBarrage",
+            "DeathQuake",
+            "Supernova",
+            "GalacticDestruction",
+            "LightRay",
+            "Lux",
+            "LightBarrage"
+        }
+        if vu233[1] and vu233[1]:IsA("ModuleScript") then
+            local vu235 = vu233[1].Name
+            local vu236 = v10.mastery:AddToggle("SkillToggle1", {
+                Title = "Use " .. vu235,
+                Default = Settings["Skill" .. vu235] or false
+            })
+            local v237 = vu236
+            vu236.OnChanged(v237, function()
+                Settings["Skill" .. vu235] = vu236.Value
+                saveSettings()
+            end)
+            coroutine.resume(coroutine.create(function()
+                while task.wait() do
+                    if Settings["Skill" .. vu235] then
+                        pcall(function()
+                            local v238 = game:GetService("Players").LocalPlayer
+                            v238.Character:FindFirstChild("HumanoidRootPart")
+                            local v239 = workspace:FindFirstChild("Mobs")
+                            if v238 and game.PlaceId ~= 10515146389 then
+                                local v240, v241, v242 = pairs(v239:GetChildren())
+                                while true do
+                                    local v243
+                                    v242, v243 = v240(v241, v242)
+                                    if v242 == nil then
+                                        break
+                                    end
+                                    if v243:FindFirstChild("Humanoid") and (v243:FindFirstChild("HumanoidRootPart") and (v243.Humanoid.Health > 0 and (v238.Character.HumanoidRootPart.Position - v243.HumanoidRootPart.Position).Magnitude < 50)) then
+                                        local v244 = v243.HumanoidRootPart.Position
+                                        local v245 = {
+                                            vu233[1],
+                                            {
+                                                Direction = (v244 - v238.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v244,
+                                                Origin = v238.Character.HumanoidRootPart.Position
+                                            },
+                                            "Start"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v245))
+                                        local v246, v247, v248 = pairs(vu234)
+                                        while true do
+                                            local v249
+                                            v248, v249 = v246(v247, v248)
+                                            if v248 == nil then
+                                                break
+                                            end
+                                            if vu233[1].Name == v249 then
+                                                wait(5)
+                                            end
+                                        end
+                                        local v250 = {
+                                            vu233[1],
+                                            {
+                                                Direction = (v244 - v238.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v244,
+                                                Origin = v238.Character.HumanoidRootPart.Position
+                                            },
+                                            "End"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v250))
+                                    end
+                                end
+                            end
+                        end)
+                        task.wait(1)
+                    end
+                end
+            end))
+        end
+        if vu233[2] and vu233[2]:IsA("ModuleScript") then
+            local vu251 = vu233[2].Name
+            local vu252 = v10.mastery:AddToggle("SkillToggle2", {
+                Title = "Use " .. vu251,
+                Default = Settings["Skill" .. vu251] or false
+            })
+            local v253 = vu252
+            vu252.OnChanged(v253, function()
+                Settings["Skill" .. vu251] = vu252.Value
+                saveSettings()
+            end)
+            coroutine.resume(coroutine.create(function()
+                while task.wait() do
+                    if Settings["Skill" .. vu251] then
+                        pcall(function()
+                            local v254 = game:GetService("Players").LocalPlayer
+                            v254.Character:FindFirstChild("HumanoidRootPart")
+                            local v255 = workspace:FindFirstChild("Mobs")
+                            if v254 and game.PlaceId ~= 10515146389 then
+                                local v256, v257, v258 = pairs(v255:GetChildren())
+                                while true do
+                                    local v259
+                                    v258, v259 = v256(v257, v258)
+                                    if v258 == nil then
+                                        break
+                                    end
+                                    if v259:FindFirstChild("Humanoid") and (v259:FindFirstChild("HumanoidRootPart") and (v259.Humanoid.Health > 0 and (v254.Character.HumanoidRootPart.Position - v259.HumanoidRootPart.Position).Magnitude < 50)) then
+                                        local v260 = v259.HumanoidRootPart.Position
+                                        local v261 = {
+                                            vu233[2],
+                                            {
+                                                Direction = (v260 - v254.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v260,
+                                                Origin = v254.Character.HumanoidRootPart.Position
+                                            },
+                                            "Start"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v261))
+                                        local v262, v263, v264 = pairs(vu234)
+                                        while true do
+                                            local v265
+                                            v264, v265 = v262(v263, v264)
+                                            if v264 == nil then
+                                                break
+                                            end
+                                            if vu233[2].Name == v265 then
+                                                wait(5)
+                                            end
+                                        end
+                                        local v266 = {
+                                            vu233[2],
+                                            {
+                                                Direction = (v260 - v254.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v260,
+                                                Origin = v254.Character.HumanoidRootPart.Position
+                                            },
+                                            "End"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v266))
+                                    end
+                                end
+                            end
+                        end)
+                        task.wait(1)
+                    end
+                end
+            end))
+        end
+        if vu233[3] and vu233[3]:IsA("ModuleScript") then
+            local vu267 = vu233[3].Name
+            local vu268 = v10.mastery:AddToggle("SkillToggle3", {
+                Title = "Use " .. vu267,
+                Default = Settings["Skill" .. vu267] or false
+            })
+            local v269 = vu268
+            vu268.OnChanged(v269, function()
+                Settings["Skill" .. vu267] = vu268.Value
+                saveSettings()
+            end)
+            coroutine.resume(coroutine.create(function()
+                while task.wait() do
+                    if Settings["Skill" .. vu267] then
+                        pcall(function()
+                            local v270 = game:GetService("Players").LocalPlayer
+                            v270.Character:FindFirstChild("HumanoidRootPart")
+                            local v271 = workspace:FindFirstChild("Mobs")
+                            if v270 and game.PlaceId ~= 10515146389 then
+                                local v272, v273, v274 = pairs(v271:GetChildren())
+                                while true do
+                                    local v275
+                                    v274, v275 = v272(v273, v274)
+                                    if v274 == nil then
+                                        break
+                                    end
+                                    if v275:FindFirstChild("Humanoid") and (v275:FindFirstChild("HumanoidRootPart") and (v275.Humanoid.Health > 0 and (v270.Character.HumanoidRootPart.Position - v275.HumanoidRootPart.Position).Magnitude < 50)) then
+                                        local v276 = v275.HumanoidRootPart.Position
+                                        local v277 = {
+                                            vu233[3],
+                                            {
+                                                Direction = (v276 - v270.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v276,
+                                                Origin = v270.Character.HumanoidRootPart.Position
+                                            },
+                                            "Start"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v277))
+                                        local v278, v279, v280 = pairs(vu234)
+                                        while true do
+                                            local v281
+                                            v280, v281 = v278(v279, v280)
+                                            if v280 == nil then
+                                                break
+                                            end
+                                            if vu233[3].Name == v281 then
+                                                wait(5)
+                                            end
+                                        end
+                                        local v282 = {
+                                            vu233[3],
+                                            {
+                                                Direction = (v276 - v270.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v276,
+                                                Origin = v270.Character.HumanoidRootPart.Position
+                                            },
+                                            "End"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v282))
+                                    end
+                                end
+                            end
+                        end)
+                        task.wait(1)
+                    end
+                end
+            end))
+        end
+        if vu233[4] and vu233[4]:IsA("ModuleScript") then
+            local vu283 = vu233[4].Name
+            local vu284 = v10.mastery:AddToggle("SkillToggle4", {
+                Title = "Use " .. vu283,
+                Default = Settings["Skill" .. vu283] or false
+            })
+            local v285 = vu284
+            vu284.OnChanged(v285, function()
+                Settings["Skill" .. vu283] = vu284.Value
+                saveSettings()
+            end)
+            coroutine.resume(coroutine.create(function()
+                while task.wait() do
+                    if Settings["Skill" .. vu283] then
+                        pcall(function()
+                            local v286 = game:GetService("Players").LocalPlayer
+                            v286.Character:FindFirstChild("HumanoidRootPart")
+                            local v287 = workspace:FindFirstChild("Mobs")
+                            if v286 and game.PlaceId ~= 10515146389 then
+                                local v288, v289, v290 = pairs(v287:GetChildren())
+                                while true do
+                                    local v291
+                                    v290, v291 = v288(v289, v290)
+                                    if v290 == nil then
+                                        break
+                                    end
+                                    if v291:FindFirstChild("Humanoid") and (v291:FindFirstChild("HumanoidRootPart") and (v291.Humanoid.Health > 0 and (v286.Character.HumanoidRootPart.Position - v291.HumanoidRootPart.Position).Magnitude < 50)) then
+                                        local v292 = v291.HumanoidRootPart.Position
+                                        local v293 = {
+                                            vu233[4],
+                                            {
+                                                Direction = (v292 - v286.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v292,
+                                                Origin = v286.Character.HumanoidRootPart.Position
+                                            },
+                                            "Start"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v293))
+                                        local v294, v295, v296 = pairs(vu234)
+                                        while true do
+                                            local v297
+                                            v296, v297 = v294(v295, v296)
+                                            if v296 == nil then
+                                                break
+                                            end
+                                            if vu233[4].Name == v297 then
+                                                wait(5)
+                                            end
+                                        end
+                                        local v298 = {
+                                            vu233[4],
+                                            {
+                                                Direction = (v292 - v286.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v292,
+                                                Origin = v286.Character.HumanoidRootPart.Position
+                                            },
+                                            "End"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v298))
+                                    end
+                                end
+                            end
+                        end)
+                        task.wait(1)
+                    end
+                end
+            end))
+        end
+        if vu233[5] and vu233[5]:IsA("ModuleScript") then
+            local vu299 = vu233[5].Name
+            local vu300 = v10.mastery:AddToggle("SkillToggle5", {
+                Title = "Use " .. vu299,
+                Default = Settings["Skill" .. vu299] or false
+            })
+            local v301 = vu300
+            vu300.OnChanged(v301, function()
+                Settings["Skill" .. vu299] = vu300.Value
+                saveSettings()
+            end)
+            coroutine.resume(coroutine.create(function()
+                while task.wait() do
+                    if Settings["Skill" .. vu299] then
+                        pcall(function()
+                            local v302 = game:GetService("Players").LocalPlayer
+                            v302.Character:FindFirstChild("HumanoidRootPart")
+                            local v303 = workspace:FindFirstChild("Mobs")
+                            if v302 and game.PlaceId ~= 10515146389 then
+                                local v304, v305, v306 = pairs(v303:GetChildren())
+                                while true do
+                                    local v307
+                                    v306, v307 = v304(v305, v306)
+                                    if v306 == nil then
+                                        break
+                                    end
+                                    if v307:FindFirstChild("Humanoid") and (v307:FindFirstChild("HumanoidRootPart") and (v307.Humanoid.Health > 0 and (v302.Character.HumanoidRootPart.Position - v307.HumanoidRootPart.Position).Magnitude < 50)) then
+                                        local v308 = v307.HumanoidRootPart.Position
+                                        local v309 = {
+                                            vu233[5],
+                                            {
+                                                Direction = (v308 - v302.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v308,
+                                                Origin = v302.Character.HumanoidRootPart.Position
+                                            },
+                                            "Start"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v309))
+                                        local v310, v311, v312 = pairs(vu234)
+                                        while true do
+                                            local v313
+                                            v312, v313 = v310(v311, v312)
+                                            if v312 == nil then
+                                                break
+                                            end
+                                            if vu233[5].Name == v313 then
+                                                wait(5)
+                                            end
+                                        end
+                                        local v314 = {
+                                            vu233[5],
+                                            {
+                                                Direction = (v308 - v302.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v308,
+                                                Origin = v302.Character.HumanoidRootPart.Position
+                                            },
+                                            "End"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v314))
+                                    end
+                                end
+                            end
+                        end)
+                        task.wait(1)
+                    end
+                end
+            end))
+        end
+        if vu233[6] and vu233[6]:IsA("ModuleScript") then
+            local vu315 = vu233[6].Name
+            local vu316 = v10.mastery:AddToggle("SkillToggle6", {
+                Title = "Use " .. vu315,
+                Default = Settings["Skill" .. vu315] or false
+            })
+            local v317 = vu316
+            vu316.OnChanged(v317, function()
+                Settings["Skill" .. vu315] = vu316.Value
+                saveSettings()
+            end)
+            coroutine.resume(coroutine.create(function()
+                while task.wait() do
+                    if Settings["Skill" .. vu315] then
+                        pcall(function()
+                            local v318 = game:GetService("Players").LocalPlayer
+                            v318.Character:FindFirstChild("HumanoidRootPart")
+                            local v319 = workspace:FindFirstChild("Mobs")
+                            if v318 and game.PlaceId ~= 10515146389 then
+                                local v320, v321, v322 = pairs(v319:GetChildren())
+                                while true do
+                                    local v323
+                                    v322, v323 = v320(v321, v322)
+                                    if v322 == nil then
+                                        break
+                                    end
+                                    if v323:FindFirstChild("Humanoid") and (v323:FindFirstChild("HumanoidRootPart") and (v323.Humanoid.Health > 0 and (v318.Character.HumanoidRootPart.Position - v323.HumanoidRootPart.Position).Magnitude < 50)) then
+                                        local v324 = v323.HumanoidRootPart.Position
+                                        local v325 = {
+                                            vu233[6],
+                                            {
+                                                Direction = (v324 - v318.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v324,
+                                                Origin = v318.Character.HumanoidRootPart.Position
+                                            },
+                                            "Start"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v325))
+                                        local v326, v327, v328 = pairs(vu234)
+                                        while true do
+                                            local v329
+                                            v328, v329 = v326(v327, v328)
+                                            if v328 == nil then
+                                                break
+                                            end
+                                            if vu233[6].Name == v329 then
+                                                wait(5)
+                                            end
+                                        end
+                                        local v330 = {
+                                            vu233[6],
+                                            {
+                                                Direction = (v324 - v318.Character.HumanoidRootPart.Position).Unit,
+                                                Position = v324,
+                                                Origin = v318.Character.HumanoidRootPart.Position
+                                            },
+                                            "End"
+                                        }
+                                        game:GetService("ReplicatedStorage").ReplicatedStorage.Abilities.Templates.ToolTemplate:FindFirstChild("RemoteEvent "):FireServer(unpack(v330))
+                                    end
+                                end
+                            end
+                        end)
+                        task.wait(1)
+                    end
+                end
+            end))
+        end
+    end
+    local v331 = v10.lobby:AddSection("Snipe")
+    v331:AddButton({
+        Title = "Open Merchant UI",
+        Callback = function()
+            pcall(function()
+                local v332 = game:GetService("Players").LocalPlayer
+                if game.PlaceId ~= 10515146389 then
+                    vu8:Notify({
+                        Title = "Only Works in Lobby!",
+                        Content = "Wrong",
+                        Duration = 4
+                    })
+                elseif game:GetService("Workspace"):FindFirstChild("NPCs"):FindFirstChild("MerchantNPC") then
+                    v332.PlayerGui.Merchant.Main.Visible = true
+                else
+                    vu8:Notify({
+                        Title = "Merchant NPC Not Found!",
+                        Content = "Merchant not found, check back later!",
+                        Duration = 4
+                    })
+                end
+            end)
+        end
+    })
+    v331:AddButton({
+        Title = "Open Scientist UI [Index]",
+        Callback = function()
+            pcall(function()
+                local v333 = game:GetService("Players").LocalPlayer
+                if game.PlaceId == 10515146389 and game:GetService("Workspace").NPCs:FindFirstChild("Scientist") then
+                    v333.PlayerGui.Index.Main.Visible = true
+                end
+            end)
+        end
+    })
+    v331:AddButton({
+        Title = "Open Scientist UI [Advanced Tech Crafting]",
+        Callback = function()
+            pcall(function()
+                local v334 = game:GetService("Players").LocalPlayer
+                if game.PlaceId == 10515146389 and game:GetService("Workspace").NPCs:FindFirstChild("Scientist") then
+                    v334.PlayerGui.ScientistCraftingUI.Main.Visible = true
+                end
+            end)
+        end
+    })
+    local vu335 = v331:AddToggle("snipsustoggle", {
+        Title = "\226\155\176\239\184\143  Auto Buy/Store Orb From Sus Vampire",
+        Default = Settings.susvamp or false
+    })
+    local v336 = vu335
+    vu335.OnChanged(v336, function()
+        Settings.susvamp = vu335.Value
+        saveSettings()
+    end)
+    function sniperssusvamp()
+        pcall(function()
+            local v337 = game:GetService("Players").LocalPlayer:FindFirstChild("Backpack")
+            game:GetService("ReplicatedStorage"):WaitForChild("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("MiscContentService"):WaitForChild("RF"):WaitForChild("BuyElementForGold"):InvokeServer(LocalPlayer)
+            task.wait()
+            local v338, v339, v340 = pairs(v337:GetChildren())
+            while true do
+                local v341
+                v340, v341 = v338(v339, v340)
+                if v340 == nil then
+                    break
+                end
+                if v341.Name:match("Orb") then
+                    game:service("VirtualInputManager"):SendKeyEvent(true, "Three", false, game)
+                    task.wait()
+                    game:GetService("ReplicatedStorage"):WaitForChild("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("MiscContentService"):WaitForChild("RF"):WaitForChild("StoreOrb"):InvokeServer()
+                end
+            end
+        end)
+    end
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.susvamp and game.PlaceId == 10515146389 then
+                sniperssusvamp()
+            end
+        end
+    end))
+    local v342 = v10.lobby:AddSection("Stats")
+    local vu343 = v342:AddToggle("UpgradeSwordPower", {
+        Title = "Auto Upgrade Sword Power",
+        Default = Settings.USP or false
+    })
+    local v344 = vu343
+    vu343.OnChanged(v344, function()
+        Settings.USP = vu343.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.USP then
+                wait()
+                game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.InventoryService.RF.UpgradeSkill:InvokeServer(unpack({
+                    "PhysicalPower",
+                    1
+                }))
+            end
+        end
+    end))
+    local vu345 = v342:AddToggle("UpgradeElementPower", {
+        Title = "Auto Upgrade Element Power",
+        Default = Settings.UEP or false
+    })
+    local v346 = vu345
+    vu345.OnChanged(v346, function()
+        Settings.UEP = vu345.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.UEP then
+                wait()
+                game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.InventoryService.RF.UpgradeSkill:InvokeServer(unpack({
+                    "MagicPower",
+                    1
+                }))
+            end
+        end
+    end))
+    local vu347 = v342:AddToggle("UpgradeElementPower", {
+        Title = "Auto Upgrade Defense",
+        Default = Settings.UD or false
+    })
+    local v348 = vu347
+    vu347.OnChanged(v348, function()
+        Settings.UD = vu347.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.UD then
+                wait()
+                game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.InventoryService.RF.UpgradeSkill:InvokeServer(unpack({
+                    "Defense",
+                    1
+                }))
+            end
+        end
+    end))
+    local v349 = v10.lobby:AddSection("Summon")
+    local vu350 = v349:AddToggle("SummonElement1", {
+        Title = "Auto Summon Element (1)",
+        Default = Settings.Summon1 or false
+    })
+    local v351 = vu350
+    vu350.OnChanged(v351, function()
+        Settings.Summon1 = vu350.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.Summon1 then
+                game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.SummoningService.RF.SummonOnce:InvokeServer()
+            end
+        end
+    end))
+    local vu352 = v349:AddToggle("SummonElement2", {
+        Title = "Auto Summon Element (3)",
+        Default = Settings.Summon2 or false
+    })
+    local v353 = vu352
+    vu352.OnChanged(v353, function()
+        Settings.Summon2 = vu352.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.Summon2 then
+                game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.SummoningService.RF.SummonThree:InvokeServer()
+            end
+        end
+    end))
+    local v354 = v10.lobby:AddSection("Other")
+    v354:AddButton({
+        Title = "Redeem All Codes",
+        Callback = function()
+            local v355, v356, v357 = pairs({
+                "10MVISITS",
+                "ATLANTIS212",
+                "newcode",
+                "refundsp",
+                "TYFOR20KPLAYERS",
+                "BETA"
+            })
+            while true do
+                local v358
+                v357, v358 = v355(v356, v357)
+                if v357 == nil then
+                    break
+                end
+                game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.CodesService.RF.RedeemCode:InvokeServer(unpack({
+                    v358
+                }))
+                wait()
+            end
+        end
+    })
+    local vu359 = v354:AddToggle("AutoFarmChest", {
+        Title = "Auto Farm Chest",
+        Default = Settings.AFC or false
+    })
+    local v360 = vu359
+    vu359.OnChanged(v360, function()
+        Settings.AFC = vu359.Value
+        saveSettings()
+        _G.qweewe = false
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            local v361 = game:GetService("Workspace"):FindFirstChild("Chests")
+            if game.PlaceId == 10515146389 then
+                if Settings.AFC and # v361:GetChildren() ~= 0 then
+                    local v362 = game.Workspace.CurrentCamera
+                    v362.CFrame = CFrame.new(Vector3.new(0, 100, 0), Vector3.new(0, 0, 0))
+                    v362.FieldOfView = 80
+                    local v363 = game.Players.LocalPlayer.Character.HumanoidRootPart
+                    local v364, v365, v366 = pairs(v361:GetChildren())
+                    while true do
+                        local v367
+                        v366, v367 = v364(v365, v366)
+                        if v366 == nil then
+                            break
+                        end
+                        if v367.ProximityPrompt then
+                            v363.CFrame = v367.CFrame
+                            wait(1)
+                            fireproximityprompt(v367.ProximityPrompt)
+                        else
+                            _G.qweewe = false
+                        end
+                    end
+                elseif Settings.AFC and (# v361:GetChildren() == 0 and (_G.qweewe == false or _G.qweewe == nil)) then
+                    _G.qweewe = true
+                    vu8:Notify({
+                        Title = "No Chest Found!",
+                        Content = "You have already collected all of them!",
+                        Duration = 4
+                    })
+                end
+            end
+        end
+    end))
+    local vu368 = v354:AddToggle("AutoFarmEvilChest", {
+        Title = "Auto Farm Evil Chest",
+        Default = Settings.AFEC or false
+    })
+    local v369 = vu368
+    vu368.OnChanged(v369, function()
+        Settings.AFEC = vu368.Value
+        saveSettings()
+    end)
+    local vu370 = false
+    coroutine.resume(coroutine.create(function()
+        while true do
+            if not task.wait() then
+                return
+            end
+            if game.PlaceId == 10515146389 and (Settings.AFEC and not vu370) then
+                local v371 = game.Players.LocalPlayer.Character.HumanoidRootPart
+                local v372, v373, v374 = pairs(game:GetService("Workspace").Map:GetChildren())
+                local v375 = false
+                while true do
+                    local v376
+                    v374, v376 = v372(v373, v374)
+                    if v374 == nil then
+                        break
+                    end
+                    if v376.Name == "Chest" then
+                        local v377 = game.Workspace.CurrentCamera
+                        v377.CFrame = CFrame.new(Vector3.new(0, 100, 0), Vector3.new(0, 0, 0))
+                        v377.FieldOfView = 80
+                        wait()
+                        v371.CFrame = v376.CFrame
+                        wait(1)
+                        fireproximityprompt(v376.ProximityPrompt)
+                        v375 = true
+                        break
+                    end
+                end
+                if not v375 then
+                    vu370 = true
+                    vu8:Notify({
+                        Title = "No Evil Chest Found!",
+                        Content = "You have already collected all of them!",
+                        Duration = 4
+                    })
+                end
+            end
+        end
+    end))
+    v354:AddParagraph({
+        Title = "You can collect each chest just once per account!"
+    })
+    v10.autoselltab:AddParagraph({
+        Title = "Only works in lobby! (Does not sell equipped/locked items)"
+    })
+    local vu378 = v10.autoselltab:AddToggle("TpLobbyFullItem", {
+        Title = "Teleport to Lobby if Inventory is Full",
+        Default = Settings.TpLobbySellItem or false
+    })
+    local v379 = vu378
+    vu378.OnChanged(v379, function()
+        Settings.TpLobbySellItem = vu378.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.TpLobbySellItem and game.PlaceId ~= 10515146389 then
+                local v380 = game:GetService("Players").LocalPlayer.PlayerGui.Inventory.Main.InventoryFrame.ItemsStored.Text
+                if v380 == "75 / 75 Items Stored" or (v380 == "80 / 80 Items Stored" or (v380 == "85 / 85 Items Stored" or (v380 == "90 / 90 Items Stored" or (v380 == "95 / 95 Items Stored" or (v380 == "100 / 100 Items Stored" or (v380 == "105 / 105 Items Stored" or (v380 == "110 / 110 Items Stored" or (v380 == "115 / 115 Items Stored" or (v380 == "120 / 120 Items Stored" or (v380 == "125 / 125 Items Stored" or (v380 == "130 / 130 Items Stored" or (v380 == "135 / 135 Items Stored" or (v380 == "140 / 140 Items Stored" or (v380 == "145 / 145 Items Stored" or v380 == "150 / 150 Items Stored")))))))))))))) then
+                    local v381 = {
+                        game:GetService("Players").LocalPlayer
+                    }
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.DungeonService.RF.TeleportToLobby:InvokeServer(unpack(v381))
+                end
+            end
+        end
+    end))
+    v1 = require(game:GetService("ReplicatedStorage"):WaitForChild("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"))
+    local vu382 = v1.GetController("DataController"):GetReplica()
+    function GetRarity(p383, p384)
+        local v385 = require(game:GetService("ReplicatedStorage").ReplicatedStorage.SharedModules.ArmorsModule)
+        local v386, v387, v388 = pairs(v385)
+        while true do
+            local v389
+            v388, v389 = v386(v387, v388)
+            if v388 == nil then
+                break
+            end
+            if v388 == p383 then
+                local v390, v391, v392 = pairs(v389)
+                while true do
+                    local v393
+                    v392, v393 = v390(v391, v392)
+                    if v392 == nil then
+                        break
+                    end
+                    if v392 == "Rarity" then
+                        return v393 == p384
+                    end
+                end
+            end
+        end
+        local v394 = require(game:GetService("ReplicatedStorage").ReplicatedStorage.SharedModules.WeaponsModule)
+        local v395, v396, v397 = pairs(v394)
+        while true do
+            local v398
+            v397, v398 = v395(v396, v397)
+            if v397 == nil then
+                break
+            end
+            if v397 == p383 then
+                local v399, v400, v401 = pairs(v398)
+                while true do
+                    local v402
+                    v401, v402 = v399(v400, v401)
+                    if v401 == nil then
+                        break
+                    end
+                    if v401 == "Rarity" then
+                        return v402 == p384
+                    end
+                end
+            end
+        end
+        local v403 = require(game:GetService("ReplicatedStorage").ReplicatedStorage.SharedModules.RelicsModule)
+        local v404, v405, v406 = pairs(v403)
+        while true do
+            local v407
+            v406, v407 = v404(v405, v406)
+            if v406 == nil then
+                break
+            end
+            if v406 == p383 then
+                local v408, v409, v410 = pairs(v407)
+                while true do
+                    local v411
+                    v410, v411 = v408(v409, v410)
+                    if v410 == nil then
+                        break
+                    end
+                    if v410 == "Rarity" then
+                        return v411 == p384
+                    end
+                end
+            end
+        end
+        local v412 = require(game:GetService("ReplicatedStorage").ReplicatedStorage.SharedModules.ElementsModule)
+        local v413, v414, v415 = pairs(v412)
+        while true do
+            local v416
+            v415, v416 = v413(v414, v415)
+            if v415 == nil then
+                break
+            end
+            if v415 == p383 then
+                local v417, v418, v419 = pairs(v416)
+                while true do
+                    local v420
+                    v419, v420 = v417(v418, v419)
+                    if v419 == nil then
+                        break
+                    end
+                    if v419 == "Rarity" then
+                        return v420 == p384
+                    end
+                end
+            end
+        end
+        return false
+    end
+    function SellItem(p421, p422)
+        if game.PlaceId == 10515146389 then
+            local v423, v424, v425 = pairs(vu382.Data.Main.Items[p421])
+            while true do
+                local v426
+                v425, v426 = v423(v424, v425)
+                if v425 == nil then
+                    break
+                end
+                local v427 = v426.Base
+                local v428 = v426.Type
+                if not v426.Equipped and GetRarity(v427, p422) then
+                    local v429 = {
+                        {
+                            {
+                                Type = v428,
+                                UUID = v425
+                            }
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.InventoryService.RF.Sell:InvokeServer(unpack(v429))
+                end
+            end
+        end
+    end
+    local v430 = v10.autoselltab:AddSection("\226\154\148\239\184\143 Sell Weapons \226\154\148\239\184\143")
+    local vu431 = v430:AddToggle("SellWeapon1Toggle", {
+        Title = "\226\154\148\239\184\143  Sell Common Weapons",
+        Default = Settings.SellWeapon1 or false
+    })
+    local v432 = vu431
+    vu431.OnChanged(v432, function()
+        Settings.SellWeapon1 = vu431.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellWeapon1 == true then
+                SellItem("Weapons", "Common")
+            end
+        end
+    end))
+    local vu433 = v430:AddToggle("SellWeapon1Toggle", {
+        Title = "\226\154\148\239\184\143  Sell Uncommon Weapons",
+        Default = Settings.SellWeapon2 or false
+    })
+    local v434 = vu433
+    vu433.OnChanged(v434, function()
+        Settings.SellWeapon2 = vu433.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellWeapon2 == true then
+                SellItem("Weapons", "Uncommon")
+            end
+        end
+    end))
+    local vu435 = v430:AddToggle("SellWeapon3Toggle", {
+        Title = "\226\154\148\239\184\143  Sell Rare Weapons",
+        Default = Settings.SellWeapon3 or false
+    })
+    local v436 = vu435
+    vu435.OnChanged(v436, function()
+        Settings.SellWeapon3 = vu435.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellWeapon3 == true then
+                SellItem("Weapons", "Rare")
+            end
+        end
+    end))
+    local vu437 = v430:AddToggle("SellWeapon4Toggle", {
+        Title = "\226\154\148\239\184\143  Sell Epic Weapons \226\154\160\239\184\143",
+        Default = Settings.SellWeapon4 or false
+    })
+    local v438 = vu437
+    vu437.OnChanged(v438, function()
+        Settings.SellWeapon4 = vu437.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellWeapon4 == true then
+                SellItem("Weapons", "Epic")
+            end
+        end
+    end))
+    v430:AddToggle("SellWeapon5Toggle", {
+        Title = "\226\154\148\239\184\143  Sell Legendary Weapons \226\154\160\239\184\143",
+        Default = Settings.SellWeapon4 or false
+    }):OnChanged(function()
+        Settings.SellWeapon4 = vu437.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellWeapon4 == true then
+                SellItem("Weapons", "Epic")
+            end
+        end
+    end))
+    local v439 = v10.autoselltab:AddSection("\226\154\153\239\184\143 Sell Armors \226\154\153\239\184\143")
+    local vu440 = v439:AddToggle("SellArmor1Toggle", {
+        Title = "\226\154\153\239\184\143  Sell Common Armors",
+        Default = Settings.SellArmor1 or false
+    })
+    local v441 = vu440
+    vu440.OnChanged(v441, function()
+        Settings.SellArmor1 = vu440.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellArmor1 == true then
+                SellItem("Armors", "Common")
+            end
+        end
+    end))
+    local vu442 = v439:AddToggle("SellArmor2Toggle", {
+        Title = "\226\154\153\239\184\143  Sell Uncommon Armors",
+        Default = Settings.SellArmor2 or false
+    })
+    local v443 = vu442
+    vu442.OnChanged(v443, function()
+        Settings.SellArmor2 = vu442.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellArmor2 == true then
+                SellItem("Armors", "Uncommon")
+            end
+        end
+    end))
+    local vu444 = v439:AddToggle("SellArmor3Toggle", {
+        Title = "\226\154\153\239\184\143  Sell Rare Armors",
+        Default = Settings.SellArmor3 or false
+    })
+    local v445 = vu444
+    vu444.OnChanged(v445, function()
+        Settings.SellArmor3 = vu444.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellArmor3 == true then
+                SellItem("Armors", "Rare")
+            end
+        end
+    end))
+    local vu446 = v439:AddToggle("SellArmor4Toggle", {
+        Title = "\226\154\153\239\184\143  Sell Epic Armors \226\154\160\239\184\143",
+        Default = Settings.SellArmor4 or false
+    })
+    local v447 = vu446
+    vu446.OnChanged(v447, function()
+        Settings.SellArmor4 = vu446.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellArmor4 == true then
+                SellItem("Armors", "Epic")
+            end
+        end
+    end))
+    local v448 = v10.autoselltab:AddSection("\226\154\156\239\184\143 Sell Relics \226\154\156\239\184\143")
+    local vu449 = v448:AddToggle("SellRelic1Toggle", {
+        Title = "\226\154\156\239\184\143  Sell Common Relics",
+        Default = Settings.SellRelic1 or false
+    })
+    local v450 = vu449
+    vu449.OnChanged(v450, function()
+        Settings.SellRelic1 = vu449.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellRelic1 == true then
+                SellItem("Relics", "Common")
+            end
+        end
+    end))
+    local vu451 = v448:AddToggle("SellRelic2Toggle", {
+        Title = "\226\154\156\239\184\143  Sell Uncommon Relics",
+        Default = Settings.SellRelic2 or false
+    })
+    local v452 = vu451
+    vu451.OnChanged(v452, function()
+        Settings.SellRelic2 = vu451.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellRelic2 == true then
+                SellItem("Relics", "Uncommon")
+            end
+        end
+    end))
+    local vu453 = v448:AddToggle("SellRelic3Toggle", {
+        Title = "\226\154\156\239\184\143  Sell Rare Relics",
+        Default = Settings.SellRelic3 or false
+    })
+    local v454 = vu453
+    vu453.OnChanged(v454, function()
+        Settings.SellRelic3 = vu453.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellRelic3 == true then
+                SellItem("Relics", "Rare")
+            end
+        end
+    end))
+    local v455 = v10.autoselltab:AddSection("\226\155\176\239\184\143 Sell Elements \226\155\176\239\184\143")
+    local vu456 = v455:AddToggle("SellOrb1Toggle", {
+        Title = "\226\155\176\239\184\143  Sell Rare Elements",
+        Default = Settings.SellOrb1 or false
+    })
+    local v457 = vu456
+    vu456.OnChanged(v457, function()
+        Settings.SellOrb1 = vu456.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellOrb1 == true then
+                SellItem("Orbs", "Rare")
+            end
+        end
+    end))
+    local vu458 = v455:AddToggle("SellOrb2Toggle", {
+        Title = "\226\155\176\239\184\143  Sell Epic Elements \226\154\160\239\184\143",
+        Default = Settings.SellOrb2 or false
+    })
+    local v459 = vu458
+    vu458.OnChanged(v459, function()
+        Settings.SellOrb2 = vu458.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.SellOrb2 == true then
+                SellItem("Orbs", "Epic")
+            end
+        end
+    end))
+    local v460 = v10.misc:AddSection("Load")
+    function autoloadscript()
+        queue_on_teleport("repeat task.wait() until game:IsLoaded() print(\'aaaaaaaaaaaaaaaaaaaaa\') task.wait(2) loadstring(game:HttpGet(\'https://raw.githubusercontent.com/xpa1n/Scripts/main/ElementalDungeons.lua\'))()")
+    end
+    coroutine.resume(coroutine.create(function()
+        if Settings.autoload then
+            autoloadscript()
+        end
+    end))
+    local vu461 = v460:AddToggle("autoloadscripttoggle", {
+        Title = "Auto Load Script",
+        Default = Settings.autoload or false
+    })
+    local v462 = vu461
+    vu461.OnChanged(v462, function()
+        Settings.autoload = vu461.Value
+        saveSettings()
+        if Settings.autoload then
+            autoloadscript()
+        end
+    end)
+    function autoreifkicked()
+        pcall(function()
+            local _ = game:GetService("Players").LocalPlayer
+            local v463 = game.CoreGui.RobloxPromptGui.promptOverlay
+            local vu464 = game:GetService("TeleportService")
+            v463.ChildAdded:connect(function(p465)
+                if p465.Name == "ErrorPrompt" then
+                    repeat
+                        vu464:Teleport(10515146389)
+                        wait(2)
+                    until false
+                end
+            end)
+        end)
+    end
+    coroutine.resume(coroutine.create(function()
+        if Settings.autorejoinifkicked then
+            autoreifkicked()
+        end
+    end))
+    local vu466 = v460:AddToggle("autojoinifkicked", {
+        Title = "Auto Rejoin If Kicked",
+        Default = Settings.autorejoinifkicked or false
+    })
+    local v467 = vu466
+    vu466.OnChanged(v467, function()
+        Settings.autorejoinifkicked = vu466.Value
+        saveSettings()
+        if Settings.autorejoinifkicked then
+            autoreifkicked()
+        end
+    end)
+    function antiafkfunc()
+        pcall(function()
+            local vu468 = game:GetService("VirtualUser")
+            game:GetService("Players").LocalPlayer.Idled:connect(function()
+                vu468:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+                wait(1)
+                vu468:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+            end)
+        end)
+    end
+    coroutine.resume(coroutine.create(function()
+        if Settings.antiafkk then
+            antiafkfunc()
+        end
+    end))
+    local vu469 = v460:AddToggle("antiafktoggle", {
+        Title = "Anti-AFK",
+        Default = Settings.antiafkk or false
+    })
+    local v470 = vu469
+    vu469.OnChanged(v470, function()
+        Settings.antiafkk = vu469.Value
+        saveSettings()
+        if Settings.antiafkk then
+            antiafkfunc()
+        end
+    end)
+    local v471 = v10.misc:AddSection("Miscellaneous")
+    local vu472 = false
+    local vu473 = false
+    local vu474 = v471:AddToggle("flytoggle", {
+        Title = "Fly (Press \'X\' to Toggle)",
+        Default = Settings.fly or false
+    })
+    local v475 = vu474
+    vu474.OnChanged(v475, function()
+        Settings.fly = vu474.Value
+        saveSettings()
+    end)
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.fly then
+                EnableFlight()
+            else
+                DisableFlight()
+            end
+        end
+    end))
+    function EnableFlight()
+        local v476 = game.Players.LocalPlayer
+        local v477 = v476:GetMouse()
+        local vu478 = v476
+        if not vu473 then
+            vu473 = true
+            if workspace:FindFirstChild("Core") then
+                workspace.Core:Destroy()
+            end
+            local vu479 = Instance.new("Part")
+            vu479.Name = "Core"
+            vu479.Size = Vector3.new(0.05, 0.05, 0.05)
+            spawn(function()
+                vu479.Parent = workspace
+                local v480 = Instance.new("Weld", vu479)
+                v480.Part0 = vu479
+                v480.Part1 = vu478.Character.LowerTorso
+                v480.C0 = CFrame.new(0, 0, 0)
+            end)
+            workspace:WaitForChild("Core")
+            local vu481 = workspace.Core
+            local vu482 = 10
+            local vu483 = {
+                a = false,
+                d = false,
+                w = false,
+                s = false
+            }
+            function start()
+                local v484 = Instance.new("BodyPosition", vu481)
+                local v485 = Instance.new("BodyGyro", vu481)
+                v484.Name = "EPIXPOS"
+                v484.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                v484.Position = vu481.Position
+                v485.MaxTorque = Vector3.new(9000000000, 9000000000, 9000000000)
+                v485.CFrame = vu481.CFrame
+                while true do
+                    wait()
+                    vu478.Character.Humanoid.PlatformStand = true
+                    local v486 = v485.CFrame - v485.CFrame.Position + v484.Position
+                    if not (vu483.w or (vu483.s or (vu483.a or vu483.d))) then
+                        vu482 = 5
+                    end
+                    if vu483.w then
+                        v486 = v486 + workspace.CurrentCamera.CFrame.LookVector * vu482
+                        vu482 = vu482 + 0
+                    end
+                    if vu483.s then
+                        v486 = v486 - workspace.CurrentCamera.CFrame.LookVector * vu482
+                        vu482 = vu482 + 0
+                    end
+                    if vu483.d then
+                        v486 = v486 * CFrame.new(vu482, 0, 0)
+                        vu482 = vu482 + 0
+                    end
+                    if vu483.a then
+                        v486 = v486 * CFrame.new(- vu482, 0, 0)
+                        vu482 = vu482 + 0
+                    end
+                    if vu482 > 10 then
+                        vu482 = 5
+                    end
+                    v484.Position = v486.Position
+                    if vu483.w then
+                        v485.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(- math.rad(vu482 * 0), 0, 0)
+                    elseif vu483.s then
+                        v485.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(math.rad(vu482 * 0), 0, 0)
+                    else
+                        v485.CFrame = workspace.CurrentCamera.CFrame
+                    end
+                    if not vu472 then
+                        if v485 then
+                            v485:Destroy()
+                        end
+                        if v484 then
+                            v484:Destroy()
+                        end
+                        vu478.Character.Humanoid.PlatformStand = false
+                        vu482 = 10
+                        return
+                    end
+                end
+            end
+            v477.KeyDown:Connect(function(p487)
+                if vu481 and vu481.Parent then
+                    if p487 == "w" then
+                        vu483.w = true
+                    elseif p487 == "s" then
+                        vu483.s = true
+                    elseif p487 == "a" then
+                        vu483.a = true
+                    elseif p487 == "d" then
+                        vu483.d = true
+                    else
+                        vu472 = p487 == "x" and not vu472
+                        if vu472 then
+                            start()
+                        end
+                    end
+                end
+            end)
+            v477.KeyUp:Connect(function(p488)
+                if p488 == "w" then
+                    vu483.w = false
+                elseif p488 == "s" then
+                    vu483.s = false
+                elseif p488 == "a" then
+                    vu483.a = false
+                elseif p488 == "d" then
+                    vu483.d = false
+                end
+            end)
+        end
+    end
+    function DisableFlight()
+        local v489 = game.Players.LocalPlayer
+        v489:GetMouse()
+        if vu473 then
+            vu473 = false
+            if e1 then
+                e1:Disconnect()
+            end
+            if e2 then
+                e2:Disconnect()
+            end
+            if workspace.Core then
+                workspace.Core:Destroy()
+            end
+            v489.Character.Humanoid.PlatformStand = false
+            vu472 = false
+        end
+    end
+    local vu490 = Settings.WalkSpeed or 30
+    v471:AddSlider("WalkSpeed", {
+        Title = "Walk Speed",
+        Default = vu490,
+        Min = 30,
+        Max = 200,
+        Rounding = 0,
+        Callback = function(p491)
+            Settings.WalkSpeed = p491
+            saveSettings()
+            vu490 = p491
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Settings.WalkSpeed
+        end
+    })
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if game.Players.LocalPlayer.Character.Humanoid.WalkSpeed ~= vu490 then
+                game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = vu490
+            end
+        end
+    end))
+    local vu492 = Settings.Jumppower or 50
+    v471:AddSlider("JumpxPower", {
+        Title = "Jump Power",
+        Default = vu490,
+        Min = 50,
+        Max = 200,
+        Rounding = 0,
+        Callback = function(p493)
+            Settings.Jumppower = p493
+            saveSettings()
+            vu492 = p493
+            game.Players.LocalPlayer.Character.Humanoid.JumpPower = Settings.Jumppower
+        end
+    })
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if game.Players.LocalPlayer.Character.Humanoid.JumpPower ~= vu492 then
+                game.Players.LocalPlayer.Character.Humanoid.JumpPower = vu492
+            end
+        end
+    end))
+    local vu494 = v471:AddToggle("InfiniteJump", {
+        Title = "Infinite Jump",
+        Default = Settings.infinjump or false
+    })
+    local v495 = vu494
+    vu494.OnChanged(v495, function()
+        Settings.infinjump = vu494.Value
+        saveSettings()
+    end)
+    function InfJumpFunction()
+        pcall(function()
+            if _G.infinJumpStarted == nil then
+                _G.infinJumpStarted = true
+                game:GetService("Players").LocalPlayer:GetMouse().KeyDown:connect(function(p496)
+                    if Settings.infinjump and p496:byte() == 32 then
+                        humanoid = game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                        humanoid:ChangeState("Jumping")
+                        wait()
+                        humanoid:ChangeState("Seated")
+                    end
+                end)
+            end
+        end)
+    end
+    InfJumpFunction()
+    function ESPPlayer()
+        local v497, v498, v499 = ipairs(game.Players:GetPlayers())
+        local function v504(p500)
+            local v501 = p500.Character
+            if v501 then
+                local v502 = v501:FindFirstChild("HumanoidRootPart")
+                local v503 = v502 and v502:FindFirstChildOfClass("BillboardGui")
+                if v503 then
+                    v503:Destroy()
+                end
+            end
+        end
+        local function v510(p505)
+            local v506 = p505.Character
+            local v507 = v506 and v506:FindFirstChild("HumanoidRootPart")
+            if v507 then
+                local v508 = Instance.new("BillboardGui")
+                local v509 = Instance.new("TextLabel")
+                v508.Parent = v507
+                v508.AlwaysOnTop = true
+                v508.Size = UDim2.new(0, 50, 0, 50)
+                v508.StudsOffset = Vector3.new(0, 2, 0)
+                v509.Parent = v508
+                v509.BackgroundColor3 = Color3.new(1, 0, 0)
+                v509.BackgroundTransparency = 1
+                v509.Size = UDim2.new(1, 0, 1, 0)
+                v509.Text = p505.Name
+                v509.TextColor3 = Color3.new(2, 2, 2)
+                v509.TextScaled = true
+            end
+        end
+        while true do
+            local v511
+            v499, v511 = v497(v498, v499)
+            if v499 == nil then
+                break
+            end
+            if Settings.plrESP then
+                v510(v511)
+            else
+                v504(v511)
+            end
+        end
+    end
+    ESPPlayer()
+    local vu512 = v471:AddToggle("ESPPlayers", {
+        Title = "ESP Players",
+        Default = Settings.plrESP or false
+    })
+    local v513 = vu512
+    vu512.OnChanged(v513, function()
+        Settings.plrESP = vu512.Value
+        saveSettings()
+        ESPPlayer()
+    end)
+    v471:AddButton({
+        Title = "Rejoin",
+        Callback = function()
+            repeat
+                task.wait()
+            until game:IsLoaded()
+            warn("Rejoinning....")
+            game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+        end
+    })
+    v471:AddButton({
+        Title = "Server Hop",
+        Callback = function()
+            local v514 = game.Players.LocalPlayer
+            local vu515 = game:GetService("HttpService")
+            local v516 = game:GetService("TeleportService")
+            local v517 = game.PlaceId
+            local v518 = game.JobId
+            local vu519 = "https://games.roblox.com/v1/games/" .. v517 .. "/servers/Public?sortOrder=Desc&limit=100"
+            function ListServers(p520)
+                return vu515:JSONDecode((game:HttpGet(vu519 .. (p520 and "&cursor=" .. p520 or ""))))
+            end
+            local v521 = nil
+            local v522 = ListServers(v521)
+            local v523 = next
+            local v524 = v522.data
+            local v525 = nil
+            while true do
+                local v526
+                v525, v526 = v523(v524, v525)
+                if v525 == nil then
+                    break
+                end
+                if v526.playing < v526.maxPlayers and v526.id ~= v518 then
+                    local v527, _ = pcall(v516.TeleportToPlaceInstance, v516, v517, v526.id, v514)
+                    if v527 then
+                    end
+                end
+            end
+            v521 = v522.nextPageCursor
+            if not v521 then
+                return
+            end
+        end
+    })
+    v471:AddButton({
+        Title = "Join Lowest Server",
+        Callback = function()
+            local vu528 = game:GetService("HttpService")
+            local v529 = game:GetService("TeleportService")
+            local v530 = game.PlaceId
+            local vu531 = "https://games.roblox.com/v1/games/" .. v530 .. "/servers/Public?sortOrder=Asc&limit=100"
+            function ListServers(p532)
+                return vu528:JSONDecode((game:HttpGet(vu531 .. (p532 and "&cursor=" .. p532 or ""))))
+            end
+            local v533 = nil
+            repeat
+                local v534 = ListServers(v533)
+                local v535 = v534.data[1]
+                v533 = v534.nextPageCursor
+            until v535
+            v529:TeleportToPlaceInstance(v530, v535.id, game.Players.LocalPlayer)
+        end
+    })
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if game.PlaceId ~= 10515146389 then
+                game:GetService("ReplicatedStorage").ReplicatedStorage.Packages.Knit.Services.DungeonService.RF.StartDungeon:InvokeServer()
+                wait(20)
+            end
+        end
+    end))
+    v10.credits:AddParagraph({
+        Title = "Script is made by pa1n#8015",
+        Content = "Thanks a lot to ArponAG & MSDOS for help with some features!"
+    })
+    local v536 = v10.credits:AddSection("Discord")
+    v536:AddButton({
+        Title = "Join Discord!",
+        Callback = function()
+            local v537 = syn and syn.request or (http and http.request or http_request)
+            local v538 = game:GetService("HttpService")
+            if v537 then
+                v537({
+                    Url = "http://127.0.0.1:6463/rpc?v=1",
+                    Method = "POST",
+                    Headers = {
+                        ["Content-Type"] = "application/json",
+                        Origin = "https://discord.com"
+                    },
+                    Body = v538:JSONEncode({
+                        cmd = "INVITE_BROWSER",
+                        nonce = v538:GenerateGUID(false),
+                        args = {
+                            code = "W2XyGrNQUe"
+                        }
+                    })
+                })
+            end
+        end
+    })
+    v536:AddInput("Input", {
+        Title = "or",
+        Default = "discord.gg/W2XyGrNQUe",
+        Placeholder = "discord.gg/W2XyGrNQUe",
+        Numeric = false,
+        Finished = false,
+        Callback = function(p539)
+            print(p539)
+        end
+    })
+    v536:AddParagraph({
+        Title = "Join discord to request new features and report bugs!"
+    })
+    v10.credits:AddSection("Info"):AddParagraph({
+        Title = "Adding more features soon ;)"
+    })
+    local vu540 = game.Players.LocalPlayer
+    local vu541 = nil
+    local vu542 = nil
+    local vu543 = false
+    local function vu549()
+        vu543 = true
+        if vu541 then
+            local v544 = vu541
+            local v545, v546, v547 = pairs(v544:GetChildren())
+            while true do
+                local v548
+                v547, v548 = v545(v546, v547)
+                if v547 == nil then
+                    break
+                end
+                if v548:IsA("BasePart") then
+                    v548.CanCollide = false
+                end
+            end
+        end
+    end
+    local function vu555()
+        vu543 = false
+        if vu541 then
+            local v550 = vu541
+            local v551, v552, v553 = pairs(v550:GetChildren())
+            while true do
+                local v554
+                v553, v554 = v551(v552, v553)
+                if v553 == nil then
+                    break
+                end
+                if v554:IsA("BasePart") then
+                    v554.CanCollide = true
+                end
+            end
+        end
+    end
+    coroutine.resume(coroutine.create(function()
+        while task.wait() and game.PlaceId ~= 10515146389 do
+            pcall(function()
+                if vu540 and vu540.Character then
+                    vu541 = vu540.Character
+                    vu542 = vu541:FindFirstChild("Humanoid")
+                    humanoidRootPart = vu541:FindFirstChild("HumanoidRootPart")
+                    if vu542 and vu542.Health > 0 then
+                        if Settings.Nearest and Settings.FarmStyle == "Tween [Safer]" then
+                            vu549()
+                        elseif Settings.Nearest == false or Settings.Nearest == nil then
+                            vu555()
+                        end
+                    else
+                        vu555()
+                    end
+                else
+                    vu555()
+                end
+                wait(1)
+            end)
+        end
+    end))
+    coroutine.resume(coroutine.create(function()
+        while task.wait() do
+            if Settings.Nearest and game.PlaceId ~= 10515146389 then
+                pcall(function()
+                    if Settings.FarmStyle == "Tween [Safer]" then
+                        localCharacter = game.Players.LocalPlayer.Character
+                        localCharacter:WaitForChild("HumanoidRootPart").Velocity = Vector3.new(0, 1, 0)
+                    end
+                end)
+            end
+        end
+    end))
+    coroutine.resume(coroutine.create(function()
+        pcall(function()
+            if Workspace.Map.FireDungeon then
+                wait(2)
+                Workspace.Map.FireDungeon.Floor:Destroy()
+                Workspace.Map.FireDungeon.BaseFloor:Destroy()
+            else
+                print("othergaymap")
+            end
+        end)
+    end))
+    local v556 = v10.Settings:AddSection("Interface")
+    Settings.Theme = Settings.Theme or "Darker"
+    Settings.MenuKeybind = Settings.MenuKeybind or "K"
+    v556:AddDropdown("InterfaceTheme", {
+        Title = "Theme",
+        Description = "Changes the interface theme.",
+        Values = vu8.Themes,
+        Default = Settings.Theme,
+        Callback = function(p557)
+            vu8:SetTheme(p557)
+            Settings.Theme = p557
+            saveSettings()
+        end
+    }):SetValue(Settings.Theme)
+    local vu558 = v556:AddToggle("AcrylicToggle", {
+        Title = "Acrylic",
+        Description = "The blurred background requires graphic quality 8+",
+        Default = Settings.Acrylic or false
+    })
+    local v559 = vu558
+    vu558.OnChanged(v559, function()
+        Settings.Acrylic = vu558.Value
+        saveSettings()
+        vu8:ToggleAcrylic(Settings.Acrylic)
+    end)
+    vu8:ToggleAcrylic(Settings.Acrylic)
+    local vu560 = v556:AddToggle("TransparentToggle", {
+        Title = "Transparency",
+        Description = "Makes the interface transparent.",
+        Default = Settings.Transparency or false
+    })
+    local v561 = vu560
+    vu560.OnChanged(v561, function()
+        Settings.Transparency = vu560.Value
+        saveSettings()
+        vu8:ToggleTransparency(Settings.Transparency)
+    end)
+    local vu562 = v556:AddKeybind("MenuKeybind", {
+        Title = "Minimize Bind",
+        Default = Settings.MenuKeybind
+    })
+    local v563 = vu562
+    vu562.OnChanged(v563, function()
+        Settings.MenuKeybind = vu562.Value
+        saveSettings()
+    end)
+    vu8.MinimizeKeybind = vu562
+    vu8:Notify({
+        Title = "Janina Hub",
+        Content = "The script has been loaded.",
+        Duration = 4
+    })
+    v9:SelectTab(1)
+    print("Script Loaded!")
+end
+local vu564 = game:HttpGet("https://rbxscripts.net/janinahub/opensourcekey")
+function NeedKey()
+    local vu565 = game:GetService("UserInputService")
+    function dragify(pu566)
+        local vu567 = nil
+        local vu568 = nil
+        local vu569 = nil
+        local function vu573(p570)
+            local v571 = p570.Position - vu569
+            local v572 = UDim2.new(startPos.X.Scale, startPos.X.Offset + v571.X, startPos.Y.Scale, startPos.Y.Offset + v571.Y)
+            game:GetService("TweenService"):Create(pu566, TweenInfo.new(0.25), {
+                Position = v572
+            }):Play()
+        end
+        pu566.InputBegan:Connect(function(pu574)
+            if (pu574.UserInputType == Enum.UserInputType.MouseButton1 or pu574.UserInputType == Enum.UserInputType.Touch) and vu565:GetFocusedTextBox() == nil then
+                vu567 = true
+                vu569 = pu574.Position
+                startPos = pu566.Position
+                pu574.Changed:Connect(function()
+                    if pu574.UserInputState == Enum.UserInputState.End then
+                        vu567 = false
+                    end
+                end)
+            end
+        end)
+        pu566.InputChanged:Connect(function(p575)
+            if p575.UserInputType == Enum.UserInputType.MouseMovement or p575.UserInputType == Enum.UserInputType.Touch then
+                vu568 = p575
+            end
+        end)
+        game:GetService("UserInputService").InputChanged:Connect(function(p576)
+            if p576 == vu568 and vu567 then
+                vu573(p576)
+            end
+        end)
+    end
+    local v577 = Instance.new("ScreenGui")
+    local vu578 = Instance.new("Frame")
+    local v579 = Instance.new("UICorner")
+    local v580 = Instance.new("Frame")
+    local v581 = Instance.new("TextLabel")
+    local v582 = Instance.new("TextButton")
+    local v583 = Instance.new("UICorner")
+    local v584 = Instance.new("TextButton")
+    local v585 = Instance.new("UICorner")
+    local v586 = Instance.new("TextButton")
+    local v587 = Instance.new("UICorner")
+    local v588 = Instance.new("TextBox")
+    local v589 = Instance.new("UICorner")
+    local v590 = Instance.new("Frame")
+    local v591 = Instance.new("UICorner")
+    local v592 = Instance.new("TextButton")
+    local v593 = Instance.new("UICorner")
+    local v594 = Instance.new("TextLabel")
+    local v595 = Instance.new("TextLabel")
+    local v596 = Instance.new("ImageLabel")
+    local v597 = Instance.new("Frame")
+    local v598 = Instance.new("TextLabel")
+    v577.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    v577.IgnoreGuiInset = true
+    v577.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    v577.Name = "JaninaHubKeyUI"
+    vu578.Name = "Container"
+    vu578.Parent = v577
+    vu578.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+    vu578.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    vu578.Size = UDim2.new(0, 335, 0, 260)
+    vu578.Position = UDim2.new(0.5, - 167, 0.5, - 130)
+    dragify(vu578)
+    v579.CornerRadius = UDim.new(0, 5)
+    v579.Parent = vu578
+    v580.Name = "Main"
+    v580.Parent = vu578
+    v580.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    v580.BackgroundTransparency = 1
+    v580.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v580.BorderSizePixel = 0
+    v580.Size = UDim2.new(1, 0, 1, 0)
+    v581.Parent = v580
+    v581.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    v581.BackgroundTransparency = 1
+    v581.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v581.BorderSizePixel = 0
+    v581.Size = UDim2.new(0, 335, 0, 136)
+    v581.Font = Enum.Font.SourceSans
+    v581.Text = "Status : Waiting For Key..."
+    v581.TextColor3 = Color3.fromRGB(69, 176, 99)
+    v581.TextSize = 20
+    v581.Name = "Status"
+    v582.Parent = v580
+    v582.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    v582.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v582.BorderSizePixel = 0
+    v582.Position = UDim2.new(0.0595238097, 0, 0.57, 0)
+    v582.Size = UDim2.new(0, 145, 0, 40)
+    v582.Font = Enum.Font.SourceSans
+    v582.Text = "Get Key"
+    v582.TextColor3 = Color3.fromRGB(178, 178, 178)
+    v582.TextSize = 17
+    v582.Name = "CopyKeybtn"
+    v583.CornerRadius = UDim.new(0, 5)
+    v583.Parent = v582
+    v584.Parent = v580
+    v584.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    v584.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v584.BorderSizePixel = 0
+    v584.Position = UDim2.new(0.505952358, 0, 0.57, 0)
+    v584.Size = UDim2.new(0, 145, 0, 40)
+    v584.Font = Enum.Font.SourceSans
+    v584.Text = "Check Key"
+    v584.TextColor3 = Color3.fromRGB(178, 178, 178)
+    v584.TextSize = 17
+    v584.Name = "KeyChecker"
+    v585.CornerRadius = UDim.new(0, 5)
+    v585.Parent = v584
+    v586.Parent = v580
+    v586.BackgroundColor3 = Color3.fromRGB(48, 102, 190)
+    v586.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v586.BorderSizePixel = 0
+    v586.Position = UDim2.new(0.28273809, 0, 0.76, 0)
+    v586.Size = UDim2.new(0, 145, 0, 40)
+    v586.Font = Enum.Font.SourceSans
+    v586.Text = "Join Discord"
+    v586.TextColor3 = Color3.fromRGB(255, 255, 255)
+    v586.TextSize = 17
+    v586.Name = "JoinDiscord"
+    v587.CornerRadius = UDim.new(0, 5)
+    v587.Parent = v586
+    v588.Parent = v580
+    v588.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    v588.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v588.BorderSizePixel = 0
+    v588.Position = UDim2.new(0.0599999987, 0, 0.38, 0)
+    v588.Size = UDim2.new(0, 295, 0, 40)
+    v588.Font = Enum.Font.SourceSans
+    v588.PlaceholderColor3 = Color3.fromRGB(178, 178, 178)
+    v588.PlaceholderText = "Enter Your Key Here"
+    v588.Text = ""
+    v588.TextColor3 = Color3.fromRGB(178, 178, 178)
+    v588.TextSize = 17
+    v588.TextStrokeColor3 = Color3.fromRGB(178, 178, 178)
+    v588.Name = "KeyBox"
+    v589.CornerRadius = UDim.new(0, 5)
+    v589.Parent = v588
+    v590.Name = "Topbar"
+    v590.Parent = vu578
+    v590.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    v590.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v590.BorderSizePixel = 0
+    v590.Size = UDim2.new(0, 335, 0, 40)
+    v591.CornerRadius = UDim.new(0, 5)
+    v591.Parent = v590
+    v592.Parent = v590
+    v592.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    v592.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v592.BorderSizePixel = 0
+    v592.Position = UDim2.new(0.899999976, 0, 0.119999997, 0)
+    v592.Size = UDim2.new(0, 30, 0, 30)
+    v592.Font = Enum.Font.Unknown
+    v592.Text = "X"
+    v592.TextColor3 = Color3.fromRGB(129, 129, 129)
+    v592.TextSize = 10
+    v592.Name = "CloseButton"
+    v593.CornerRadius = UDim.new(0, 5)
+    v593.Parent = v592
+    v594.Parent = v590
+    v594.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    v594.BackgroundTransparency = 1
+    v594.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v594.BorderSizePixel = 0
+    v594.Position = UDim2.new(0, 242, 0, 40)
+    v594.Size = UDim2.new(0, - 50, 0, - 40)
+    v594.Font = Enum.Font.SourceSansBold
+    v594.Text = "Key System"
+    v594.TextColor3 = Color3.fromRGB(255, 255, 255)
+    v594.TextSize = 22
+    v595.Parent = v590
+    v595.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    v595.BackgroundTransparency = 1
+    v595.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v595.BorderSizePixel = 0
+    v595.Size = UDim2.new(0, 240, 0, 40)
+    v595.Font = Enum.Font.SciFi
+    v595.Text = "Janina Hub \226\128\148"
+    v595.TextColor3 = Color3.fromRGB(255, 255, 255)
+    v595.TextSize = 17
+    v596.Parent = v590
+    v596.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    v596.BackgroundTransparency = 1
+    v596.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v596.BorderSizePixel = 0
+    v596.Position = UDim2.new(0.0900000036, 0, 0.119999997, 0)
+    v596.Size = UDim2.new(0, 30, 0, 30)
+    v596.Image = "rbxassetid://14943357678"
+    v597.Name = "Bottom"
+    v597.Parent = vu578
+    v597.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    v597.BackgroundTransparency = 1
+    v597.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v597.BorderSizePixel = 0
+    v597.Position = UDim2.new(0, 0, 1, 0)
+    v597.Size = UDim2.new(0, 335, 0, - 30)
+    v598.Parent = v597
+    v598.BackgroundColor3 = Color3.fromRGB(178, 178, 178)
+    v598.BackgroundTransparency = 1
+    v598.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    v598.BorderSizePixel = 0
+    v598.Size = UDim2.new(1, 0, 0, 30)
+    v598.Font = Enum.Font.Arial
+    v598.Text = "If you can\'t copy: discord.gg/W2XyGrNQUe"
+    v598.TextColor3 = Color3.fromRGB(178, 178, 178)
+    v598.TextSize = 11
+    v598.Position = UDim2.new(0, 0, 0, 4)
+    local vu599 = v580:FindFirstChild("Status")
+    local v600 = v590:FindFirstChild("CloseButton")
+    local vu601 = v580:FindFirstChild("JoinDiscord")
+    local vu602 = v580:FindFirstChild("CopyKeybtn")
+    local v603 = v580:FindFirstChild("KeyChecker")
+    local vu604 = v580:FindFirstChild("KeyBox")
+    v600.MouseButton1Click:Connect(function()
+        vu578:Destroy()
+    end)
+    vu601.MouseButton1Click:Connect(function()
+        setclipboard(tostring("https://discord.gg/W2XyGrNQUe"))
+        vu601.Text = "Copied Discord Invite"
+        task.wait(0.6)
+        vu601.Text = "Join Discord"
+    end)
+    vu602.MouseButton1Click:Connect(function()
+        setclipboard(tostring("https://rbxscripts.net/janinahub/key"))
+        vu602.Text = "Copied Key Link"
+        task.wait(0.6)
+        vu602.Text = "Get Key"
+    end)
+    v603.MouseButton1Click:Connect(function()
+        warn("Verifying key...")
+        warn("Verifying key...")
+        task.wait()
+        if vu604.Text ~= vu564 then
+            vu599.Text = "Status: Checking Key..."
+            task.wait(1)
+            vu599.Text = "Status: Invalid Key :("
+            task.wait(1)
+            vu599.Text = "Status: Please get a real key..."
+            task.wait(1)
+            vu599.Text = "Status: Waiting for key..."
+        else
+            Settings.Key = vu604.Text
+            saveSettings()
+            vu599.Text = "Status: Checking Key..."
+            task.wait(1)
+            vu599.Text = "Status: Key is Correct!"
+            task.wait(1)
+            vu599.Text = "Status: Loading GUI!"
+            task.wait(1)
+            vu578:Destroy()
+            MainScript()
+        end
+    end)
+end
+tempokey = "BqxIFdTrNO"
+function keychecker()
+    if tempokey ~= vu564 then
+        NeedKey()
+    elseif game.PlaceId ~= 10515146389 then
+        if game.PlaceId ~= 10515146389 then
+            repeat
+                task.wait()
+                warn("waitingforshittoload")
+            until game:GetService("Players").LocalPlayer.PlayerGui.Main.StartBtn.Visible == true or game:GetService("Players").LocalPlayer.PlayerGui.Main.BossHealthBars.DungeonTimer.Visible == true
+            MainScript()
+        end
+    else
+        MainScript()
+    end
+end
+local vu605 = 5
+function canOpenUI()
+    return not _G.LastOpenTime and true or vu605 <= tick() - _G.LastOpenTime
+end
+if game:GetService("CoreGui"):FindFirstChild("ScreenGui") then
+    print("Script Already Running!")
+elseif not game:GetService("CoreGui"):FindFirstChild("ScreenGui") and canOpenUI() then
+    repeat
+        task.wait()
+    until game:IsLoaded()
+    repeat
+        task.wait()
+    until game.Workspace:FindFirstChild(game.Players.LocalPlayer.Name)
+    repeat
+        task.wait()
+    until game:GetService("ReplicatedStorage"):FindFirstChild("ReplicatedStorage"):FindFirstChild("Packages"):FindFirstChild("Knit")
+    _G.LastOpenTime = tick()
+    keychecker()
+end
