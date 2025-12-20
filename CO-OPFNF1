@@ -1,0 +1,138 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
+
+local ESP_ENABLED = true
+local TEXT_SIZE = 14
+
+-- Tabel de culori bazat pe cuvinte cheie
+local ColorMatch = {
+    ["Freddy"] = Color3.fromRGB(165, 42, 42),
+    ["Bonnie"] = Color3.fromRGB(0, 100, 255),
+    ["Chica"] = Color3.fromRGB(255, 255, 0),
+    ["Foxy"] = Color3.fromRGB(255, 0, 0),
+    ["Golden"] = Color3.fromRGB(255, 215, 0),
+    ["Nightmare"] = Color3.fromRGB(50, 50, 50)
+}
+
+local ESPs = {}
+
+function getESPColor(name)
+    for key, color in pairs(ColorMatch) do
+        if name:lower():find(key:lower()) then
+            return color
+        end
+    end
+    return nil
+end
+
+function findBestPart(model)
+    -- Caută piesa menționată de tine în ierarhia adâncă
+    for _, desc in ipairs(model:GetDescendants()) do
+        if desc:IsA("BasePart") and desc.Transparency < 1 and desc.Name ~= "HumanoidRootPart" then
+            return desc
+        end
+    end
+    return model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart", true)
+end
+
+function createESP(model)
+    local color = getESPColor(model.Name)
+    if not color or ESPs[model] then return end
+
+    print("ESP activat pentru: " .. model.Name .. " aflat in " .. model:GetFullName())
+
+    -- HIGHLIGHT FULL BODY
+    local highlight = Instance.new("Highlight")
+    highlight.Adornee = model
+    highlight.FillColor = color
+    highlight.OutlineColor = Color3.new(1, 1, 1)
+    highlight.FillTransparency = 0.4
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.Parent = model
+
+    -- TEXTE
+    local nameText = Drawing.new("Text")
+    nameText.Text = model.Name
+    nameText.Color = color
+    nameText.Size = TEXT_SIZE
+    nameText.Outline = true
+    nameText.Center = true
+    
+    local distText = Drawing.new("Text")
+    distText.Size = TEXT_SIZE - 2
+    distText.Color = Color3.new(1, 1, 1)
+    distText.Outline = true
+    distText.Center = true
+
+    ESPs[model] = {
+        Highlight = highlight,
+        Name = nameText,
+        Distance = distText,
+        Part = findBestPart(model)
+    }
+end
+
+function updateESP()
+    for model, data in pairs(ESPs) do
+        if not model.Parent then
+            data.Name.Visible = false
+            data.Distance.Visible = false
+            data.Highlight:Destroy()
+            ESPs[model] = nil
+            continue
+        end
+
+        if not ESP_ENABLED then
+            data.Name.Visible = false
+            data.Distance.Visible = false
+            data.Highlight.Enabled = false
+            continue
+        end
+
+        local part = data.Part or findBestPart(model)
+        if part then
+            local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
+            if onScreen then
+                local dist = (Camera.CFrame.Position - part.Position).Magnitude
+                
+                data.Name.Position = Vector2.new(screenPos.X, screenPos.Y - 20)
+                data.Name.Visible = true
+                
+                data.Distance.Text = "[" .. math.floor(dist) .. "m]"
+                data.Distance.Position = Vector2.new(screenPos.X, screenPos.Y)
+                data.Distance.Visible = true
+                
+                data.Highlight.Enabled = true
+            else
+                data.Name.Visible = false
+                data.Distance.Visible = false
+                data.Highlight.Enabled = false
+            end
+        end
+    end
+end
+
+-- Scanare agresivă în tot jocul
+RunService.RenderStepped:Connect(updateESP)
+
+task.spawn(function()
+    while true do
+        for _, obj in ipairs(game:GetDescendants()) do
+            if obj:IsA("Model") then
+                createESP(obj)
+            end
+        end
+        task.wait(5)
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(i, p)
+    if not p and i.KeyCode == Enum.KeyCode.F6 then 
+        ESP_ENABLED = not ESP_ENABLED 
+        print("ESP: " .. tostring(ESP_ENABLED))
+    end
+end)
