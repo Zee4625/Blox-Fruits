@@ -91,7 +91,7 @@ function Library:Window(title)
     local Top = Instance.new("Frame")
     Top.Name = "Top"
     Top.Parent = Main
-    Top.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+    Top.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     Top.BorderSizePixel = 0
     Top.Size = UDim2.new(1, 0, 0, 34)
     
@@ -103,7 +103,7 @@ function Library:Window(title)
     TopCover.Name = "Cover"
     TopCover.Parent = Top
     TopCover.AnchorPoint = Vector2.new(0.5, 1)
-    TopCover.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+    TopCover.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     TopCover.BorderSizePixel = 0
     TopCover.Position = UDim2.new(0.5, 0, 1, 0)
     TopCover.Size = UDim2.new(1, 0, 0, 4)
@@ -112,7 +112,7 @@ function Library:Window(title)
     Line.Name = "Line"
     Line.Parent = Top
     Line.AnchorPoint = Vector2.new(0.5, 1)
-    Line.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Line.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
     Line.BackgroundTransparency = 0.920
     Line.Position = UDim2.new(0.5, 0, 1, 1)
     Line.Size = UDim2.new(1, 0, 0, 1)
@@ -122,12 +122,12 @@ function Library:Window(title)
     Logo.Name = "Logo"
     Logo.Parent = Top
     Logo.AnchorPoint = Vector2.new(0, 0.5)
-    Logo.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    Logo.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
     Logo.BackgroundTransparency = 1.000
     Logo.Position = UDim2.new(0, 4, 0.5, 0)
     Logo.Size = UDim2.new(0, 32, 0, 32)
     Logo.Image = "http://www.roblox.com/asset/?id=82858721461099"
-    Logo.ImageColor3 = Color3.fromRGB(0, 255, 0)
+    Logo.ImageColor3 = Color3.fromRGB(170, 255, 195)
     
     -- Minimize Button (using minus icon)
     local Minimize = Instance.new("ImageButton")
@@ -245,7 +245,7 @@ function Library:Window(title)
     GameName.Name = "GameName"
     GameName.Parent = Top 
     GameName.AnchorPoint = Vector2.new(0, 0.5)
-    GameName.BackgroundColor3 = Color3.fromRGB(125, 0, 255)
+    GameName.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
     GameName.BackgroundTransparency = 1.000
     GameName.Position = UDim2.new(0, 32, 0.5, 0)
     GameName.Size = UDim2.new(0, 165, 0, 22)
@@ -359,7 +359,7 @@ function Library:Window(title)
         local TabButton = Instance.new("TextButton")
         TabButton.Name = "TabButton"
         TabButton.Parent = TabsContainer
-        TabButton.BackgroundColor3 = Color3.fromRGB(232, 17, 85)
+        TabButton.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
         TabButton.BackgroundTransparency = 1
         TabButton.Size = UDim2.new(1, -12, 0, 30)
         TabButton.AutoButtonColor = false
@@ -389,7 +389,7 @@ function Library:Window(title)
             Icon.Position = UDim2.new(0, 5, 0.5, -10)
             Icon.Size = UDim2.new(0, 20, 0, 20)
             Icon.Image = icon
-            Icon.ImageColor3 = Color3.fromRGB(232, 17, 85)
+            Icon.ImageColor3 = Color3.fromRGB(170, 255, 195)
         end
         
         -- Add text label
@@ -400,7 +400,7 @@ function Library:Window(title)
         TextLabel.Size = UDim2.new(1, 0, 1, 0)
         TextLabel.Font = Enum.Font.Gotham
         TextLabel.Text = title
-        TextLabel.TextColor3 = Color3.fromRGB(72,72,72)
+        TextLabel.TextColor3 = Color3.fromRGB(170, 255, 195)
         TextLabel.TextSize = 14.000
         TextLabel.TextXAlignment = Enum.TextXAlignment.Center
         
@@ -416,7 +416,7 @@ function Library:Window(title)
         Page.Visible = false
         Page.Parent = Pages
         Page.Active = true
-        Page.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        Page.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
         Page.BackgroundTransparency = 1.000
         Page.BorderSizePixel = 0
         Page.Size = UDim2.new(1, 0, 1, 0)
@@ -475,7 +475,7 @@ function Library:Window(title)
             local Button = Instance.new("TextButton")
             Button.Name = "Button"
             Button.Parent = Page
-            Button.BackgroundColor3 = Color3.fromRGB(134, 10, 49)
+            Button.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
             Button.BorderSizePixel = 0
             Button.Size = UDim2.new(1, -6, 0, 34)
             Button.AutoButtonColor = false
@@ -527,13 +527,13 @@ function Library:Window(title)
             local Title = Instance.new("TextLabel")
             Title.Name = "Title"
             Title.Parent = Toggle
-            Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Title.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
             Title.BackgroundTransparency = 1.000
             Title.Position = UDim2.new(0, 8, 0, 0)
             Title.Size = UDim2.new(1, -6, 1, 0)
             Title.Font = Enum.Font.Gotham
             Title.Text = text or "Toggle"
-            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.TextColor3 = Color3.fromRGB(170, 255, 195)
             Title.TextSize = 14.000
             Title.TextXAlignment = Enum.TextXAlignment.Left
             
