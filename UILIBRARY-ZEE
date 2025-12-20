@@ -470,7 +470,7 @@ function Library:Window(title)
         -- Element functions
         local Elements = {}
         
-        -- Button
+        -- Button Window
         function Elements:Button(text, callback)
             local Button = Instance.new("TextButton")
             Button.Name = "Button"
@@ -489,11 +489,11 @@ function Library:Window(title)
             ButtonCorner.Parent = Button
             
             Button.MouseEnter:Connect(function()
-                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(160, 12, 59)}):Play()
+                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(170, 255, 195)}):Play()
             end)
             
             Button.MouseLeave:Connect(function()
-                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(134, 10, 49)}):Play()
+                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(170, 255, 195)}):Play()
             end)
             
             Button.MouseButton1Click:Connect(function()
