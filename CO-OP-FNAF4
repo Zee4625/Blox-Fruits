@@ -9,14 +9,21 @@ local UPDATE_RATE = 0.05
 local ESP_ENABLED = true
 local TEXT_SIZE = 14
 
--- Tabel culori - Asigură-te că numele de aici coincid cu numele Modelului principal
+-- Tabel culori actualizat cu Fredbear și Nightmare Fredbear
 local ESPColors = {
+    -- FNAF 1 & Special
     ["Freddy"] = Color3.fromRGB(165, 42, 42),
     ["Bonnie"] = Color3.fromRGB(0, 100, 255),
     ["Chica"] = Color3.fromRGB(255, 255, 0),
     ["Foxy"] = Color3.fromRGB(255, 0, 0),
     ["Goldenfreddy"] = Color3.fromRGB(255, 215, 0),
     ["Springtrap"] = Color3.fromRGB(120, 130, 0),
+    
+    -- Fredbears
+    ["Fredbear"] = Color3.fromRGB(255, 200, 0), -- Galben Auriu
+    ["Nightmare Fredbear"] = Color3.fromRGB(220, 180, 0), -- Galben mai închis/murdar
+    
+    -- FNAF 4 (Nightmares)
     ["Nightmare Freddy"] = Color3.fromRGB(100, 50, 0),
     ["Nightmare Bonnie"] = Color3.fromRGB(50, 50, 150),
     ["Nightmare Chica"] = Color3.fromRGB(200, 200, 0),
@@ -45,7 +52,7 @@ function createESP(model)
     if not model:IsA("Model") then return end
     local color = ESPColors[model.Name] or Color3.new(1, 1, 1)
     
-    -- Highlight (Contur 3D)
+    -- Highlight (Contur 3D Full Body)
     local highlight = Instance.new("Highlight")
     highlight.Adornee = model
     highlight.FillColor = color
@@ -104,7 +111,6 @@ function updateESP()
             continue
         end
         
-        -- Căutăm piesa la fiecare update dacă a fost pierdută
         local part = findValidPart(model)
         
         if part then
@@ -138,14 +144,15 @@ function updateESP()
                 data.Name.Visible = false
                 data.Distance.Visible = false
                 for _, l in ipairs(data.BoxLines) do l.Visible = false end
+                if data.Highlight then data.Highlight.Enabled = false end
             end
         end
     end
 end
 
--- Scanare în tot Workspace-ul pentru orice Model care are numele din listă
+-- Scanare generală (Include game:GetDescendants() pentru a-i găsi oriunde)
 function scan()
-    for _, item in ipairs(Workspace:GetDescendants()) do
+    for _, item in ipairs(game:GetDescendants()) do
         if item:IsA("Model") and ESPColors[item.Name] and not ESPs[item] then
             createESP(item)
         end
@@ -154,7 +161,6 @@ end
 
 RunService.RenderStepped:Connect(updateESP)
 
--- Scanare rară pentru a nu face lag
 task.spawn(function()
     while true do
         scan()
@@ -162,11 +168,19 @@ task.spawn(function()
     end
 end)
 
--- Toggle F6
 UserInputService.InputBegan:Connect(function(input, gpe)
     if not gpe and input.KeyCode == Enum.KeyCode.F6 then
         ESP_ENABLED = not ESP_ENABLED
+        -- Ascunde elementele imediat când dai OFF
+        if not ESP_ENABLED then
+            for _, data in pairs(ESPs) do
+                data.Name.Visible = false
+                data.Distance.Visible = false
+                for _, l in ipairs(data.BoxLines) do l.Visible = false end
+                if data.Highlight then data.Highlight.Enabled = false end
+            end
+        end
     end
 end)
 
-print("ESP Universal FNAF (Deep Part Search) activat! [F6]")
+print("ESP FNAF (Fredbears Included) activat! [F6]")
