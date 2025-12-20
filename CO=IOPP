@@ -1,0 +1,53 @@
+-- Crearea Interfeței (GUI)
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local UIListLayout = Instance.new("UIListLayout")
+local FNAF1 = Instance.new("TextButton")
+local FNAF4 = Instance.new("TextButton")
+
+-- Proprietăți Frame
+ScreenGui.Parent = game.CoreGui
+Frame.Name = "FNAF_Menu"
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.Position = UDim2.new(0.5, -100, 0.5, -50)
+Frame.Size = UDim2.new(0, 200, 0, 120)
+Frame.Active = true
+Frame.Draggable = true -- Permite mutarea meniului cu mouse-ul
+
+UIListLayout.Parent = Frame
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.Padding = UDim.new(0, 10)
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- Stil Buton FNAF 1
+FNAF1.Name = "FNAF1"
+FNAF1.Parent = Frame
+FNAF1.BackgroundColor3 = Color3.fromRGB(0, 168, 107) -- Verdele cerut de tine
+FNAF1.Size = UDim2.new(0, 180, 0, 45)
+FNAF1.Font = Enum.Font.SourceSansBold
+FNAF1.Text = "FNAF 1"
+FNAF1.TextColor3 = Color3.fromRGB(255, 255, 255)
+FNAF1.TextSize = 20
+
+-- Stil Buton FNAF 4
+FNAF4.Name = "FNAF4"
+FNAF4.Parent = Frame
+FNAF4.BackgroundColor3 = Color3.fromRGB(0, 168, 107)
+FNAF4.Size = UDim2.new(0, 180, 0, 45)
+FNAF4.Font = Enum.Font.SourceSansBold
+FNAF4.Text = "FNAF 4"
+FNAF4.TextColor3 = Color3.fromRGB(255, 255, 255)
+FNAF4.TextSize = 20
+
+-- Funcționalitate Buton FNAF 1
+FNAF1.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CO-OPFNF1"))()
+end)
+
+-- Funcționalitate Buton FNAF 4
+FNAF4.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CO-OP-FNAF4"))()
+end)
+
+print("Meniu FNAF încărcat cu succes!")
