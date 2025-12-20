@@ -251,7 +251,7 @@ function Library:Window(title)
     GameName.Size = UDim2.new(0, 165, 0, 22)
     GameName.Font = Enum.Font.Gotham
     GameName.Text = title or "Game Name"
-    GameName.TextColor3 = Color3.fromRGB(232, 17, 85)
+    GameName.TextColor3 = Color3.fromRGB(170, 255, 195)
     GameName.TextSize = 14.000
     GameName.TextXAlignment = Enum.TextXAlignment.Left
     
@@ -280,7 +280,7 @@ function Library:Window(title)
     local TabsContainer = Instance.new("Frame")
     TabsContainer.Name = "TabsContainer"
     TabsContainer.Parent = Tabs
-    TabsContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TabsContainer.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
     TabsContainer.BackgroundTransparency = 1.000
     TabsContainer.Size = UDim2.new(1, 0, 1, 0)
     
@@ -481,7 +481,7 @@ function Library:Window(title)
             Button.AutoButtonColor = false
             Button.Font = Enum.Font.Gotham
             Button.Text = text or "Button"
-            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Button.TextColor3 = Color3.fromRGB(170, 255, 195)
             Button.TextSize = 14.000
             
             local ButtonCorner = Instance.new("UICorner")
