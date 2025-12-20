@@ -910,7 +910,7 @@ function Library:Window(title)
             local OptionHolder = Instance.new("Frame")
             OptionHolder.Name = "OptionHolder"
             OptionHolder.Parent = Dropdown
-            OptionHolder.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+            OptionHolder.BackgroundColor3 = Color3.fromRGB(0, 168, 107)
             OptionHolder.BorderSizePixel = 0
             OptionHolder.Position = UDim2.new(0, 0, 0, 34)
             OptionHolder.Size = UDim2.new(1, 0, 0, 0)
@@ -963,7 +963,7 @@ function Library:Window(title)
                 Option.AutoButtonColor = false
                 Option.Font = Enum.Font.Gotham
                 Option.Text = option
-                Option.TextColor3 = Color3.fromRGB(0, 168, 107)
+                Option.TextColor3 = Color3.fromRGB(0, 0, 0)
                 Option.TextSize = 14.000
                 
                 local OptionCorner = Instance.new("UICorner")
@@ -1082,7 +1082,7 @@ function Library:Window(title)
                     Option.AutoButtonColor = false
                     Option.Font = Enum.Font.Gotham
                     Option.Text = option
-                    Option.TextColor3 = Color3.fromRGB(0, 168, 107)
+                    Option.TextColor3 = Color3.fromRGB(0, 0, 0)
                     Option.TextSize = 14.000
                     
                     local OptionCorner = Instance.new("UICorner")
