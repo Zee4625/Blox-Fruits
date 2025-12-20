@@ -422,7 +422,7 @@ function Library:Window(title)
         Page.Size = UDim2.new(1, 0, 1, 0)
         Page.CanvasPosition = Vector2.new(0, 0)
         Page.ScrollBarThickness = 2
-        Page.ScrollBarImageColor3 = Color3.fromRGB(255, 24, 101)
+        Page.ScrollBarImageColor3 = Color3.fromRGB(46, 204, 113)
         
         local PageList = Instance.new("UIListLayout")
         PageList.Parent = Page
