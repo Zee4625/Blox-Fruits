@@ -1,0 +1,257 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+--=== ELITE TICKET FARM (SAFE ZONE + CLEAN UI) ===--
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Camera = Workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local ticketsFolder = Workspace:WaitForChild("Game")
+    :WaitForChild("Effects")
+    :WaitForChild("Tickets")
+
+-- Настройки и Состояние
+local State = {
+    ESP = true,
+    AutoFarm = false,
+    MenuOpen = true,
+    SafeZonePos = Vector3.new(0, 5000, 0), -- Координаты "Базы" в небе
+    SafePlatform = nil
+}
+
+local ESP_Table = {}
+
+-- ==========================================
+--           SAFE ZONE CREATION
+-- ==========================================
+local function CreateSafePlatform()
+    if State.SafePlatform then return end
+    
+    local part = Instance.new("Part")
+    part.Name = "SafeZonePlatform"
+    part.Size = Vector3.new(50, 2, 50)
+    part.Position = State.SafeZonePos - Vector3.new(0, 4, 0) -- Чуть ниже ног
+    part.Anchored = true
+    part.CanCollide = true
+    part.Transparency = 0.5 -- Сделал полупрозрачным, чтобы ты видел, что она есть
+    part.Color = Color3.fromRGB(0, 255, 255)
+    part.Material = Enum.Material.Neon
+    part.Parent = Workspace
+    
+    State.SafePlatform = part
+end
+
+-- ==========================================
+--                 GUI SYSTEM
+-- ==========================================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "TicketEliteUI"
+ScreenGui.ResetOnSpawn = false
+if pcall(function() game:GetService("CoreGui").Parent = game:GetService("CoreGui") end) then
+    ScreenGui.Parent = game:GetService("CoreGui")
+else
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+end
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 320, 0, 180)
+MainFrame.Position = UDim2.new(0.5, -160, 0.4, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Visible = true
+MainFrame.Parent = ScreenGui
+
+-- Декорация рамки
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(255, 60, 60)
+Stroke.Thickness = 2
+Stroke.Parent = MainFrame
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 6)
+Corner.Parent = MainFrame
+
+-- Заголовок
+local Title = Instance.new("TextLabel")
+Title.Text = "TICKET FARM [R-SHIFT]"
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.Parent = MainFrame
+
+-- === ИСПРАВЛЕНИЕ КУРСОРА (MODAL BUTTON) ===
+-- Эта кнопка перехватывает фокус мыши, когда GUI видно.
+-- Это штатный способ Roblox, он не ломает ESC.
+local CursorFixBtn = Instance.new("TextButton")
+CursorFixBtn.Name = "CursorFix"
+CursorFixBtn.BackgroundTransparency = 1
+CursorFixBtn.Modal = true -- ВОТ ЭТО ВКЛЮЧАЕТ КУРСОР
+CursorFixBtn.Text = ""
+CursorFixBtn.Size = UDim2.new(0, 0, 0, 0)
+CursorFixBtn.Parent = MainFrame
+
+-- Кнопки
+local function CreateButton(name, text, yPos, callback)
+    local btn = Instance.new("TextButton")
+    btn.Name = name
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Position = UDim2.new(0.05, 0, 0, yPos)
+    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.Parent = MainFrame
+    
+    local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 6); c.Parent = btn
+    
+    btn.MouseButton1Click:Connect(function()
+        local newState = callback()
+        if newState then
+            btn.TextColor3 = Color3.fromRGB(0, 255, 100)
+            btn.Text = text:gsub("OFF", "ON")
+        else
+            btn.TextColor3 = Color3.fromRGB(255, 60, 60)
+            btn.Text = text:gsub("ON", "OFF")
+        end
+    end)
+    return btn
+end
+
+local BtnESP = CreateButton("BtnESP", "Visuals: ON", 50, function()
+    State.ESP = not State.ESP
+    if not State.ESP then
+        for _, d in pairs(ESP_Table) do d.Line.Visible = false end
+    end
+    return State.ESP
+end)
+-- Установим начальный цвет зеленым
+BtnESP.TextColor3 = Color3.fromRGB(0, 255, 100)
+
+local BtnFarm = CreateButton("BtnFarm", "Safe Farm: OFF", 95, function()
+    State.AutoFarm = not State.AutoFarm
+    if State.AutoFarm then
+        CreateSafePlatform()
+    end
+    return State.AutoFarm
+end)
+
+-- Управление меню
+UserInputService.InputBegan:Connect(function(input, gp)
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        State.MenuOpen = not State.MenuOpen
+        MainFrame.Visible = State.MenuOpen
+        -- Свойство Modal на кнопке внутри MainFrame само сделает курсор видимым/скрытым
+    end
+end)
+
+-- ==========================================
+--               ESP LOGIC
+-- ==========================================
+-- (Код ESP такой же, так как он тебе понравился)
+local function GetScreenEdgePosition(center, dir, vpSize, offset)
+    local halfX = (vpSize.X / 2) - offset; local halfY = (vpSize.Y / 2) - offset
+    local slope = dir.Y / dir.X
+    local factor = math.min(halfX / math.abs(dir.X), halfY / math.abs(dir.Y))
+    return center + (dir * factor)
+end
+
+local function removeESP(obj)
+    if ESP_Table[obj] then
+        if ESP_Table[obj].Line then ESP_Table[obj].Line:Remove() end
+        if ESP_Table[obj].Highlight then ESP_Table[obj].Highlight:Destroy() end
+        if ESP_Table[obj].Billboard then ESP_Table[obj].Billboard:Destroy() end
+        ESP_Table[obj] = nil
+    end
+end
+
+local function createESP(obj)
+    if ESP_Table[obj] then return end
+    local h = Instance.new("Highlight"); h.FillColor = Color3.fromRGB(255,0,0); h.Parent = obj
+    local bb = Instance.new("BillboardGui"); bb.Size = UDim2.new(0,50,0,15); bb.AlwaysOnTop=true; bb.Parent=obj; bb.StudsOffset=Vector3.new(0,2,0)
+    local t = Instance.new("TextLabel"); t.Size=UDim2.new(1,0,1,0); t.BackgroundTransparency=1; t.Text="TICKET"; t.TextColor3=Color3.fromRGB(255,0,0); t.TextScaled=true; t.Parent=bb
+    local l = Drawing.new("Line"); l.Visible=false; l.Color=Color3.fromRGB(255,0,0); l.Thickness=1
+    ESP_Table[obj] = {Line=l, Highlight=h, Billboard=bb, Part=obj}
+    obj.AncestryChanged:Connect(function(_,p) if not p then removeESP(obj) end end)
+end
+
+RunService.RenderStepped:Connect(function()
+    if not State.ESP then return end
+    local vp = Camera.ViewportSize
+    local center = Vector2.new(vp.X/2, vp.Y/2)
+    for obj, d in pairs(ESP_Table) do
+        if not d.Part or not d.Part.Parent then removeESP(obj); continue end
+        local pos, onScreen = Camera:WorldToViewportPoint(d.Part.Position)
+        d.Line.Visible = true; d.Line.From = center
+        if onScreen then d.Line.To = Vector2.new(pos.X, pos.Y)
+        else
+            local dir = (Vector2.new(pos.X, pos.Y) - center)
+            if pos.Z < 0 then dir = -dir end
+            d.Line.To = GetScreenEdgePosition(center, dir.Unit, vp, 25)
+        end
+    end
+end)
+
+for _,v in ipairs(ticketsFolder:GetDescendants()) do if v:IsA("BasePart") then createESP(v) end end
+ticketsFolder.DescendantAdded:Connect(function(v) if v:IsA("BasePart") then createESP(v) end end)
+
+-- ==========================================
+--           AUTO FARM LOGIC (SAFE ZONE)
+-- ==========================================
+task.spawn(function()
+    while true do
+        task.wait(0.1) -- Тик проверки
+        
+        if State.AutoFarm then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local hrp = char.HumanoidRootPart
+                
+                -- 1. Ищем тикет
+                local targetTicket = nil
+                for _, v in ipairs(ticketsFolder:GetDescendants()) do
+                    if v:IsA("BasePart") and v.Parent then
+                        targetTicket = v
+                        break -- Берем первый найденный
+                    end
+                end
+                
+                if targetTicket then
+                    -- === ФАЗА СБОРА ===
+                    -- Телепортируемся к тикету
+                    hrp.CFrame = targetTicket.CFrame + Vector3.new(0, 2, 0)
+                    
+                    -- Ждем чуть-чуть (чтобы сервер засчитал подбор)
+                    task.wait(0.35) 
+                    
+                    -- === ФАЗА ОТСТУПЛЕНИЯ ===
+                    -- Мгновенно обратно на базу
+                    if State.SafePlatform then
+                        hrp.CFrame = CFrame.new(State.SafeZonePos + Vector3.new(0, 3, 0))
+                    end
+                    
+                    -- Небольшая пауза перед следующим поиском
+                    task.wait(0.1)
+                else
+                    -- === ФАЗА ОЖИДАНИЯ ===
+                    -- Если тикетов нет, сидим на базе
+                    if State.SafePlatform then
+                        -- Проверяем, если мы НЕ на базе (упали или отбежали), возвращаем
+                        if (hrp.Position - State.SafeZonePos).Magnitude > 50 then
+                            hrp.CFrame = CFrame.new(State.SafeZonePos + Vector3.new(0, 3, 0))
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+print("✅ ELITE SCRIPT LOADED. PRESS R-SHIFT.")
