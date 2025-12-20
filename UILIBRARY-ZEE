@@ -902,7 +902,7 @@ function Library:Window(title)
             Arrow.Size = UDim2.new(0, 28, 0, 28)
             Arrow.ZIndex = 2
             Arrow.Image = "rbxassetid://3926307971"
-            Arrow.ImageColor3 = Color3.fromRGB(0, 168, 107)
+            Arrow.ImageColor3 = Color3.fromRGB(0, 0, 0)
             Arrow.ImageRectOffset = Vector2.new(324, 524)
             Arrow.ImageRectSize = Vector2.new(36, 36)
             Arrow.ScaleType = Enum.ScaleType.Crop
