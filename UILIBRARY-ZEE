@@ -25,7 +25,7 @@ function Library:Window(title)
     local Main = Instance.new("Frame")
     Main.Name = "Main"
     Main.Parent = ui
-    Main.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  
+    Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Main.BorderSizePixel = 0
     Main.Position = UDim2.new(0.377, 0, 0.368, 0)
     Main.Size = UDim2.new(0, 470, 0, 283)
