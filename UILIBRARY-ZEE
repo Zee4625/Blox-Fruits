@@ -856,7 +856,7 @@ function Library:Window(title)
             local Dropdown = Instance.new("Frame")
             Dropdown.Name = "Dropdown"
             Dropdown.Parent = Page
-            Dropdown.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
+            Dropdown.BackgroundColor3 = Color3.fromRGB(0, 168, 107)
             Dropdown.BackgroundTransparency = 1.000
             Dropdown.BorderSizePixel = 0
             Dropdown.ClipsDescendants = true
@@ -882,13 +882,13 @@ function Library:Window(title)
             local Title = Instance.new("TextLabel")
             Title.Name = "Title"
             Title.Parent = Choose
-            Title.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
+            Title.BackgroundColor3 = Color3.fromRGB(0, 168, 107)
             Title.BackgroundTransparency = 1.000
             Title.Position = UDim2.new(0, 8, 0, 0)
             Title.Size = UDim2.new(1, -6, 1, 0)
             Title.Font = Enum.Font.Gotham
             Title.Text = text or "Dropdown"
-            Title.TextColor3 = Color3.fromRGB(170, 255, 195)
+            Title.TextColor3 = Color3.fromRGB(0, 168, 107)
             Title.TextSize = 14.000
             Title.TextXAlignment = Enum.TextXAlignment.Left
             
@@ -902,7 +902,7 @@ function Library:Window(title)
             Arrow.Size = UDim2.new(0, 28, 0, 28)
             Arrow.ZIndex = 2
             Arrow.Image = "rbxassetid://3926307971"
-            Arrow.ImageColor3 = Color3.fromRGB(161, 12, 59)
+            Arrow.ImageColor3 = Color3.fromRGB(0, 168, 107)
             Arrow.ImageRectOffset = Vector2.new(324, 524)
             Arrow.ImageRectSize = Vector2.new(36, 36)
             Arrow.ScaleType = Enum.ScaleType.Crop
@@ -957,13 +957,13 @@ function Library:Window(title)
                 local Option = Instance.new("TextButton")
                 Option.Name = "Option"
                 Option.Parent = OptionHolder
-                Option.BackgroundColor3 = Color3.fromRGB(134, 10, 49)
+                Option.BackgroundColor3 = Color3.fromRGB(0, 168, 107)
                 Option.BorderSizePixel = 0
                 Option.Size = UDim2.new(1, -16, 0, 30)
                 Option.AutoButtonColor = false
                 Option.Font = Enum.Font.Gotham
                 Option.Text = option
-                Option.TextColor3 = Color3.fromRGB(255, 255, 255)
+                Option.TextColor3 = Color3.fromRGB(0, 168, 107)
                 Option.TextSize = 14.000
                 
                 local OptionCorner = Instance.new("UICorner")
@@ -1082,7 +1082,7 @@ function Library:Window(title)
                     Option.AutoButtonColor = false
                     Option.Font = Enum.Font.Gotham
                     Option.Text = option
-                    Option.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    Option.TextColor3 = Color3.fromRGB(0, 168, 107)
                     Option.TextSize = 14.000
                     
                     local OptionCorner = Instance.new("UICorner")
