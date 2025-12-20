@@ -957,7 +957,7 @@ function Library:Window(title)
                 local Option = Instance.new("TextButton")
                 Option.Name = "Option"
                 Option.Parent = OptionHolder
-                Option.BackgroundColor3 = Color3.fromRGB(50, 205, 50)
+                Option.BackgroundColor3 = Color3.fromRGB(107, 142, 35)
                 Option.BorderSizePixel = 0
                 Option.Size = UDim2.new(1, -16, 0, 30)
                 Option.AutoButtonColor = false
