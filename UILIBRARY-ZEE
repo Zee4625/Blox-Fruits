@@ -25,7 +25,7 @@ function Library:Window(title)
     local Main = Instance.new("Frame")
     Main.Name = "Main"
     Main.Parent = ui
-    Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     Main.BorderSizePixel = 0
     Main.Position = UDim2.new(0.377, 0, 0.368, 0)
     Main.Size = UDim2.new(0, 470, 0, 283)
@@ -554,7 +554,7 @@ function Library:Window(title)
             local Check = Instance.new("ImageLabel")
             Check.Name = "Check"
             Check.Parent = ToggleFrame
-            Check.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Check.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
             Check.BackgroundTransparency = 1.000
             Check.Position = UDim2.new(-0.214285731, 0, -0.214285731, 0)
             Check.Size = UDim2.new(0, 20, 0, 20)
@@ -612,7 +612,7 @@ function Library:Window(title)
             Label.Size = UDim2.new(1, -6, 0, 34)
             Label.Font = Enum.Font.Gotham
             Label.Text = "  " .. (text or "Label")
-            Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Label.TextColor3 = Color3.fromRGB(170, 255, 195)
             Label.TextSize = 14.000
             Label.TextXAlignment = Enum.TextXAlignment.Left
             
@@ -636,13 +636,13 @@ function Library:Window(title)
             local Title = Instance.new("TextLabel")
             Title.Name = "Title"
             Title.Parent = Slider
-            Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Title.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
             Title.BackgroundTransparency = 1.000
             Title.Position = UDim2.new(0, 8, 0, 0)
             Title.Size = UDim2.new(1, -6, 0, 34)
             Title.Font = Enum.Font.Gotham
             Title.Text = text or "Slider"
-            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.TextColor3 = Color3.fromRGB(170, 255, 195)
             Title.TextSize = 14.000
             Title.TextXAlignment = Enum.TextXAlignment.Left
             
@@ -650,13 +650,13 @@ function Library:Window(title)
             Value.Name = "Value"
             Value.Parent = Slider
             Value.AnchorPoint = Vector2.new(1, 0)
-            Value.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Value.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
             Value.BackgroundTransparency = 1.000
             Value.Position = UDim2.new(1, -10, 0, 0)
             Value.Size = UDim2.new(1, 0, 0, 34)
             Value.Font = Enum.Font.Gotham
             Value.Text = tostring(default)
-            Value.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Value.TextColor3 = Color3.fromRGB(170, 255, 195)
             Value.TextSize = 14.000
             Value.TextXAlignment = Enum.TextXAlignment.Right
             
@@ -737,13 +737,13 @@ function Library:Window(title)
             local Title = Instance.new("TextLabel")
             Title.Name = "Title"
             Title.Parent = Keybind
-            Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Title.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
             Title.BackgroundTransparency = 1.000
             Title.Position = UDim2.new(0, 8, 0, 0)
             Title.Size = UDim2.new(1, -6, 1, 0)
             Title.Font = Enum.Font.Gotham
             Title.Text = text or "Keybind"
-            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.TextColor3 = Color3.fromRGB(170, 255, 195)
             Title.TextSize = 14.000
             Title.TextXAlignment = Enum.TextXAlignment.Left
             
@@ -756,7 +756,7 @@ function Library:Window(title)
             CurrentKey.Size = UDim2.new(-0, 46, 0, 24)
             CurrentKey.Font = Enum.Font.Gotham
             CurrentKey.Text = defaultKey.Name or ". . ."
-            CurrentKey.TextColor3 = Color3.fromRGB(255, 255, 255)
+            CurrentKey.TextColor3 = Color3.fromRGB(170, 255, 195)
             CurrentKey.TextSize = 14.000
             
             local CurrentKeyCorner = Instance.new("UICorner")
@@ -808,13 +808,13 @@ function Library:Window(title)
             local Title = Instance.new("TextLabel")
             Title.Name = "Title"
             Title.Parent = InputBox
-            Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Title.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
             Title.BackgroundTransparency = 1.000
             Title.Position = UDim2.new(0, 8, 0, 0)
             Title.Size = UDim2.new(1, -6, 0, 20)
             Title.Font = Enum.Font.Gotham
             Title.Text = text or "Input"
-            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.TextColor3 = Color3.fromRGB(170, 255, 195)
             Title.TextSize = 14.000
             Title.TextXAlignment = Enum.TextXAlignment.Left
             
@@ -828,7 +828,7 @@ function Library:Window(title)
             Box.Font = Enum.Font.Gotham
             Box.PlaceholderText = placeholder or "Enter text..."
             Box.Text = ""
-            Box.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Box.TextColor3 = Color3.fromRGB(170, 255, 195)
             Box.TextSize = 14.000
             
             local BoxCorner = Instance.new("UICorner")
@@ -856,7 +856,7 @@ function Library:Window(title)
             local Dropdown = Instance.new("Frame")
             Dropdown.Name = "Dropdown"
             Dropdown.Parent = Page
-            Dropdown.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Dropdown.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
             Dropdown.BackgroundTransparency = 1.000
             Dropdown.BorderSizePixel = 0
             Dropdown.ClipsDescendants = true
@@ -882,13 +882,13 @@ function Library:Window(title)
             local Title = Instance.new("TextLabel")
             Title.Name = "Title"
             Title.Parent = Choose
-            Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            Title.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
             Title.BackgroundTransparency = 1.000
             Title.Position = UDim2.new(0, 8, 0, 0)
             Title.Size = UDim2.new(1, -6, 1, 0)
             Title.Font = Enum.Font.Gotham
             Title.Text = text or "Dropdown"
-            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.TextColor3 = Color3.fromRGB(170, 255, 195)
             Title.TextSize = 14.000
             Title.TextXAlignment = Enum.TextXAlignment.Left
             
