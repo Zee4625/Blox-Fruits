@@ -1,0 +1,172 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
+
+local UPDATE_RATE = 0.05
+local ESP_ENABLED = true
+local TEXT_SIZE = 14
+
+-- Tabel culori - Asigură-te că numele de aici coincid cu numele Modelului principal
+local ESPColors = {
+    ["Freddy"] = Color3.fromRGB(165, 42, 42),
+    ["Bonnie"] = Color3.fromRGB(0, 100, 255),
+    ["Chica"] = Color3.fromRGB(255, 255, 0),
+    ["Foxy"] = Color3.fromRGB(255, 0, 0),
+    ["Goldenfreddy"] = Color3.fromRGB(255, 215, 0),
+    ["Springtrap"] = Color3.fromRGB(120, 130, 0),
+    ["Nightmare Freddy"] = Color3.fromRGB(100, 50, 0),
+    ["Nightmare Bonnie"] = Color3.fromRGB(50, 50, 150),
+    ["Nightmare Chica"] = Color3.fromRGB(200, 200, 0),
+    ["Nightmare Foxy"] = Color3.fromRGB(150, 0, 0),
+    ["Nightmare"] = Color3.fromRGB(20, 20, 20)
+}
+
+local ESPs = {}
+
+-- Funcție care caută orice piesă (Part) în interiorul modelului, oricât de adânc
+function findValidPart(model)
+    -- Verificăm dacă există piese comune
+    local common = model:FindFirstChild("HumanoidRootPart") or model:FindFirstChild("Head") or model:FindFirstChild("Cube")
+    if common then return common end
+    
+    -- Dacă nu, căutăm prima piesă (BasePart) în toată structura
+    for _, descendant in ipairs(model:GetDescendants()) do
+        if descendant:IsA("BasePart") then
+            return descendant
+        end
+    end
+    return nil
+end
+
+function createESP(model)
+    if not model:IsA("Model") then return end
+    local color = ESPColors[model.Name] or Color3.new(1, 1, 1)
+    
+    -- Highlight (Contur 3D)
+    local highlight = Instance.new("Highlight")
+    highlight.Adornee = model
+    highlight.FillColor = color
+    highlight.OutlineColor = Color3.new(1, 1, 1)
+    highlight.FillTransparency = 0.4
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.Enabled = ESP_ENABLED
+    highlight.Parent = model
+    
+    -- Elemente Drawing (Text și Cutie)
+    local nameText = Drawing.new("Text")
+    nameText.Text = model.Name
+    nameText.Color = color
+    nameText.Size = TEXT_SIZE
+    nameText.Outline = true
+    nameText.Center = true
+    nameText.Visible = ESP_ENABLED
+    
+    local distText = Drawing.new("Text")
+    distText.Size = TEXT_SIZE - 2
+    distText.Color = Color3.new(1, 1, 1)
+    distText.Outline = true
+    distText.Center = true
+    distText.Visible = ESP_ENABLED
+    
+    local lines = {}
+    for i = 1, 4 do
+        local l = Drawing.new("Line")
+        l.Thickness = 2
+        l.Color = color
+        l.Visible = ESP_ENABLED
+        lines[i] = l
+    end
+    
+    ESPs[model] = {
+        Highlight = highlight,
+        Name = nameText,
+        Distance = distText,
+        BoxLines = lines,
+        Color = color
+    }
+end
+
+function updateESP()
+    if not ESP_ENABLED then return end
+    local char = LocalPlayer.Character
+    local myRoot = char and char:FindFirstChild("HumanoidRootPart")
+    
+    for model, data in pairs(ESPs) do
+        if not model.Parent then
+            data.Name.Visible = false
+            data.Distance.Visible = false
+            for _, l in ipairs(data.BoxLines) do l.Visible = false end
+            if data.Highlight then data.Highlight:Destroy() end
+            ESPs[model] = nil
+            continue
+        end
+        
+        -- Căutăm piesa la fiecare update dacă a fost pierdută
+        local part = findValidPart(model)
+        
+        if part then
+            local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
+            
+            if onScreen then
+                local dist = myRoot and (myRoot.Position - part.Position).Magnitude or 0
+                local size = 1500 / screenPos.Z
+                local w, h = size / 2, size
+                
+                -- Update Box
+                data.BoxLines[1].From = Vector2.new(screenPos.X - w, screenPos.Y - h)
+                data.BoxLines[1].To = Vector2.new(screenPos.X + w, screenPos.Y - h)
+                data.BoxLines[2].From = Vector2.new(screenPos.X + w, screenPos.Y - h)
+                data.BoxLines[2].To = Vector2.new(screenPos.X + w, screenPos.Y + h)
+                data.BoxLines[3].From = Vector2.new(screenPos.X + w, screenPos.Y + h)
+                data.BoxLines[3].To = Vector2.new(screenPos.X - w, screenPos.Y + h)
+                data.BoxLines[4].From = Vector2.new(screenPos.X - w, screenPos.Y + h)
+                data.BoxLines[4].To = Vector2.new(screenPos.X - w, screenPos.Y - h)
+                
+                -- Update Texte
+                data.Name.Position = Vector2.new(screenPos.X, screenPos.Y - h - 25)
+                data.Name.Visible = true
+                data.Distance.Text = math.floor(dist) .. "m"
+                data.Distance.Position = Vector2.new(screenPos.X, screenPos.Y + h + 5)
+                data.Distance.Visible = true
+                
+                for _, l in ipairs(data.BoxLines) do l.Visible = true end
+                if data.Highlight then data.Highlight.Enabled = true end
+            else
+                data.Name.Visible = false
+                data.Distance.Visible = false
+                for _, l in ipairs(data.BoxLines) do l.Visible = false end
+            end
+        end
+    end
+end
+
+-- Scanare în tot Workspace-ul pentru orice Model care are numele din listă
+function scan()
+    for _, item in ipairs(Workspace:GetDescendants()) do
+        if item:IsA("Model") and ESPColors[item.Name] and not ESPs[item] then
+            createESP(item)
+        end
+    end
+end
+
+RunService.RenderStepped:Connect(updateESP)
+
+-- Scanare rară pentru a nu face lag
+task.spawn(function()
+    while true do
+        scan()
+        task.wait(3)
+    end
+end)
+
+-- Toggle F6
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if not gpe and input.KeyCode == Enum.KeyCode.F6 then
+        ESP_ENABLED = not ESP_ENABLED
+    end
+end)
+
+print("ESP Universal FNAF (Deep Part Search) activat! [F6]")
