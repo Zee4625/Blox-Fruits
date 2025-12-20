@@ -888,7 +888,7 @@ function Library:Window(title)
             Title.Size = UDim2.new(1, -6, 1, 0)
             Title.Font = Enum.Font.Gotham
             Title.Text = text or "Dropdown"
-            Title.TextColor3 = Color3.fromRGB(0, 168, 107)
+            Title.TextColor3 = Color3.fromRGB(0, 0, 0)
             Title.TextSize = 14.000
             Title.TextXAlignment = Enum.TextXAlignment.Left
             
