@@ -122,12 +122,12 @@ function Library:Window(title)
     Logo.Name = "Logo"
     Logo.Parent = Top
     Logo.AnchorPoint = Vector2.new(0, 0.5)
-    Logo.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Logo.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
     Logo.BackgroundTransparency = 1.000
     Logo.Position = UDim2.new(0, 4, 0.5, 0)
     Logo.Size = UDim2.new(0, 26, 0, 30)
     Logo.Image = "http://www.roblox.com/asset/?id=82858721461099"
-    Logo.ImageColor3 = Color3.fromRGB(232, 17, 85)
+    Logo.ImageColor3 = Color3.fromRGB(0, 255, 0)
     
     -- Minimize Button (using minus icon)
     local Minimize = Instance.new("ImageButton")
