@@ -1,1 +1,178 @@
-a
+-- Load Library
+local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/UILIBRARY-ZEE'))()
+
+-- Create Main Window
+local window = Library:Window('.  ZeeHUB v11')
+
+---------------------------------------------------------
+-- TAB 1: MAIN
+---------------------------------------------------------
+local mainTab = window:Tab({"Main", "rbxassetid://7734022041"})
+
+mainTab:Dropdown("Visuals (ESP)", {"X-Ray", "X-Ray-Name", "X-Ray-Radar", "X-Ray-Box"}, function(selected)
+    local urls = {
+        ["X-Ray"] = "ESP-CORNER",
+        ["X-Ray-Name"] = "NAMESP",
+        ["X-Ray-Radar"] = "RADARMODEEEEEEEEEEEEE",
+        ["X-Ray-Box"] = "SEEEEENS"
+    }
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/"..urls[selected]))()
+end)
+
+mainTab:Dropdown("Performance & Utilities", {"FPS Info", "FPS Boost", "Item Inspect", "Rejoin", "Noclip GUI"}, function(selected)
+    local urls = {
+        ["FPS Info"] = "FPS1",
+        ["FPS Boost"] = "FPS-BOOST-1",
+        ["Item Inspect"] = "ITEMEXP",
+        ["Rejoin"] = "REJJJJJJOOOOOOOOINNN!",
+        ["Noclip GUI"] = "NPCLIP"
+    }
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/"..urls[selected]))()
+end)
+
+---------------------------------------------------------
+-- TAB 2: COLLAB GUI
+---------------------------------------------------------
+local collabTab = window:Tab({"Collab GUI", "rbxassetid://7733954760"})
+
+collabTab:Dropdown("Zee Collabs Special", {"Cars HB", "Invincible Fly", "Build Mode", "Invincible Fly V2", "Invisible", "Return By Death", "Altar", "Jerk Anim", "Wally", "NarX"}, function(selected)
+    local urls = {
+        ["Cars HB"] = "car", ["Invincible Fly"] = "FLY", ["Build Mode"] = "BUILD", 
+        ["Invincible Fly V2"] = "INVFLY2", ["Invisible"] = "SPYME", ["Return By Death"] = "RETURNBYD", 
+        ["Altar"] = "ALT", ["Jerk Anim"] = "JERCCC", ["Wally"] = "WALLY", ["NarX"] = "NARUTo"
+    }
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/"..urls[selected], true))()
+end)
+
+collabTab:Dropdown("Other Scripts", {"Talentless", "Night Vision", "Zombie Anim", "TP GUI", "R15 Anims", "CoolKID Hubs", "Shift Lock", "Rage Bait", "Eye Mode"}, function(selected)
+    local urls = {
+        ["Talentless"] = "Piano", ["Night Vision"] = "NIGHTVISSS", ["Zombie Anim"] = "ZOMBIUUU", 
+        ["TP GUI"] = "tpBOSS", ["R15 Anims"] = "r154", ["CoolKID Hubs"] = "COOLKID", 
+        ["Shift Lock"] = "Shifttt53422323", ["Rage Bait"] = "TROLLG", ["Eye Mode"] = "EYEMODE"
+    }
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/"..urls[selected], true))()
+end)
+
+---------------------------------------------------------
+-- TAB 3: GAMES (FULL A-Z LIST)
+---------------------------------------------------------
+local gamesTab = window:Tab({"Games-PC", "rbxassetid://7733965118"})
+
+-- Tabelul cu toate jocurile ordonate de la A la Z
+local allGames = {
+    "1 vs all", "3008", "99 Nights", "Aba", "Arise Crossover", 
+    "Attack on Titan", "Bee-BSS", "Blox Fruits", "BlueLock Rivals", 
+    "Brainrot Zombie", "Build a Boat", "Deadly Delivery", "Death Rails", 
+    "Demonfall", "Driving Empire", "Elemental Dungeons", "Evade", 
+    "FNAF Eternal", "Grow A Garden", "Hunty Zombies", "JJK", 
+    "Meme Sea", "MM2", "Pixel Blade", "Project Smash", 
+    "Protect House", "Rune Slayer", "Survive Draft", "The Forge", 
+    "Lost Front", "Trident Survival", "TSB", "Weak Legacy 2", "Wierd Gun Game"
+}
+
+gamesTab:Dropdown("Select a Game (A-Z)", allGames, function(selected)
+    -- Logica de link-uri pentru fiecare joc
+    if selected == "1 vs all" then loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/1%20VS%20ALL"))()
+    elseif selected == "3008" then loadstring(game:HttpGet("https://raw.githubusercontent.com/ZZINS077/3008/refs/heads/main/ZZINSHUB"))()
+    elseif selected == "99 Nights" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR", true))()
+    elseif selected == "Aba" then loadstring(game:HttpGet("https://raw.githubusercontent.com/travislmao/pub-scripts/main/abagui"))()
+    elseif selected == "Arise Crossover" then loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ARISE"))()
+    elseif selected == "Attack on Titan" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ATKKK1TTT", true))()
+    elseif selected == "Bee-BSS" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BSSSSSSSSSSSSSS", true))()
+    elseif selected == "Blox Fruits" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Xz0", true))()
+    elseif selected == "BlueLock Rivals" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BBQ", true))()
+    elseif selected == "Brainrot Zombie" then loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Brainroot%20tower"))()
+    elseif selected == "Build a Boat" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BOATBUILD67", true))()
+    elseif selected == "Deadly Delivery" then loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/DEADLYDEV222"))()
+    elseif selected == "Death Rails" then loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Death%20rails"))()
+    elseif selected == "Demonfall" then loadstring(game:HttpGetAsync("https://api.junkie-development.de/api/v1/luascripts/public/58767ffc288c78fd334e474d1893d9807479fb2a8a4eb28156bf02c95e5b9aaf/download", true))()
+    elseif selected == "Driving Empire" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CARSSS", true))()
+    elseif selected == "Elemental Dungeons" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ElementalDunggg", true))()
+    elseif selected == "Evade" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Evade", true))()
+    elseif selected == "FNAF Eternal" then loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FNAF-2"))()
+    elseif selected == "Grow A Garden" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/GRO", true))()
+    elseif selected == "Hunty Zombies" then loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ZMBO"))()
+    elseif selected == "JJK" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/JJK-X", true))()
+    elseif selected == "Meme Sea" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/MEME", true))()
+    elseif selected == "MM2" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/M2FS", true))()
+    elseif selected == "Pixel Blade" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PIXEL", true))()
+    elseif selected == "Project Smash" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PROSMASH1", true))()
+    elseif selected == "Protect House" then loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/HOUSE%20DONE"))()
+    elseif selected == "Rune Slayer" then loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Runesll"))()
+    elseif selected == "Survive Draft" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/SURVIVEONADRAFT!", true))()
+    elseif selected == "The Forge" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORGEEEEEE", true))()
+    elseif selected == "Lost Front" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORNT%20AA", true))()
+    elseif selected == "Trident Survival" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/TRIDENT87678", true))()
+    elseif selected == "TSB" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/TSB-7821", true))()
+    elseif selected == "Weak Legacy 2" then loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Waak%202"))()
+    elseif selected == "Wierd Gun Game" then loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WGUN", true))()
+    end
+end)
+
+---------------------------------------------------------
+-- TAB 4: HUBS
+---------------------------------------------------------
+
+local gamesTabMobile = window:Tab({"Games-Mobile", "rbxassetid://7733965118"})
+
+local mobileGamesList = {
+    "Trident Survival", "99 Nights", "PIXEL BLADE", "Project Smash", 
+    "Wierd Gun Game", "Driving Empire", "Bee-BSS", "The Lost Front", 
+    "The Forge-BETA!", "Build a boat", "Uma Race", "Survive on a draft", 
+    "Attack on titan revolution", "Weak Legacy 2", "Hunty Zombie", 
+    "1 VS All", "Protect the house", "Brainroot tower", 
+    "Death rails", "FNAF Eternal Nights", "Elemental dungeons"
+}
+
+gamesTabMobile:Dropdown("Select Mobile Game", mobileGamesList, function(selected)
+    if selected == "Trident Survival" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/TRIDENT87678"))()
+    elseif selected == "99 Nights" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/99FOR"))()
+    elseif selected == "PIXEL BLADE" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PIXEL"))()
+    elseif selected == "Project Smash" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/PROSMASH1"))()
+    elseif selected == "Wierd Gun Game" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/WGUN"))()
+    elseif selected == "Driving Empire" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CARSSS"))()
+    elseif selected == "Bee-BSS" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BSSSSSSSSSSSSSS"))()
+    elseif selected == "The Lost Front" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORNT%20AA"))()
+    elseif selected == "The Forge-BETA!" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FORGEEEEEE"))()
+    elseif selected == "Build a boat" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/BOATBUILD67"))()
+    elseif selected == "Uma Race" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/UMAAAA"))()
+    elseif selected == "Survive on a draft" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/SURVIVEONADRAFT!"))()
+    elseif selected == "Attack on titan revolution" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ATKKK1TTT"))()
+    elseif selected == "Weak Legacy 2" then
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Waak%202"))()
+    elseif selected == "Hunty Zombie" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/TORAISNOTME"))()
+    elseif selected == "1 VS All" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/1%20VS%20ALL"))() 
+    elseif selected == "Protect the house" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/HOUSE%20DONE"))() 
+    elseif selected == "Brainroot tower" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Brainroot%20tower"))() 
+    elseif selected == "Death rails" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Death%20rails"))() 
+    elseif selected == "FNAF Eternal Nights" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FNAF-2"))() 
+    elseif selected == "Elemental dungeons" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ElementalDunggg"))() 
+    end
+end)
+
+
+local hubTab = window:Tab({"Hubs", "rbxassetid://7733920644"})
+
+hubTab:Button("Old ZeeHub", function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/prm", true))()
+end)
