@@ -5,45 +5,46 @@ local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
+-- CONFIGURAȚIE
 local ESP_ENABLED = true
-local TEXT_SIZE = 16
-local MOVE_THRESHOLD = 0.01 -- Sensibilitatea la mișcare
+local TEXT_SIZE = 14
+local MOVE_THRESHOLD = 0.05 -- Sensibilitate mișcare
+local SCAN_INTERVAL = 5 -- Secunde între scanări pentru obiecte noi
 
--- Tabel Culori FNAF 1 & 2
 local ESPColors = {
-    -- FNAF 1
+    -- FNAF 1 & 2
     ["Freddy"] = Color3.fromRGB(165, 42, 42),
     ["Bonnie"] = Color3.fromRGB(100, 0, 255),
     ["Chica"] = Color3.fromRGB(255, 255, 0),
     ["Foxy"] = Color3.fromRGB(255, 0, 0),
     ["Golden"] = Color3.fromRGB(255, 215, 0),
-    -- FNAF 2
     ["Toy Freddy"] = Color3.fromRGB(180, 70, 70),
     ["Toy Bonnie"] = Color3.fromRGB(0, 180, 255),
     ["Toy Chica"] = Color3.fromRGB(255, 255, 100),
     ["Mangle"] = Color3.fromRGB(255, 200, 200),
     ["BB"] = Color3.fromRGB(255, 50, 50),
-    ["Balloon Boy"] = Color3.fromRGB(255, 50, 50),
     ["Puppet"] = Color3.fromRGB(255, 255, 255),
     ["Marionette"] = Color3.fromRGB(255, 255, 255),
-    ["Withered"] = Color3.fromRGB(100, 100, 100),
-    ["Shadow"] = Color3.fromRGB(50, 0, 100)
+    ["Withered"] = Color3.fromRGB(100, 100, 100)
 }
 
 local ESPs = {}
 
--- Găsește o piesă validă pentru ancorare (Head, Jaw, sau orice BasePart)
 function getAncorPart(target)
     if target:IsA("BasePart") then return target end
-    local priority = target:FindFirstChild("HumanoidRootPart") or target:FindFirstChild("Head") or target:FindFirstChild("Jaw")
-    if priority and priority:IsA("BasePart") then return priority end
-    for _, child in ipairs(target:GetDescendants()) do
-        if child:IsA("BasePart") then return child end
+    local p = target:FindFirstChild("HumanoidRootPart") or target:FindFirstChild("Head") or target:FindFirstChild("Jaw")
+    if p and p:IsA("BasePart") then return p end
+    -- Căutare rapidă descendenți (limitată pentru a preveni lag-ul)
+    local d = target:GetChildren()
+    for i=1, #d do
+        if d[i]:IsA("BasePart") then return d[i] end
     end
     return nil
 end
 
 function createESP(object)
+    if ESPs[object] then return end
+    
     local color = nil
     local cleanName = ""
     for name, col in pairs(ESPColors) do
@@ -54,108 +55,103 @@ function createESP(object)
         end
     end
     
-    if not color or ESPs[object] then return end
+    if not color then return end
 
-    -- Creare Highlight (Contur mov/colorat prin pereți)
     local highlight = Instance.new("Highlight")
-    highlight.Name = "FNAF_Highlight"
+    highlight.Name = "Zee_FNAF_HL"
     highlight.Adornee = object
     highlight.FillColor = color
-    highlight.OutlineColor = Color3.new(1, 1, 1)
-    highlight.FillTransparency = 0.5
     highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
     highlight.Enabled = false
     highlight.Parent = object
 
-    -- Text Drawing (Numele)
-    local nameDrawing = Drawing.new("Text")
-    nameDrawing.Text = cleanName
-    nameDrawing.Color = color
-    nameDrawing.Size = TEXT_SIZE
-    nameDrawing.Outline = true
-    nameDrawing.Center = true
-    nameDrawing.Visible = false
+    local tag = Drawing.new("Text")
+    tag.Size = TEXT_SIZE
+    tag.Outline = true
+    tag.Center = true
+    tag.Visible = false
 
     ESPs[object] = {
         Highlight = highlight,
-        NameTag = nameDrawing,
+        Tag = tag,
+        Name = cleanName,
+        Color = color,
         LastPos = Vector3.new(0,0,0),
-        IsMoving = false,
-        LastBeep = 0
+        HasMovedOnce = false
     }
 end
 
-function updateESP()
-    local myChar = LocalPlayer.Character
-    local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+-- LOGICĂ UPDATE (RenderStepped)
+RunService.RenderStepped:Connect(function()
+    if not ESP_ENABLED then 
+        for _, d in pairs(ESPs) do 
+            d.Tag.Visible = false 
+            d.Highlight.Enabled = false 
+        end
+        return 
+    end
+
+    local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 
     for obj, data in pairs(ESPs) do
         if not obj or not obj.Parent then
-            data.NameTag.Visible = false
+            data.Tag:Remove()
             if data.Highlight then data.Highlight:Destroy() end
             ESPs[obj] = nil
             continue
         end
 
         local part = getAncorPart(obj)
-        if part and ESP_ENABLED then
-            -- Detecție mișcare: comparăm poziția curentă cu cea anterioară
+        if part then
             local currentPos = part.Position
-            local movement = (currentPos - data.LastPos).Magnitude
             
-            if movement > MOVE_THRESHOLD then
-                data.IsMoving = true
-            else
-                data.IsMoving = false
+            -- Detectăm dacă s-a mișcat măcar o dată
+            if (currentPos - data.LastPos).Magnitude > MOVE_THRESHOLD then
+                data.HasMovedOnce = true
             end
-            data.LastPos = currentPos 
+            data.LastPos = currentPos
 
-            local pos, onScreen = Camera:WorldToViewportPoint(currentPos)
-            local distance = myRoot and (myRoot.Position - currentPos).Magnitude or 0
-            
-            -- Condiție: Să fie pe ecran ȘI să se miște (FĂRĂ LIMITĂ DE DISTANȚĂ)
-            if onScreen and data.IsMoving then
-                data.NameTag.Position = Vector2.new(pos.X, pos.Y - 15)
-                data.NameTag.Visible = true
-                data.Highlight.Enabled = true
-            else
-                data.NameTag.Visible = false
-                data.Highlight.Enabled = false
-            end
-
-            -- Alertă sonoră de proximitate (sub 15m) - rămâne activă pentru siguranță
-            if distance < 15 and data.IsMoving and tick() - data.LastBeep > 0.6 then
-                local beep = Instance.new("Sound", Workspace)
-                beep.SoundId = "rbxassetid://131070500"
-                beep.Volume = 0.4
-                beep:Play()
-                game:GetService("Debris"):AddItem(beep, 1)
-                data.LastBeep = tick()
+            -- Afișăm doar dacă a fost detectată mișcare în trecut
+            if data.HasMovedOnce then
+                local pos, onScreen = Camera:WorldToViewportPoint(currentPos)
+                if onScreen then
+                    local dist = myRoot and math.floor((myRoot.Position - currentPos).Magnitude) or 0
+                    
+                    data.Tag.Text = string.format("%s\n[%dm]\n(ACTIVE)", data.Name, dist)
+                    data.Tag.Position = Vector2.new(pos.X, pos.Y - 20)
+                    data.Tag.Color = data.Color
+                    data.Tag.Visible = true
+                    data.Highlight.Enabled = true
+                else
+                    data.Tag.Visible = false
+                    data.Highlight.Enabled = false
+                end
             end
         end
-    end
-end
-
--- Scanare continuă pentru obiecte noi (Manechine, Foldere, Modele)
-task.spawn(function()
-    while true do
-        for _, v in ipairs(Workspace:GetDescendants()) do
-            if v:IsA("Model") or v:IsA("Folder") or v:IsA("Configuration") or v:IsA("BasePart") then
-                createESP(v)
-            end
-        end
-        task.wait(3)
     end
 end)
 
-RunService.RenderStepped:Connect(updateESP)
+-- SCANARE OPTIMIZATĂ (Fără Lag Spikes)
+task.spawn(function()
+    while true do
+        local descendants = Workspace:GetDescendants()
+        for i = 1, #descendants do
+            local v = descendants[i]
+            if v:IsA("Model") or v:IsA("Folder") then
+                createESP(v)
+            end
+            -- Procesăm în bucăți pentru a nu bloca CPU-ul
+            if i % 100 == 0 then task.wait() end
+        end
+        task.wait(SCAN_INTERVAL)
+    end
+end)
 
--- Toggle F6 pentru a opri/porni tot sistemul
+-- TOGGLE F6
 UserInputService.InputBegan:Connect(function(input, gpe)
     if not gpe and input.KeyCode == Enum.KeyCode.F6 then
         ESP_ENABLED = not ESP_ENABLED
-        print("Sistem ESP FNAF: " .. (ESP_ENABLED and "PORNIT" or "OPRIT"))
     end
 end)
 
-print("ESP FNAF Motion-Only (Fără limită distanță) activat! [F6]")
+print("ESP FNAF: Motion-Memory activat. F6 pentru Toggle.")
