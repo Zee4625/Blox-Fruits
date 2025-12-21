@@ -8,11 +8,10 @@ local Camera = Workspace.CurrentCamera
 -- CONFIGURAȚIE
 local ESP_ENABLED = true
 local TEXT_SIZE = 14
-local MOVE_THRESHOLD = 0.01 -- Sensibilitate foarte mare la mișcare
-local SCAN_INTERVAL = 4     -- Secunde între scanări pentru obiecte noi
+local MOVE_THRESHOLD = 0.01 
+local SCAN_INTERVAL = 5     
 
 local ESPColors = {
-    -- FNAF 1 & 2
     ["Freddy"] = Color3.fromRGB(165, 42, 42),
     ["Bonnie"] = Color3.fromRGB(100, 0, 255),
     ["Chica"] = Color3.fromRGB(255, 255, 0),
@@ -23,7 +22,6 @@ local ESPColors = {
     ["Toy Chica"] = Color3.fromRGB(255, 255, 100),
     ["Mangle"] = Color3.fromRGB(255, 200, 200),
     ["BB"] = Color3.fromRGB(255, 50, 50),
-    ["Balloon Boy"] = Color3.fromRGB(255, 50, 50),
     ["Puppet"] = Color3.fromRGB(255, 255, 255),
     ["Marionette"] = Color3.fromRGB(255, 255, 255),
     ["Withered"] = Color3.fromRGB(100, 100, 100),
@@ -32,13 +30,10 @@ local ESPColors = {
 
 local ESPs = {}
 
--- Găsește o piesă validă pentru ancorare
 function getAncorPart(target)
     if target:IsA("BasePart") then return target end
     local p = target:FindFirstChild("HumanoidRootPart") or target:FindFirstChild("Head") or target:FindFirstChild("Jaw")
     if p and p:IsA("BasePart") then return p end
-    
-    -- Căutare rapidă în copii (max 10 pentru a evita lagul)
     local children = target:GetChildren()
     for i = 1, math.min(#children, 10) do
         if children[i]:IsA("BasePart") then return children[i] end
@@ -70,37 +65,49 @@ function createESP(object)
     highlight.Enabled = false
     highlight.Parent = object
 
-    local tag = Drawing.new("Text")
-    tag.Size = TEXT_SIZE
-    tag.Outline = true
-    tag.Center = true
-    tag.Visible = false
+    -- Text Nume (Culoarea caracterului)
+    local nameTag = Drawing.new("Text")
+    nameTag.Size = TEXT_SIZE
+    nameTag.Outline = true
+    nameTag.Center = true
+    nameTag.Visible = false
+
+    -- Text Metri (Alb permanent)
+    local meterTag = Drawing.new("Text")
+    meterTag.Size = TEXT_SIZE - 2
+    meterTag.Color = Color3.new(1, 1, 1) -- ALB
+    meterTag.Outline = true
+    meterTag.Center = true
+    meterTag.Visible = false
 
     ESPs[object] = {
         Highlight = highlight,
-        Tag = tag,
+        NameTag = nameTag,
+        MeterTag = meterTag,
         Name = cleanName,
         Color = color,
-        LastPos = Vector3.new(0,0,0)
+        LastPos = Vector3.new(0,0,0),
+        MoveCount = 0,
+        IsPermanent = false
     }
 end
 
--- LOGICĂ UPDATE (Randează cadrele)
 RunService.RenderStepped:Connect(function()
     if not ESP_ENABLED then 
         for _, d in pairs(ESPs) do 
-            d.Tag.Visible = false 
+            d.NameTag.Visible = false 
+            d.MeterTag.Visible = false
             d.Highlight.Enabled = false 
         end
         return 
     end
 
-    local char = LocalPlayer.Character
-    local myRoot = char and char:FindFirstChild("HumanoidRootPart")
+    local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 
     for obj, data in pairs(ESPs) do
         if not obj or not obj.Parent then
-            data.Tag:Remove()
+            data.NameTag:Remove()
+            data.MeterTag:Remove()
             if data.Highlight then data.Highlight:Destroy() end
             ESPs[obj] = nil
             continue
@@ -109,56 +116,66 @@ RunService.RenderStepped:Connect(function()
         local part = getAncorPart(obj)
         if part then
             local currentPos = part.Position
-            -- Calculăm dacă se mișcă în acest moment
             local velocity = (currentPos - data.LastPos).Magnitude
+            
+            -- Logica de numărare a mișcărilor
+            if velocity > MOVE_THRESHOLD then
+                data.MoveCount = data.MoveCount + 1
+                if data.MoveCount >= 2 then
+                    data.IsPermanent = true
+                end
+            end
             data.LastPos = currentPos
 
-            -- DOAR DACĂ SE MIȘCĂ (velocity > 0.01)
-            if velocity > MOVE_THRESHOLD then
-                local pos, onScreen = Camera:WorldToViewportPoint(currentPos)
+            local pos, onScreen = Camera:WorldToViewportPoint(currentPos)
+            
+            -- Afișăm textele doar când se mișcă activ
+            if onScreen and velocity > MOVE_THRESHOLD then
+                local dist = myRoot and math.floor((myRoot.Position - currentPos).Magnitude) or 0
                 
-                if onScreen then
-                    local dist = myRoot and math.floor((myRoot.Position - currentPos).Magnitude) or 0
-                    
-                    data.Tag.Text = string.format("%s\n[%dm]\nMOVING", data.Name, dist)
-                    data.Tag.Position = Vector2.new(pos.X, pos.Y - 20)
-                    data.Tag.Color = data.Color
-                    data.Tag.Visible = true
-                    data.Highlight.Enabled = true
-                else
-                    data.Tag.Visible = false
-                    data.Highlight.Enabled = false
-                end
+                data.NameTag.Text = data.Name .. " [MOVING]"
+                data.NameTag.Position = Vector2.new(pos.X, pos.Y - 25)
+                data.NameTag.Color = data.Color
+                data.NameTag.Visible = true
+                
+                data.MeterTag.Text = dist .. "m"
+                data.MeterTag.Position = Vector2.new(pos.X, pos.Y - 10)
+                data.MeterTag.Visible = true
             else
-                -- DACĂ STĂ PE LOC, ASCUNDE TOT
-                data.Tag.Visible = false
+                data.NameTag.Visible = false
+                data.MeterTag.Visible = false
+            end
+
+            -- Highlight-ul devine permanent dacă s-a mișcat de 2 ori
+            if data.IsPermanent then
+                data.Highlight.Enabled = true
+            elseif velocity > MOVE_THRESHOLD then
+                data.Highlight.Enabled = true
+            else
                 data.Highlight.Enabled = false
             end
         end
     end
 end)
 
--- SCANARE OPTIMIZATĂ PENTRU A EVITA LAG SPIKES
 task.spawn(function()
     while true do
         local descendants = Workspace:GetDescendants()
         for i = 1, #descendants do
             local v = descendants[i]
-            if v:IsA("Model") or v:IsA("Folder") or v:IsA("Configuration") then
+            if v:IsA("Model") or v:IsA("Folder") then
                 createESP(v)
             end
-            -- Oprește execuția scurt la fiecare 150 de obiecte pentru a lăsa procesorul să respire
             if i % 150 == 0 then task.wait() end
         end
         task.wait(SCAN_INTERVAL)
     end
 end)
 
--- TOGGLE F6
 UserInputService.InputBegan:Connect(function(input, gpe)
     if not gpe and input.KeyCode == Enum.KeyCode.F6 then
         ESP_ENABLED = not ESP_ENABLED
     end
 end)
 
-print("Sistem Motion ESP FNAF Incarcat! [F6]")
+print("ESP FNAF: Permanent Highlight on Move x2 Incarcat!")
