@@ -1,0 +1,20 @@
+-- Load Library
+local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/UILIBRARY-ZEE'))()
+
+-- Create Main Window
+local window = Library:Window('ZeeHub FNAF Edition')
+
+---------------------------------------------------------
+-- TAB: FNAF GAMES
+---------------------------------------------------------
+local fnafTab = window:Tab({"FNAF Scripts", "rbxassetid://7733965118"})
+
+-- Buton pentru FNAF 4
+fnafTab:Button("FNAF 4", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/CO-OP-FNAF4"))()
+end)
+
+-- Buton pentru FNAF 1
+fnafTab:Button("FNAF 1", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/FNAF-3"))()
+end)
