@@ -202,7 +202,7 @@ function Library:Window(title)
     end)
     
     Minimize.MouseEnter:Connect(function()
-        TweenService:Create(Minimize, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {ImageColor3 = Color3.fromRGB(255,255,255)}):Play()
+        TweenService:Create(Minimize, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
     end)
     
     Minimize.MouseLeave:Connect(function()
@@ -259,7 +259,7 @@ function Library:Window(title)
     local Tabs = Instance.new("Frame")
     Tabs.Name = "Tabs"
     Tabs.Parent = Main
-    Tabs.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+    Tabs.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
     Tabs.BorderSizePixel = 0
     Tabs.Position = UDim2.new(0, 0, 0, 35)
     Tabs.Size = UDim2.new(0, 122, 1, -35)
@@ -272,7 +272,7 @@ function Library:Window(title)
     TabsCover.Name = "Cover"
     TabsCover.Parent = Tabs
     TabsCover.AnchorPoint = Vector2.new(1, 0.5)
-    TabsCover.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+    TabsCover.BackgroundColor3 = Color3.fromRGB(170, 255, 195)
     TabsCover.BorderSizePixel = 0
     TabsCover.Position = UDim2.new(1, 0, 0.5, 0)
     TabsCover.Size = UDim2.new(0, 5, 1, 0)
