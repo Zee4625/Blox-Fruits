@@ -410,7 +410,7 @@ function Library:Window(title)
             TextLabel.TextXAlignment = Enum.TextXAlignment.Left
         end
         
-        -- Page
+-- Page
         local Page = Instance.new("ScrollingFrame")
         Page.Name = "Page"
         Page.Visible = false
@@ -422,7 +422,8 @@ function Library:Window(title)
         Page.Size = UDim2.new(1, 0, 1, 0)
         Page.CanvasPosition = Vector2.new(0, 0)
         Page.ScrollBarThickness = 2
-        Page.ScrollBarImageColor3 = Color3.fromRGB(255, 24, 101)
+        -- MODIFICAT: ScrollBar mov deschis
+        Page.ScrollBarImageColor3 = Color3.fromRGB(120, 40, 180)
         
         local PageList = Instance.new("UIListLayout")
         PageList.Parent = Page
@@ -475,7 +476,8 @@ function Library:Window(title)
             local Button = Instance.new("TextButton")
             Button.Name = "Button"
             Button.Parent = Page
-            Button.BackgroundColor3 = Color3.fromRGB(134, 10, 49)
+            -- MODIFICAT: Mov pentru buton
+            Button.BackgroundColor3 = Color3.fromRGB(85, 26, 139)
             Button.BorderSizePixel = 0
             Button.Size = UDim2.new(1, -6, 0, 34)
             Button.AutoButtonColor = false
@@ -489,11 +491,13 @@ function Library:Window(title)
             ButtonCorner.Parent = Button
             
             Button.MouseEnter:Connect(function()
-                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(160, 12, 59)}):Play()
+                -- MODIFICAT: Mov hover
+                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(120, 40, 180)}):Play()
             end)
             
             Button.MouseLeave:Connect(function()
-                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(134, 10, 49)}):Play()
+                -- MODIFICAT: Revenire la mov buton
+                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(85, 26, 139)}):Play()
             end)
             
             Button.MouseButton1Click:Connect(function()
@@ -541,7 +545,8 @@ function Library:Window(title)
             ToggleFrame.Name = "ToggleFrame"
             ToggleFrame.Parent = Toggle
             ToggleFrame.AnchorPoint = Vector2.new(1, 0.5)
-            ToggleFrame.BackgroundColor3 = Color3.fromRGB(161, 12, 59)
+            -- MODIFICAT: Mov pentru fundal toggle activat
+            ToggleFrame.BackgroundColor3 = Color3.fromRGB(120, 40, 180)
             ToggleFrame.BackgroundTransparency = 1.000
             ToggleFrame.BorderSizePixel = 0
             ToggleFrame.Position = UDim2.new(1, -8, 0.5, 0)
@@ -566,7 +571,8 @@ function Library:Window(title)
             ToggleStroke.Parent = ToggleFrame
             ToggleStroke.LineJoinMode = Enum.LineJoinMode.Round
             ToggleStroke.Thickness = 2
-            ToggleStroke.Color = Color3.fromRGB(161, 12, 59)
+            -- MODIFICAT: Margine mov pentru toggle
+            ToggleStroke.Color = Color3.fromRGB(120, 40, 180)
             
             local toggled = default or false
             
@@ -677,7 +683,8 @@ function Library:Window(title)
             local SliderDrag = Instance.new("Frame")
             SliderDrag.Name = "SliderDrag"
             SliderDrag.Parent = SliderClick
-            SliderDrag.BackgroundColor3 = Color3.fromRGB(188, 14, 69)
+            -- MODIFICAT: Mov aprins pentru bara glisantă
+            SliderDrag.BackgroundColor3 = Color3.fromRGB(145, 30, 200)
             SliderDrag.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
             
             local SliderDragCorner = Instance.new("UICorner")
@@ -717,137 +724,7 @@ function Library:Window(title)
             end)
         end
         
-        -- Keybind
-        function Elements:Keybind(text, defaultKey, callback)
-            local Keybind = Instance.new("TextButton")
-            Keybind.Name = "Keybind"
-            Keybind.Parent = Page
-            Keybind.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-            Keybind.Size = UDim2.new(1, -6, 0, 34)
-            Keybind.AutoButtonColor = false
-            Keybind.Font = Enum.Font.SourceSans
-            Keybind.Text = ""
-            Keybind.TextColor3 = Color3.fromRGB(0, 0, 0)
-            Keybind.TextSize = 14.000
-            
-            local KeybindCorner = Instance.new("UICorner")
-            KeybindCorner.CornerRadius = UDim.new(0, 6)
-            KeybindCorner.Parent = Keybind
-            
-            local Title = Instance.new("TextLabel")
-            Title.Name = "Title"
-            Title.Parent = Keybind
-            Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            Title.BackgroundTransparency = 1.000
-            Title.Position = UDim2.new(0, 8, 0, 0)
-            Title.Size = UDim2.new(1, -6, 1, 0)
-            Title.Font = Enum.Font.Gotham
-            Title.Text = text or "Keybind"
-            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-            Title.TextSize = 14.000
-            Title.TextXAlignment = Enum.TextXAlignment.Left
-            
-            local CurrentKey = Instance.new("TextLabel")
-            CurrentKey.Name = "CurrentKey"
-            CurrentKey.Parent = Keybind
-            CurrentKey.AnchorPoint = Vector2.new(1, 0.5)
-            CurrentKey.BackgroundColor3 = Color3.fromRGB(43, 43, 43)
-            CurrentKey.Position = UDim2.new(1, -6, 0.5, 0)
-            CurrentKey.Size = UDim2.new(-0, 46, 0, 24)
-            CurrentKey.Font = Enum.Font.Gotham
-            CurrentKey.Text = defaultKey.Name or ". . ."
-            CurrentKey.TextColor3 = Color3.fromRGB(255, 255, 255)
-            CurrentKey.TextSize = 14.000
-            
-            local CurrentKeyCorner = Instance.new("UICorner")
-            CurrentKeyCorner.CornerRadius = UDim.new(0, 4)
-            CurrentKeyCorner.Parent = CurrentKey
-            
-            local binding = false
-            local key = defaultKey
-            
-            Keybind.MouseButton1Click:Connect(function()
-                binding = true
-                CurrentKey.Text = ". . ."
-                
-                local input
-                input = UserInputService.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.Keyboard then
-                        key = input.KeyCode
-                        CurrentKey.Text = key.Name
-                        binding = false
-                        input:Disconnect()
-                    end
-                end)
-            end)
-            
-            UserInputService.InputBegan:Connect(function(input, gameProcessed)
-                if not gameProcessed and input.KeyCode == key then
-                    callback(key)
-                end
-            end)
-            
-            -- Mobile support
-            Keybind.TouchTap:Connect(function()
-                Keybind.MouseButton1Click:Fire()
-            end)
-        end
-        
-        -- InputBox
-        function Elements:InputBox(text, placeholder, callback)
-            local InputBox = Instance.new("Frame")
-            InputBox.Name = "InputBox"
-            InputBox.Parent = Page
-            InputBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-            InputBox.Size = UDim2.new(1, -6, 0, 48)
-            
-            local InputBoxCorner = Instance.new("UICorner")
-            InputBoxCorner.CornerRadius = UDim.new(0, 6)
-            InputBoxCorner.Parent = InputBox
-            
-            local Title = Instance.new("TextLabel")
-            Title.Name = "Title"
-            Title.Parent = InputBox
-            Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            Title.BackgroundTransparency = 1.000
-            Title.Position = UDim2.new(0, 8, 0, 0)
-            Title.Size = UDim2.new(1, -6, 0, 20)
-            Title.Font = Enum.Font.Gotham
-            Title.Text = text or "Input"
-            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-            Title.TextSize = 14.000
-            Title.TextXAlignment = Enum.TextXAlignment.Left
-            
-            local Box = Instance.new("TextBox")
-            Box.Name = "Box"
-            Box.Parent = InputBox
-            Box.BackgroundColor3 = Color3.fromRGB(43, 43, 43)
-            Box.BorderSizePixel = 0
-            Box.Position = UDim2.new(0, 8, 0, 24)
-            Box.Size = UDim2.new(1, -16, 0, 20)
-            Box.Font = Enum.Font.Gotham
-            Box.PlaceholderText = placeholder or "Enter text..."
-            Box.Text = ""
-            Box.TextColor3 = Color3.fromRGB(255, 255, 255)
-            Box.TextSize = 14.000
-            
-            local BoxCorner = Instance.new("UICorner")
-            BoxCorner.CornerRadius = UDim.new(0, 4)
-            BoxCorner.Parent = Box
-            
-            Box.FocusLost:Connect(function(enterPressed)
-                if enterPressed then
-                    callback(Box.Text)
-                end
-            end)
-            
-            -- Mobile support
-            Box.TouchTap:Connect(function()
-                Box:CaptureFocus()
-            end)
-        end
-        
-     ---- Dropdown
+        -- Dropdown
 function Elements:Dropdown(text, options, callback, multiSelect)
     multiSelect = multiSelect or false
     options = options or {}
