@@ -359,7 +359,7 @@ function Library:Window(title)
         local TabButton = Instance.new("TextButton")
         TabButton.Name = "TabButton"
         TabButton.Parent = TabsContainer
-        TabButton.BackgroundColor3 = Color3.fromRGB(128, 0, 128)
+        TabButton.BackgroundColor3 = Color3.fromRGB(232, 17, 85)
         TabButton.BackgroundTransparency = 1
         TabButton.Size = UDim2.new(1, -12, 0, 30)
         TabButton.AutoButtonColor = false
@@ -475,7 +475,7 @@ function Library:Window(title)
             local Button = Instance.new("TextButton")
             Button.Name = "Button"
             Button.Parent = Page
-            Button.BackgroundColor3 = Color3.fromRGB(128, 0, 128
+            Button.BackgroundColor3 = Color3.fromRGB(134, 10, 49)
             Button.BorderSizePixel = 0
             Button.Size = UDim2.new(1, -6, 0, 34)
             Button.AutoButtonColor = false
@@ -489,11 +489,11 @@ function Library:Window(title)
             ButtonCorner.Parent = Button
             
             Button.MouseEnter:Connect(function()
-                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(128, 0, 128)}):Play()
+                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(160, 12, 59)}):Play()
             end)
             
             Button.MouseLeave:Connect(function()
-                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(128, 0, 128)}):Play()
+                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(134, 10, 49)}):Play()
             end)
             
             Button.MouseButton1Click:Connect(function()
