@@ -910,7 +910,7 @@ function Library:Window(title)
             local OptionHolder = Instance.new("Frame")
             OptionHolder.Name = "OptionHolder"
             OptionHolder.Parent = Dropdown
-            OptionHolder.BackgroundColor3 = Color3.fromRGB(0, 168, 107)
+            OptionHolder.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
             OptionHolder.BorderSizePixel = 0
             OptionHolder.Position = UDim2.new(0, 0, 0, 34)
             OptionHolder.Size = UDim2.new(1, 0, 0, 0)
