@@ -28,7 +28,7 @@ function Library:Window(title)
     Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     Main.BorderSizePixel = 0
     Main.Position = UDim2.new(0.377, 0, 0.368, 0)
-    Main.Size = UDim2.new(0, 470, 0, 283)
+    Main.Size = UDim2.new(0, 472, 0, 284)
     Main.Active = true
     Main.Selectable = true
 
@@ -856,7 +856,7 @@ function Library:Window(title)
             local Dropdown = Instance.new("Frame")
             Dropdown.Name = "Dropdown"
             Dropdown.Parent = Page
-            Dropdown.BackgroundColor3 = Color3.fromRGB(0, 169, 108)
+            Dropdown.BackgroundColor3 = Color3.fromRGB(0, 170, 109)
             Dropdown.BackgroundTransparency = 1.000
             Dropdown.BorderSizePixel = 0
             Dropdown.ClipsDescendants = true
