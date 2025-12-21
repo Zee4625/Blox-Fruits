@@ -8,8 +8,8 @@ local Camera = Workspace.CurrentCamera
 -- CONFIGURAȚIE
 local ESP_ENABLED = true
 local TEXT_SIZE = 14
-local MOVE_THRESHOLD = 0.05 -- Sensibilitate mișcare
-local SCAN_INTERVAL = 5 -- Secunde între scanări pentru obiecte noi
+local MOVE_THRESHOLD = 0.01 -- Sensibilitate foarte mare la mișcare
+local SCAN_INTERVAL = 4     -- Secunde între scanări pentru obiecte noi
 
 local ESPColors = {
     -- FNAF 1 & 2
@@ -23,21 +23,25 @@ local ESPColors = {
     ["Toy Chica"] = Color3.fromRGB(255, 255, 100),
     ["Mangle"] = Color3.fromRGB(255, 200, 200),
     ["BB"] = Color3.fromRGB(255, 50, 50),
+    ["Balloon Boy"] = Color3.fromRGB(255, 50, 50),
     ["Puppet"] = Color3.fromRGB(255, 255, 255),
     ["Marionette"] = Color3.fromRGB(255, 255, 255),
-    ["Withered"] = Color3.fromRGB(100, 100, 100)
+    ["Withered"] = Color3.fromRGB(100, 100, 100),
+    ["Shadow"] = Color3.fromRGB(50, 0, 100)
 }
 
 local ESPs = {}
 
+-- Găsește o piesă validă pentru ancorare
 function getAncorPart(target)
     if target:IsA("BasePart") then return target end
     local p = target:FindFirstChild("HumanoidRootPart") or target:FindFirstChild("Head") or target:FindFirstChild("Jaw")
     if p and p:IsA("BasePart") then return p end
-    -- Căutare rapidă descendenți (limitată pentru a preveni lag-ul)
-    local d = target:GetChildren()
-    for i=1, #d do
-        if d[i]:IsA("BasePart") then return d[i] end
+    
+    -- Căutare rapidă în copii (max 10 pentru a evita lagul)
+    local children = target:GetChildren()
+    for i = 1, math.min(#children, 10) do
+        if children[i]:IsA("BasePart") then return children[i] end
     end
     return nil
 end
@@ -61,6 +65,7 @@ function createESP(object)
     highlight.Name = "Zee_FNAF_HL"
     highlight.Adornee = object
     highlight.FillColor = color
+    highlight.OutlineColor = Color3.new(1, 1, 1)
     highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
     highlight.Enabled = false
     highlight.Parent = object
@@ -76,12 +81,11 @@ function createESP(object)
         Tag = tag,
         Name = cleanName,
         Color = color,
-        LastPos = Vector3.new(0,0,0),
-        HasMovedOnce = false
+        LastPos = Vector3.new(0,0,0)
     }
 end
 
--- LOGICĂ UPDATE (RenderStepped)
+-- LOGICĂ UPDATE (Randează cadrele)
 RunService.RenderStepped:Connect(function()
     if not ESP_ENABLED then 
         for _, d in pairs(ESPs) do 
@@ -91,7 +95,8 @@ RunService.RenderStepped:Connect(function()
         return 
     end
 
-    local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local char = LocalPlayer.Character
+    local myRoot = char and char:FindFirstChild("HumanoidRootPart")
 
     for obj, data in pairs(ESPs) do
         if not obj or not obj.Parent then
@@ -104,20 +109,18 @@ RunService.RenderStepped:Connect(function()
         local part = getAncorPart(obj)
         if part then
             local currentPos = part.Position
-            
-            -- Detectăm dacă s-a mișcat măcar o dată
-            if (currentPos - data.LastPos).Magnitude > MOVE_THRESHOLD then
-                data.HasMovedOnce = true
-            end
+            -- Calculăm dacă se mișcă în acest moment
+            local velocity = (currentPos - data.LastPos).Magnitude
             data.LastPos = currentPos
 
-            -- Afișăm doar dacă a fost detectată mișcare în trecut
-            if data.HasMovedOnce then
+            -- DOAR DACĂ SE MIȘCĂ (velocity > 0.01)
+            if velocity > MOVE_THRESHOLD then
                 local pos, onScreen = Camera:WorldToViewportPoint(currentPos)
+                
                 if onScreen then
                     local dist = myRoot and math.floor((myRoot.Position - currentPos).Magnitude) or 0
                     
-                    data.Tag.Text = string.format("%s\n[%dm]\n(ACTIVE)", data.Name, dist)
+                    data.Tag.Text = string.format("%s\n[%dm]\nMOVING", data.Name, dist)
                     data.Tag.Position = Vector2.new(pos.X, pos.Y - 20)
                     data.Tag.Color = data.Color
                     data.Tag.Visible = true
@@ -126,22 +129,26 @@ RunService.RenderStepped:Connect(function()
                     data.Tag.Visible = false
                     data.Highlight.Enabled = false
                 end
+            else
+                -- DACĂ STĂ PE LOC, ASCUNDE TOT
+                data.Tag.Visible = false
+                data.Highlight.Enabled = false
             end
         end
     end
 end)
 
--- SCANARE OPTIMIZATĂ (Fără Lag Spikes)
+-- SCANARE OPTIMIZATĂ PENTRU A EVITA LAG SPIKES
 task.spawn(function()
     while true do
         local descendants = Workspace:GetDescendants()
         for i = 1, #descendants do
             local v = descendants[i]
-            if v:IsA("Model") or v:IsA("Folder") then
+            if v:IsA("Model") or v:IsA("Folder") or v:IsA("Configuration") then
                 createESP(v)
             end
-            -- Procesăm în bucăți pentru a nu bloca CPU-ul
-            if i % 100 == 0 then task.wait() end
+            -- Oprește execuția scurt la fiecare 150 de obiecte pentru a lăsa procesorul să respire
+            if i % 150 == 0 then task.wait() end
         end
         task.wait(SCAN_INTERVAL)
     end
@@ -154,4 +161,4 @@ UserInputService.InputBegan:Connect(function(input, gpe)
     end
 end)
 
-print("ESP FNAF: Motion-Memory activat. F6 pentru Toggle.")
+print("Sistem Motion ESP FNAF Incarcat! [F6]")
