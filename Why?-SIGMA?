@@ -127,9 +127,9 @@ function Library:Window(title)
     Logo.Position = UDim2.new(0, 4, 0.5, 0)
     Logo.Size = UDim2.new(0, 26, 0, 30)
     Logo.Image = "http://www.roblox.com/asset/?id=86941986800618"
-    Logo.ImageColor3 = Color3.fromRGB(232, 17, 85)
+    Logo.ImageColor3 = Color3.fromRGB(180, 60, 240) -- Mov
     
-    -- Minimize Button (using minus icon)
+    -- Minimize Button
     local Minimize = Instance.new("ImageButton")
     Minimize.Name = "Minimize"
     Minimize.Parent = Top
@@ -142,7 +142,7 @@ function Library:Window(title)
     Minimize.ImageColor3 = Color3.fromRGB(199, 199, 199)
     Minimize.ScaleType = Enum.ScaleType.Crop
     
-    -- Minimized Icon (initially hidden)
+    -- Minimized Icon
     local MinimizedIcon = Instance.new("ImageButton")
     MinimizedIcon.Name = "MinimizedIcon"
     MinimizedIcon.Parent = ui
@@ -251,7 +251,7 @@ function Library:Window(title)
     GameName.Size = UDim2.new(0, 165, 0, 22)
     GameName.Font = Enum.Font.Gotham
     GameName.Text = title or "Game Name"
-    GameName.TextColor3 = Color3.fromRGB(232, 17, 85)
+    GameName.TextColor3 = Color3.fromRGB(180, 60, 240) -- Mov
     GameName.TextSize = 14.000
     GameName.TextXAlignment = Enum.TextXAlignment.Left
     
@@ -318,7 +318,7 @@ function Library:Window(title)
     Resize.Size = UDim2.new(0, 16, 0, 16)
     Resize.ZIndex = 2
     Resize.Image = "rbxassetid://3926307971"
-    Resize.ImageColor3 = Color3.fromRGB(186, 13, 68)
+    Resize.ImageColor3 = Color3.fromRGB(120, 40, 180) -- Mov
     Resize.ImageRectOffset = Vector2.new(204, 364)
     Resize.ImageRectSize = Vector2.new(36, 36)
     
@@ -359,7 +359,7 @@ function Library:Window(title)
         local TabButton = Instance.new("TextButton")
         TabButton.Name = "TabButton"
         TabButton.Parent = TabsContainer
-        TabButton.BackgroundColor3 = Color3.fromRGB(232, 17, 85)
+        TabButton.BackgroundColor3 = Color3.fromRGB(180, 60, 240) -- Mov
         TabButton.BackgroundTransparency = 1
         TabButton.Size = UDim2.new(1, -12, 0, 30)
         TabButton.AutoButtonColor = false
@@ -389,7 +389,7 @@ function Library:Window(title)
             Icon.Position = UDim2.new(0, 5, 0.5, -10)
             Icon.Size = UDim2.new(0, 20, 0, 20)
             Icon.Image = icon
-            Icon.ImageColor3 = Color3.fromRGB(232, 17, 85)
+            Icon.ImageColor3 = Color3.fromRGB(180, 60, 240) -- Mov
         end
         
         -- Add text label
@@ -422,7 +422,7 @@ function Library:Window(title)
         Page.Size = UDim2.new(1, 0, 1, 0)
         Page.CanvasPosition = Vector2.new(0, 0)
         Page.ScrollBarThickness = 2
-        Page.ScrollBarImageColor3 = Color3.fromRGB(255, 24, 101)
+        Page.ScrollBarImageColor3 = Color3.fromRGB(160, 50, 220) -- Mov
         
         local PageList = Instance.new("UIListLayout")
         PageList.Parent = Page
@@ -475,7 +475,7 @@ function Library:Window(title)
             local Button = Instance.new("TextButton")
             Button.Name = "Button"
             Button.Parent = Page
-            Button.BackgroundColor3 = Color3.fromRGB(134, 10, 49)
+            Button.BackgroundColor3 = Color3.fromRGB(85, 26, 139) -- Mov
             Button.BorderSizePixel = 0
             Button.Size = UDim2.new(1, -6, 0, 34)
             Button.AutoButtonColor = false
@@ -489,11 +489,11 @@ function Library:Window(title)
             ButtonCorner.Parent = Button
             
             Button.MouseEnter:Connect(function()
-                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(160, 12, 59)}):Play()
+                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(120, 40, 180)}):Play() -- Mov vibrant
             end)
             
             Button.MouseLeave:Connect(function()
-                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(134, 10, 49)}):Play()
+                TweenService:Create(Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(85, 26, 139)}):Play() -- Revenire
             end)
             
             Button.MouseButton1Click:Connect(function()
@@ -541,7 +541,7 @@ function Library:Window(title)
             ToggleFrame.Name = "ToggleFrame"
             ToggleFrame.Parent = Toggle
             ToggleFrame.AnchorPoint = Vector2.new(1, 0.5)
-            ToggleFrame.BackgroundColor3 = Color3.fromRGB(161, 12, 59)
+            ToggleFrame.BackgroundColor3 = Color3.fromRGB(120, 40, 180) -- Mov
             ToggleFrame.BackgroundTransparency = 1.000
             ToggleFrame.BorderSizePixel = 0
             ToggleFrame.Position = UDim2.new(1, -8, 0.5, 0)
@@ -566,7 +566,7 @@ function Library:Window(title)
             ToggleStroke.Parent = ToggleFrame
             ToggleStroke.LineJoinMode = Enum.LineJoinMode.Round
             ToggleStroke.Thickness = 2
-            ToggleStroke.Color = Color3.fromRGB(161, 12, 59)
+            ToggleStroke.Color = Color3.fromRGB(120, 40, 180) -- Mov
             
             local toggled = default or false
             
@@ -677,7 +677,7 @@ function Library:Window(title)
             local SliderDrag = Instance.new("Frame")
             SliderDrag.Name = "SliderDrag"
             SliderDrag.Parent = SliderClick
-            SliderDrag.BackgroundColor3 = Color3.fromRGB(188, 14, 69)
+            SliderDrag.BackgroundColor3 = Color3.fromRGB(145, 30, 200) -- Mov
             SliderDrag.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
             
             local SliderDragCorner = Instance.new("UICorner")
@@ -847,7 +847,7 @@ function Library:Window(title)
             end)
         end
         
-        -- Dropdown
+        -- Dropdown (ADĂUGAT CU CULORI MOV)
         function Elements:Dropdown(text, options, callback, multiSelect)
             multiSelect = multiSelect or false
             options = options or {}
@@ -902,7 +902,7 @@ function Library:Window(title)
             Arrow.Size = UDim2.new(0, 28, 0, 28)
             Arrow.ZIndex = 2
             Arrow.Image = "rbxassetid://3926307971"
-            Arrow.ImageColor3 = Color3.fromRGB(161, 12, 59)
+            Arrow.ImageColor3 = Color3.fromRGB(120, 40, 180) -- Mov
             Arrow.ImageRectOffset = Vector2.new(324, 524)
             Arrow.ImageRectSize = Vector2.new(36, 36)
             Arrow.ScaleType = Enum.ScaleType.Crop
@@ -957,7 +957,7 @@ function Library:Window(title)
                 local Option = Instance.new("TextButton")
                 Option.Name = "Option"
                 Option.Parent = OptionHolder
-                Option.BackgroundColor3 = Color3.fromRGB(134, 10, 49)
+                Option.BackgroundColor3 = Color3.fromRGB(85, 26, 139) -- Mov
                 Option.BorderSizePixel = 0
                 Option.Size = UDim2.new(1, -16, 0, 30)
                 Option.AutoButtonColor = false
@@ -1076,7 +1076,7 @@ function Library:Window(title)
                     local Option = Instance.new("TextButton")
                     Option.Name = "Option"
                     Option.Parent = OptionHolder
-                    Option.BackgroundColor3 = Color3.fromRGB(134, 10, 49)
+                    Option.BackgroundColor3 = Color3.fromRGB(85, 26, 139) -- Mov
                     Option.BorderSizePixel = 0
                     Option.Size = UDim2.new(1, -16, 0, 30)
                     Option.AutoButtonColor = false
