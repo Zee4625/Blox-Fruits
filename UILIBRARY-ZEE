@@ -318,7 +318,7 @@ function Library:Window(title)
     Resize.Size = UDim2.new(0, 16, 0, 16)
     Resize.ZIndex = 2
     Resize.Image = "rbxassetid://3926307971"
-    Resize.ImageColor3 = Color3.fromRGB(186, 13, 68)
+    Resize.ImageColor3 = Color3.fromRGB(170, 255, 195)
     Resize.ImageRectOffset = Vector2.new(204, 364)
     Resize.ImageRectSize = Vector2.new(36, 36)
 
