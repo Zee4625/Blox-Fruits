@@ -1,0 +1,513 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+--==================================================
+-- LEONY'S HUB | COMPLETE VERSION | DELTA EXECUTOR
+--==================================================
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local Camera = Workspace.CurrentCamera
+local LP = Players.LocalPlayer
+
+--==================================================
+-- GUI
+--==================================================
+
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.ResetOnSpawn = false
+
+-- Toggle Button
+local toggleBtn = Instance.new("TextButton", gui)
+toggleBtn.Size = UDim2.new(0,50,0,50)
+toggleBtn.Position = UDim2.new(0,10,0,120)
+toggleBtn.Text = "Z"
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextScaled = true
+toggleBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+toggleBtn.TextColor3 = Color3.new(1,1,1)
+
+-- Main GUI
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0,550,0,520)
+main.Position = UDim2.new(0.05,0,0.1,0)
+main.BackgroundColor3 = Color3.fromRGB(28,28,28)
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
+
+toggleBtn.MouseButton1Click:Connect(function()
+	main.Visible = not main.Visible
+end)
+
+-- Header
+local header = Instance.new("TextLabel", main)
+header.Size = UDim2.new(1,0,0,55)
+header.Text = "ZeeHUB"
+header.Font = Enum.Font.GothamBold
+header.TextSize = 26
+header.TextColor3 = Color3.new(0,64,0)
+header.BackgroundColor3 = Color3.fromRGB(40,40,40)
+
+-- Content
+local content = Instance.new("Frame", main)
+content.Position = UDim2.new(0,0,0,60)
+content.Size = UDim2.new(1,0,1,-60)
+content.BackgroundTransparency = 1
+
+local layout = Instance.new("UIListLayout", content)
+layout.Padding = UDim.new(0,10)
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+--==================================================
+-- UI HELPERS
+--==================================================
+
+local function section(text)
+	local lbl = Instance.new("TextLabel", content)
+	lbl.Size = UDim2.new(0.95,0,0,35)
+	lbl.Text = text
+	lbl.Font = Enum.Font.GothamBold
+	lbl.TextSize = 18
+	lbl.TextColor3 = Color3.fromRGB(200,200,200)
+	lbl.BackgroundColor3 = Color3.fromRGB(35,35,35)
+end
+
+local function toggle(text, callback)
+	local btn = Instance.new("TextButton", content)
+	btn.Size = UDim2.new(0.95,0,0,40)
+	btn.Text = text.." : OFF"
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 16
+	btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+	btn.TextColor3 = Color3.new(1,1,1)
+
+	local state = false
+	btn.MouseButton1Click:Connect(function()
+		state = not state
+		btn.Text = text.." : "..(state and "ON" or "OFF")
+		callback(state)
+	end)
+end
+
+--==================================================
+-- AIMLOCK
+--==================================================
+
+local AIMLOCK = false
+local AIM_HITBOX = "Head"
+local currentTarget = nil
+
+local function isVisible(part)
+	local origin = Camera.CFrame.Position
+	local direction = part.Position - origin
+	local params = RaycastParams.new()
+	params.FilterDescendantsInstances = {LP.Character}
+	params.FilterType = Enum.RaycastFilterType.Blacklist
+	params.IgnoreWater = true
+
+	local result = Workspace:Raycast(origin, direction, params)
+	return result and result.Instance:IsDescendantOf(part.Parent)
+end
+
+local function getHitPart(char)
+	if AIM_HITBOX == "Head" then
+		return char:FindFirstChild("Head")
+	elseif AIM_HITBOX == "Chest" then
+		return char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
+	elseif AIM_HITBOX == "Legs" then
+		return char:FindFirstChild("LowerTorso") or char:FindFirstChild("HumanoidRootPart")
+	end
+end
+
+local function getTarget()
+	local closest, dist = nil, math.huge
+	for _,p in pairs(Players:GetPlayers()) do
+		if p ~= LP and p.Character then
+			local hum = p.Character:FindFirstChild("Humanoid")
+			local part = getHitPart(p.Character)
+			if hum and hum.Health > 0 and part and isVisible(part) then
+				local pos, onScreen = Camera:WorldToViewportPoint(part.Position)
+				if onScreen then
+					local mag = (Vector2.new(pos.X,pos.Y)
+						- Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y/2)).Magnitude
+					if mag < dist then
+						dist = mag
+						closest = part
+					end
+				end
+			end
+		end
+	end
+	return closest
+end
+
+RunService.RenderStepped:Connect(function()
+	if AIMLOCK then
+		if not currentTarget or not currentTarget.Parent or not isVisible(currentTarget) then
+			currentTarget = getTarget()
+		end
+		if currentTarget then
+			Camera.CFrame = CFrame.new(Camera.CFrame.Position, currentTarget.Position)
+		end
+	else
+		currentTarget = nil
+	end
+end)
+
+--==================================================
+-- IMPROVED ESP SYSTEM
+--==================================================
+
+local espEnabled = false
+local espObjects = {}
+local boxEspEnabled = false
+local nameEspEnabled = false
+local healthEspEnabled = false
+
+-- Extended skeleton connections for better visualization
+local skeletonPairs = {
+	{"Head","UpperTorso"},
+	{"UpperTorso","LowerTorso"},
+	{"UpperTorso","LeftUpperArm"},
+	{"LeftUpperArm","LeftLowerArm"},
+	{"LeftLowerArm","LeftHand"},
+	{"UpperTorso","RightUpperArm"},
+	{"RightUpperArm","RightLowerArm"},
+	{"RightLowerArm","RightHand"},
+	{"LowerTorso","LeftUpperLeg"},
+	{"LeftUpperLeg","LeftLowerLeg"},
+	{"LeftLowerLeg","LeftFoot"},
+	{"LowerTorso","RightUpperLeg"},
+	{"RightUpperLeg","RightLowerLeg"},
+	{"RightLowerLeg","RightFoot"}
+}
+
+-- Color options
+local espColors = {
+	skeleton = Color3.fromRGB(255, 50, 50),
+	box = Color3.fromRGB(50, 255, 50),
+	name = Color3.fromRGB(255, 255, 255),
+	health = Color3.fromRGB(50, 255, 50)
+}
+
+local function clearESP()
+	for _,data in pairs(espObjects) do
+		if data.lines then
+			for _,line in pairs(data.lines) do
+				line:Remove()
+			end
+		end
+		if data.box then
+			for _,line in pairs(data.box) do
+				line:Remove()
+			end
+		end
+		if data.name then
+			data.name:Remove()
+		end
+		if data.healthBar then
+			data.healthBar.fill:Remove()
+			data.healthBar.border:Remove()
+		end
+	end
+	espObjects = {}
+end
+
+local function getTeamColor(player)
+	if player.Team then
+		return player.TeamColor.Color
+	end
+	return espColors.skeleton
+end
+
+local function createESP(player)
+	if player == LP or not player.Character then return end
+	
+	local data = {}
+	
+	-- Skeleton lines
+	if espEnabled then
+		data.lines = {}
+		for _ = 1, #skeletonPairs do
+			local line = Drawing.new("Line")
+			line.Color = getTeamColor(player)
+			line.Thickness = 2
+			line.Visible = false
+			table.insert(data.lines, line)
+		end
+	end
+	
+	-- Box ESP
+	if boxEspEnabled then
+		data.box = {}
+		for i = 1, 4 do
+			local line = Drawing.new("Line")
+			line.Color = espColors.box
+			line.Thickness = 2
+			line.Visible = false
+			table.insert(data.box, line)
+		end
+	end
+	
+	-- Name ESP
+	if nameEspEnabled then
+		data.name = Drawing.new("Text")
+		data.name.Text = player.Name
+		data.name.Color = espColors.name
+		data.name.Size = 16
+		data.name.Center = true
+		data.name.Outline = true
+		data.name.Visible = false
+	end
+	
+	-- Health bar
+	if healthEspEnabled then
+		data.healthBar = {
+			fill = Drawing.new("Line"),
+			border = Drawing.new("Line")
+		}
+		data.healthBar.fill.Color = espColors.health
+		data.healthBar.fill.Thickness = 3
+		data.healthBar.fill.Visible = false
+		data.healthBar.border.Color = Color3.fromRGB(30, 30, 30)
+		data.healthBar.border.Thickness = 1
+		data.healthBar.border.Visible = false
+	end
+	
+	espObjects[player] = data
+end
+
+local function updateESP()
+	if not (espEnabled or boxEspEnabled or nameEspEnabled or healthEspEnabled) then return end
+	
+	for player, data in pairs(espObjects) do
+		local char = player.Character
+		if char then
+			local humanoid = char:FindFirstChildOfClass("Humanoid")
+			local rootPart = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+			
+			if humanoid and humanoid.Health > 0 and rootPart then
+				local position, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+				
+				if onScreen then
+					-- Update skeleton ESP
+					if espEnabled and data.lines then
+						for i, pair in ipairs(skeletonPairs) do
+							local a = char:FindFirstChild(pair[1])
+							local b = char:FindFirstChild(pair[2])
+							
+							if a and b then
+								local p1, on1 = Camera:WorldToViewportPoint(a.Position)
+								local p2, on2 = Camera:WorldToViewportPoint(b.Position)
+								
+								if on1 and on2 then
+									data.lines[i].From = Vector2.new(p1.X, p1.Y)
+									data.lines[i].To = Vector2.new(p2.X, p2.Y)
+									data.lines[i].Visible = true
+								else
+									data.lines[i].Visible = false
+								end
+							else
+								data.lines[i].Visible = false
+							end
+						end
+					end
+					
+					-- Update box ESP
+					if boxEspEnabled and data.box then
+						local size = Vector2.new(30, 50)
+						local pos = Vector2.new(position.X - size.X/2, position.Y - size.Y/2)
+						
+						-- Top
+						data.box[1].From = Vector2.new(pos.X, pos.Y)
+						data.box[1].To = Vector2.new(pos.X + size.X, pos.Y)
+						
+						-- Right
+						data.box[2].From = Vector2.new(pos.X + size.X, pos.Y)
+						data.box[2].To = Vector2.new(pos.X + size.X, pos.Y + size.Y)
+						
+						-- Bottom
+						data.box[3].From = Vector2.new(pos.X, pos.Y + size.Y)
+						data.box[3].To = Vector2.new(pos.X + size.X, pos.Y + size.Y)
+						
+						-- Left
+						data.box[4].From = Vector2.new(pos.X, pos.Y)
+						data.box[4].To = Vector2.new(pos.X, pos.Y + size.Y)
+						
+						for _, line in pairs(data.box) do
+							line.Visible = true
+						end
+					end
+					
+					-- Update name ESP
+					if nameEspEnabled and data.name then
+						data.name.Position = Vector2.new(position.X, position.Y - 60)
+						data.name.Visible = true
+					end
+					
+					-- Update health bar
+					if healthEspEnabled and data.healthBar then
+						local healthPercent = humanoid.Health / humanoid.MaxHealth
+						local barHeight = 40
+						local barWidth = 4
+						local posX = position.X - 35
+						local posY = position.Y - barHeight/2
+						
+						-- Health fill
+						data.healthBar.fill.From = Vector2.new(posX, posY + barHeight)
+						data.healthBar.fill.To = Vector2.new(posX, posY + barHeight - (barHeight * healthPercent))
+						
+						-- Health border
+						data.healthBar.border.From = Vector2.new(posX, posY)
+						data.healthBar.border.To = Vector2.new(posX, posY + barHeight)
+						
+						data.healthBar.fill.Visible = true
+						data.healthBar.border.Visible = true
+					end
+				else
+					-- Hide all if off screen
+					if data.lines then for _, line in pairs(data.lines) do line.Visible = false end end
+					if data.box then for _, line in pairs(data.box) do line.Visible = false end end
+					if data.name then data.name.Visible = false end
+					if data.healthBar then
+						data.healthBar.fill.Visible = false
+						data.healthBar.border.Visible = false
+					end
+				end
+			else
+				-- Hide all if dead
+				if data.lines then for _, line in pairs(data.lines) do line.Visible = false end end
+				if data.box then for _, line in pairs(data.box) do line.Visible = false end end
+				if data.name then data.name.Visible = false end
+				if data.healthBar then
+					data.healthBar.fill.Visible = false
+					data.healthBar.border.Visible = false
+				end
+			end
+		end
+	end
+end
+
+-- Optimized update loop
+local lastUpdate = 0
+RunService.RenderStepped:Connect(function(deltaTime)
+	lastUpdate = lastUpdate + deltaTime
+	if lastUpdate > 0.016 then -- ~60 FPS cap for ESP updates
+		updateESP()
+		lastUpdate = 0
+	end
+end)
+
+-- Player tracking
+Players.PlayerAdded:Connect(function(p)
+	p.CharacterAdded:Connect(function()
+		if espEnabled or boxEspEnabled or nameEspEnabled or healthEspEnabled then
+			createESP(p)
+		end
+	end)
+	
+	-- Clean up when player leaves
+	p:GetPropertyChangedSignal("Parent"):Connect(function()
+		if p.Parent == nil then
+			if espObjects[p] then
+				if espObjects[p].lines then
+					for _, line in pairs(espObjects[p].lines) do
+						line:Remove()
+					end
+				end
+				if espObjects[p].box then
+					for _, line in pairs(espObjects[p].box) do
+						line:Remove()
+					end
+				end
+				if espObjects[p].name then
+					espObjects[p].name:Remove()
+				end
+				if espObjects[p].healthBar then
+					espObjects[p].healthBar.fill:Remove()
+					espObjects[p].healthBar.border:Remove()
+				end
+				espObjects[p] = nil
+			end
+		end
+	end)
+end)
+
+-- Initialize ESP for existing players
+for _, p in pairs(Players:GetPlayers()) do
+	if espEnabled or boxEspEnabled or nameEspEnabled or healthEspEnabled then
+		createESP(p)
+	end
+end
+
+--==================================================
+-- DESYNC (CLIENT JITTER)
+--==================================================
+
+local desync = false
+RunService.RenderStepped:Connect(function()
+	if desync and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+		local hrp = LP.Character.HumanoidRootPart
+		hrp.CFrame = hrp.CFrame * CFrame.new(
+			math.random(-2,2)/50,
+			0,
+			math.random(-2,2)/50
+		)
+	end
+end)
+
+--==================================================
+-- GUI CONTENT
+--==================================================
+
+section("AIM")
+toggle("Aimlock", function(v) AIMLOCK = v end)
+toggle("Aim Head", function(v) if v then AIM_HITBOX="Head" end end)
+toggle("Aim Chest", function(v) if v then AIM_HITBOX="Chest" end end)
+toggle("Aim Legs", function(v) if v then AIM_HITBOX="Legs" end end)
+
+section("VISUALS")
+toggle("Skeleton ESP", function(v)
+	espEnabled = v
+	clearESP()
+	if v or boxEspEnabled or nameEspEnabled or healthEspEnabled then
+		for _,p in pairs(Players:GetPlayers()) do
+			createESP(p)
+		end
+	end
+end)
+
+toggle("Box ESP", function(v)
+	boxEspEnabled = v
+	clearESP()
+	if v or espEnabled or nameEspEnabled or healthEspEnabled then
+		for _,p in pairs(Players:GetPlayers()) do
+			createESP(p)
+		end
+	end
+end)
+
+toggle("Name ESP", function(v)
+	nameEspEnabled = v
+	clearESP()
+	if v or espEnabled or boxEspEnabled or healthEspEnabled then
+		for _,p in pairs(Players:GetPlayers()) do
+			createESP(p)
+		end
+	end
+end)
+
+toggle("Health Bar", function(v)
+	healthEspEnabled = v
+	clearESP()
+	if v or espEnabled or boxEspEnabled or nameEspEnabled then
+		for _,p in pairs(Players:GetPlayers()) do
+			createESP(p)
+		end
+	end
+end)
+
+section("MISC")
+toggle("Desync (Client)", function(v) desync = v end)
