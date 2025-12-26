@@ -18,11 +18,11 @@ end
 ---------------------------------------------------------
 local tab1 = window:Tab({"ESP", "rbxassetid://7734022041"})
 
-tab1:Dropdown("Select ESP", {"Player ESP", "Fruit ESP"}, function(selected)
+tab1:Dropdown("Select ESP", {"Player ESP", "Fruit esp/farm"}, function(selected)
     if selected == "Player ESP" then
         -- Player ESP / X-Ray
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ESP-CORNER"))()
-    elseif selected == "Fruit ESP" then
+    elseif selected == "Fruit esp/farm" then
         -- Noul link pentru Fruit ESP
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/ZEEHUB/refs/heads/main/bloxesp"))()
     end
