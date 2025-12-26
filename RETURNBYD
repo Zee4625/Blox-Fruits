@@ -5,41 +5,54 @@ local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 local REVIVE_SOUND_ID = "rbxassetid://18597544476"
-local lastDeathCFrame = nil
 
--- Salvează poziția la moarte
-local function onHumanoidDied(humanoid)
-	if humanoid and humanoid.RootPart then
-		lastDeathCFrame = humanoid.RootPart.CFrame
-	elseif player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-		lastDeathCFrame = player.Character.HumanoidRootPart.CFrame
+local lastDeathCFrame = nil
+local diedOnce = false
+
+------------------------------------------------
+-- SAVE POSITION ON DEATH
+------------------------------------------------
+local function onHumanoidDied(character)
+	local hrp = character:FindFirstChild("HumanoidRootPart")
+	if hrp then
+		lastDeathCFrame = hrp.CFrame
+		diedOnce = true
 	end
 end
 
--- Sunet epic de revive
+------------------------------------------------
+-- REVIVE SOUND
+------------------------------------------------
 local function playReviveSound()
 	local sound = Instance.new("Sound")
 	sound.SoundId = REVIVE_SOUND_ID
 	sound.Volume = 0
 	sound.Parent = workspace.CurrentCamera
 	sound:Play()
-	for i = 0, 1, 0.1 do
-		sound.Volume = i * 4
-		task.wait(0.03)
-	end
-	task.delay(2, function()
+
+	task.spawn(function()
+		for i = 0, 1, 0.1 do
+			sound.Volume = i * 4
+			task.wait(0.03)
+		end
+
+		task.wait(2)
+
 		for i = 1, 0, -0.1 do
 			sound.Volume = i * 4
 			task.wait(0.03)
 		end
-		sound:Stop()
+
 		sound:Destroy()
 	end)
 end
 
--- Time rewind efect vizual
+------------------------------------------------
+-- TIME REWIND EFFECT
+------------------------------------------------
 local function timeRewindEffect()
 	local gui = player:WaitForChild("PlayerGui")
+
 	local rewindFrame = Instance.new("Frame")
 	rewindFrame.Size = UDim2.new(1,0,1,0)
 	rewindFrame.BackgroundColor3 = Color3.new(1,1,1)
@@ -51,31 +64,43 @@ local function timeRewindEffect()
 	blur.Size = 0
 	blur.Parent = Lighting
 
-	local tweenIn = TweenService:Create(rewindFrame, TweenInfo.new(0.2), {BackgroundTransparency = 0.6})
-	local blurIn = TweenService:Create(blur, TweenInfo.new(0.2), {Size = 15})
-	tweenIn:Play()
-	blurIn:Play()
+	TweenService:Create(rewindFrame, TweenInfo.new(0.2), {
+		BackgroundTransparency = 0.6
+	}):Play()
+
+	TweenService:Create(blur, TweenInfo.new(0.2), {
+		Size = 15
+	}):Play()
 
 	local cam = workspace.CurrentCamera
 	local startCF = cam.CFrame
 	local elapsed = 0
+
 	local conn
 	conn = RunService.RenderStepped:Connect(function(dt)
 		elapsed += dt
-		if elapsed > 0.3 then
+		if elapsed >= 0.3 then
 			conn:Disconnect()
 			cam.CFrame = startCF
 		else
-			local offset = Vector3.new((math.random()-0.5)*0.15, (math.random()-0.5)*0.15, 0)
+			local offset = Vector3.new(
+				(math.random() - 0.5) * 0.15,
+				(math.random() - 0.5) * 0.15,
+				0
+			)
 			cam.CFrame = startCF * CFrame.new(offset)
 		end
 	end)
 
 	task.delay(0.3, function()
-		local tweenOut = TweenService:Create(rewindFrame, TweenInfo.new(0.2), {BackgroundTransparency = 1})
-		local blurOut = TweenService:Create(blur, TweenInfo.new(0.2), {Size = 0})
-		tweenOut:Play()
-		blurOut:Play()
+		TweenService:Create(rewindFrame, TweenInfo.new(0.2), {
+			BackgroundTransparency = 1
+		}):Play()
+
+		TweenService:Create(blur, TweenInfo.new(0.2), {
+			Size = 0
+		}):Play()
+
 		task.delay(0.25, function()
 			rewindFrame:Destroy()
 			blur:Destroy()
@@ -83,9 +108,12 @@ local function timeRewindEffect()
 	end)
 end
 
--- Efect cinematic pe ecran
+------------------------------------------------
+-- SCREEN CINEMATIC
+------------------------------------------------
 local function showScreenEffect()
-	local gui = player:WaitForChild("PlayerGui")
+	local gui = player.PlayerGui
+
 	local frame = Instance.new("Frame")
 	frame.Size = UDim2.new(1,0,1,0)
 	frame.BackgroundColor3 = Color3.fromRGB(40,120,255)
@@ -93,61 +121,72 @@ local function showScreenEffect()
 	frame.ZIndex = 15
 	frame.Parent = gui
 
-	-- Text cinematic
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Text = "Return by Death"
-	textLabel.TextColor3 = Color3.fromRGB(255,255,255)
 	textLabel.Font = Enum.Font.Bangers
+	textLabel.TextColor3 = Color3.new(1,1,1)
 	textLabel.TextScaled = true
 	textLabel.BackgroundTransparency = 1
 	textLabel.Size = UDim2.new(1,0,0.2,0)
 	textLabel.Position = UDim2.new(0,0,0.4,0)
 	textLabel.ZIndex = 16
-	textLabel.Parent = gui
+	textLabel.Parent = frame
 
-	local tweenIn = TweenService:Create(frame, TweenInfo.new(0.3), {BackgroundTransparency = 0.3})
-	local tweenOut = TweenService:Create(frame, TweenInfo.new(0.5), {BackgroundTransparency = 1})
-	tweenIn:Play()
-	tweenIn.Completed:Wait()
+	TweenService:Create(frame, TweenInfo.new(0.3), {
+		BackgroundTransparency = 0.3
+	}):Play()
 
-	-- Puls text
-	for i = 1,0,-0.05 do
-		textLabel.TextTransparency = i
-		task.wait(0.03)
-	end
-	for i = 0,1,0.05 do
+	task.wait(0.3)
+
+	for i = 1, 0, -0.05 do
 		textLabel.TextTransparency = i
 		task.wait(0.03)
 	end
 
-	tweenOut:Play()
-	tweenOut.Completed:Wait()
+	for i = 0, 1, 0.05 do
+		textLabel.TextTransparency = i
+		task.wait(0.03)
+	end
+
+	TweenService:Create(frame, TweenInfo.new(0.5), {
+		BackgroundTransparency = 1
+	}):Play()
+
+	task.wait(0.5)
 	frame:Destroy()
-	textLabel:Destroy()
 end
 
--- Respawn instant cinematic
-local function respawnAtLastDeath()
-	if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and lastDeathCFrame then
-		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
-		player.Character.HumanoidRootPart.CFrame = lastDeathCFrame
-		if humanoid then humanoid.Health = humanoid.MaxHealth end
+------------------------------------------------
+-- RESPAWN AT LAST DEATH
+------------------------------------------------
+local function respawnAtLastDeath(character)
+	if not diedOnce or not lastDeathCFrame then return end
 
-		playReviveSound()
-		timeRewindEffect()
-		showScreenEffect()
+	local hrp = character:WaitForChild("HumanoidRootPart")
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-		task.wait(0.2) -- mic wait cinematic
+	hrp.CFrame = lastDeathCFrame
+	if humanoid then
+		humanoid.Health = humanoid.MaxHealth
 	end
+
+	playReviveSound()
+	timeRewindEffect()
+	showScreenEffect()
 end
 
--- Conectare character
-local function onCharacterAdded(char)
-	local humanoid = char:WaitForChild("Humanoid")
+------------------------------------------------
+-- CHARACTER HANDLER
+------------------------------------------------
+local function onCharacterAdded(character)
+	local humanoid = character:WaitForChild("Humanoid")
+
 	humanoid.Died:Connect(function()
-		onHumanoidDied(humanoid)
+		onHumanoidDied(character)
 	end)
-	respawnAtLastDeath()
+
+	task.wait(0.1)
+	respawnAtLastDeath(character)
 end
 
 player.CharacterAdded:Connect(onCharacterAdded)
