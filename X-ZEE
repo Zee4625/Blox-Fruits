@@ -1,68 +1,138 @@
+--[[
+    Chest Farm Script - Complete Fixed Version
+--]]
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
 local MaxSpeed = 300 -- Studs per second
+local farmEnabled = false -- Toggle farm
 
-local LocalPlayer = game:GetService("Players").LocalPlayer
-local Locations = workspace:FindFirstChild("_WorldOrigin") and workspace._WorldOrigin:FindFirstChild("Locations")
+-- === GUI SETUP ===
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ChestFarmGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 140, 0, 40)
+MainFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0,8)
+UICorner.Parent = MainFrame
+
+local FarmButton = Instance.new("TextButton")
+FarmButton.Size = UDim2.new(1,0,1,0)
+FarmButton.BackgroundTransparency = 1
+FarmButton.Font = Enum.Font.GothamBold
+FarmButton.TextSize = 14
+FarmButton.TextColor3 = Color3.fromRGB(255,50,50)
+FarmButton.Text = "CHEST FARM: OFF"
+FarmButton.Parent = MainFrame
+
+-- Dragging logic
+local dragging, dragInput, dragStart, startPos
+MainFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = MainFrame.Position
+	end
+end)
+UserInputService.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+		local delta = input.Position - dragStart
+		MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+-- Toggle farm on button click
+FarmButton.MouseButton1Click:Connect(function()
+	farmEnabled = not farmEnabled
+	if farmEnabled then
+		FarmButton.Text = "CHEST FARM: ON"
+		FarmButton.TextColor3 = Color3.fromRGB(0,255,100)
+	else
+		FarmButton.Text = "CHEST FARM: OFF"
+		FarmButton.TextColor3 = Color3.fromRGB(255,50,50)
+	end
+end)
+
+-- === UTILITY FUNCTIONS ===
 local function getCharacter()
-    while not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") do
-        LocalPlayer.CharacterAdded:Wait()
-    end
-    return LocalPlayer.Character
+	while not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") do
+		LocalPlayer.CharacterAdded:Wait()
+	end
+	return LocalPlayer.Character
+end
+
+local function toggleNoclip(state)
+	for _, part in pairs(getCharacter():GetChildren()) do
+		if part:IsA("BasePart") then
+			part.CanCollide = not state
+		end
+	end
 end
 
 local function DistanceFromPlrSort(ObjectList)
-    local RootPart = getCharacter().HumanoidRootPart
-    table.sort(ObjectList, function(ChestA, ChestB)
-        local RootPos = RootPart.Position
-        return (RootPos - ChestA.Position).Magnitude < (RootPos - ChestB.Position).Magnitude
-    end)
+	local RootPart = getCharacter().HumanoidRootPart
+	table.sort(ObjectList, function(a,b)
+		return (RootPart.Position - a.Position).Magnitude < (RootPart.Position - b.Position).Magnitude
+	end)
 end
 
 local function getChestsSorted()
-    while true do
-        local Chests = {}
-        for _, Object in pairs(workspace:GetDescendants()) do
-            if Object:IsA("Part") and Object.Name:find("Chest") and Object:FindFirstChild("TouchInterest") then
-                table.insert(Chests, Object)
-            end
-        end
-        if #Chests > 0 then
-            DistanceFromPlrSort(Chests)
-            return Chests
-        end
-        task.wait(0.5) -- Așteaptă până apar cufere noi
-    end
-end
-
-local function toggleNoclip(Toggle)
-    for _, v in pairs(getCharacter():GetChildren()) do
-        if v:IsA("BasePart") then
-            v.CanCollide = not Toggle
-        end
-    end
+	while true do
+		local Chests = {}
+		for _, obj in pairs(Workspace:GetDescendants()) do
+			if obj:IsA("Part") and obj.Name:find("Chest") and obj:FindFirstChild("TouchInterest") then
+				table.insert(Chests,obj)
+			end
+		end
+		if #Chests > 0 then
+			DistanceFromPlrSort(Chests)
+			return Chests
+		end
+		task.wait(0.5)
+	end
 end
 
 local function Teleport(Goal, Speed)
-    Speed = Speed or MaxSpeed
-    toggleNoclip(true)
-    local RootPart = getCharacter().HumanoidRootPart
-    while (RootPart.Position - Goal.Position).Magnitude > 1 do
-        local Direction = (Goal.Position - RootPart.Position).unit
-        RootPart.CFrame = RootPart.CFrame + Direction * (Speed * task.wait())
-    end
-    toggleNoclip(false)
+	Speed = Speed or MaxSpeed
+	toggleNoclip(true)
+	local RootPart = getCharacter().HumanoidRootPart
+	while (RootPart.Position - Goal.Position).Magnitude > 1 do
+		local Direction = (Goal.Position - RootPart.Position).Unit
+		RootPart.CFrame = RootPart.CFrame + Direction * (Speed * task.wait())
+		if not farmEnabled then break end -- Stop instantly if toggled off
+	end
+	toggleNoclip(false)
 end
 
-local function main()
-    while true do
-        local Chests = getChestsSorted()
-        if #Chests > 0 then
-            Teleport(Chests[1].CFrame)
-        else
-            print("Niciun cufăr găsit, încerc din nou...")
-        end
-        task.wait(0.1) -- Evită suprasolicitarea serverului
-    end
-end
-
-task.spawn(main)
+-- === MAIN FARM LOOP ===
+task.spawn(function()
+	while true do
+		if farmEnabled then
+			local Chests = getChestsSorted()
+			if #Chests > 0 then
+				Teleport(Chests[1].CFrame)
+			else
+				print("Niciun cufăr găsit, încerc din nou...")
+			end
+		end
+		task.wait(0.1)
+	end
+end)
