@@ -8,11 +8,11 @@ local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 
 local function toggleWallHack(state)
-	for _, part in pairs(character:GetDescendants()) do
-		if part:IsA("BasePart") then
-			part.CanCollide = not state
-		end
-	end
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = not state
+        end
+    end
 end
 
 ---------------------------------------------------------
@@ -21,13 +21,11 @@ end
 local tab1 = window:Tab({"ESP", "rbxassetid://7734022041"})
 
 tab1:Dropdown("Select ESP", {"Player ESP", "Fruit esp/farm"}, function(selected)
-	if selected == "Player ESP" then
-		-- Player ESP / X-Ray
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ESP-CORNER"))()
-	elseif selected == "Fruit esp/farm" then
-		-- Fruit ESP
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/ZEEHUB/refs/heads/main/bloxesp"))()
-	end
+    if selected == "Player ESP" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/ESP-CORNER"))()
+    elseif selected == "Fruit esp/farm" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/ZEEHUB/refs/heads/main/bloxesp"))()
+    end
 end)
 
 ---------------------------------------------------------
@@ -35,24 +33,20 @@ end)
 ---------------------------------------------------------
 local tab2 = window:Tab({"Farm", "rbxassetid://7733954760"})
 
-tab2:Dropdown("Select Farm", {"Auto Farm (Chest)", "Range Attack"}, function(selected)
-	if selected == "Auto Farm (Chest)" then 
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/X-ZEE"))()
-	elseif selected == "Range Attack" then
-		-- Hitbox / Range Attack
-		local tool = character:FindFirstChildOfClass("Tool")
-		if tool and tool:FindFirstChild("Handle") then
-			tool.Handle.Size = Vector3.new(50, 50, 50)
-			tool.Handle.Transparency = 0.8
-		else
-			print("Echipează o armă mai întâi!")
-		end
-	end
-end)
-
--- Buton Safe Zone
-tab2:Button("Safe Zone", function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/ZEEHUB/refs/heads/main/safe"))()
+tab2:Dropdown("Select Farm", {"Auto Farm (Chest)", "Range Attack", "Safe Zone"}, function(selected)
+    if selected == "Auto Farm (Chest)" then 
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/X-ZEE"))()
+    elseif selected == "Range Attack" then
+        local tool = character:FindFirstChildOfClass("Tool")
+        if tool and tool:FindFirstChild("Handle") then
+            tool.Handle.Size = Vector3.new(50, 50, 50)
+            tool.Handle.Transparency = 0.8
+        else
+            print("Echipează o armă mai întâi!")
+        end
+    elseif selected == "Safe Zone" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/ZEEHUB/refs/heads/main/safe"))()
+    end
 end)
 
 ---------------------------------------------------------
@@ -60,21 +54,25 @@ end)
 ---------------------------------------------------------
 local tab3 = window:Tab({"Misc", "rbxassetid://7733965118"})
 
-tab3:Dropdown("Select Misc", {"Speed Mode", "Wallhack", "Jump Boost", "Rejoin"}, function(selected)
-	if selected == "Speed Mode" then
-		player.Character.Humanoid.WalkSpeed = 100
-	elseif selected == "Wallhack" then
-		toggleWallHack(true)
-	elseif selected == "Jump Boost" then
-		player.Character.Humanoid.JumpPower = 150
-	elseif selected == "Rejoin" then
-		game:GetService("TeleportService"):Teleport(game.PlaceId, player)
-	end
+-- Dropdown Misc (doar Rejoin)
+tab3:Dropdown("Select Misc", {"Rejoin"}, function(selected)
+    if selected == "Rejoin" then
+        game:GetService("TeleportService"):Teleport(game.PlaceId, player)
+    end
 end)
 
--- Notificare de confirmare
+-- Dropdown SpeedBoost (Boat-Speed)
+tab3:Dropdown("SpeedBoost", {"Boat-Speed"}, function(selected)
+    if selected == "Boat-Speed" then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Zee4625/Blox-Fruits/refs/heads/main/Boat-sp"))()
+    end
+end)
+
+---------------------------------------------------------
+-- NOTIFICARE
+---------------------------------------------------------
 game:GetService("StarterGui"):SetCore("SendNotification", {
-	Title = "ZeeHUB v11",
-	Text = "!",
-	Duration = 5
+    Title = "ZeeHUB v11",
+    Text = "Configurație Farm actualizată!",
+    Duration = 5
 })
