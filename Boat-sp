@@ -1,0 +1,173 @@
+-- Boat Speed Controller (Elegant UI) - MaxSpeed 700
+
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local MAX_SPEED = 700
+
+-- Get current VehicleSeat
+local function getCurrentSeat()
+	local char = player.Character
+	if not char then return nil end
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if hum and hum.SeatPart and hum.SeatPart:IsA("VehicleSeat") then
+		return hum.SeatPart
+	end
+	return nil
+end
+
+-- GUI SETUP
+local gui = Instance.new("ScreenGui")
+gui.Name = "BoatSpeedGui"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0,320,0,150)
+frame.Position = UDim2.new(0.5,-160,0.5,-75)
+frame.BackgroundColor3 = Color3.fromRGB(20,20,25)
+frame.Active = true
+frame.Parent = gui
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0,12)
+
+-- SHADOW
+local shadow = Instance.new("ImageLabel")
+shadow.Size = UDim2.new(1,20,1,20)
+shadow.Position = UDim2.new(0,-10,0,-10)
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageTransparency = 0.7
+shadow.Parent = frame
+
+-- DRAG LOGIC
+local dragging, dragStart, startPos
+frame.InputBegan:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = i.Position
+		startPos = frame.Position
+	end
+end)
+
+UIS.InputChanged:Connect(function(i)
+	if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = i.Position - dragStart
+		frame.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+UIS.InputEnded:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+-- TITLE
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,-40,0,32)
+title.Position = UDim2.new(0,16,0,8)
+title.BackgroundTransparency = 1
+title.Text = "Boat Speed Controller"
+title.TextColor3 = Color3.fromRGB(230,230,230)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = frame
+
+-- CLOSE BUTTON
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0,26,0,26)
+close.Position = UDim2.new(1,-34,0,10)
+close.Text = "✕"
+close.Font = Enum.Font.GothamBold
+close.TextSize = 16
+close.TextColor3 = Color3.new(1,1,1)
+close.BackgroundColor3 = Color3.fromRGB(180,40,40)
+close.Parent = frame
+Instance.new("UICorner", close)
+
+close.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
+
+-- SLIDER BAR
+local bar = Instance.new("Frame")
+bar.Size = UDim2.new(1,-40,0,8)
+bar.Position = UDim2.new(0,20,0,65)
+bar.BackgroundColor3 = Color3.fromRGB(60,60,65)
+bar.Parent = frame
+Instance.new("UICorner", bar)
+
+local fill = Instance.new("Frame")
+fill.Size = UDim2.new(0,0,1,0)
+fill.BackgroundColor3 = Color3.fromRGB(0,180,255)
+fill.Parent = bar
+Instance.new("UICorner", fill)
+
+local knob = Instance.new("Frame")
+knob.Size = UDim2.new(0,18,0,18)
+knob.Position = UDim2.new(0,-9,0.5,-9)
+knob.BackgroundColor3 = Color3.fromRGB(245,245,245)
+knob.Parent = bar
+Instance.new("UICorner", knob)
+
+-- VALUE LABEL
+local value = Instance.new("TextLabel")
+value.Size = UDim2.new(1,-40,0,24)
+value.Position = UDim2.new(0,20,0,85)
+value.BackgroundTransparency = 1
+value.Text = "Speed: 0"
+value.TextColor3 = Color3.fromRGB(180,180,180)
+value.Font = Enum.Font.Gotham
+value.TextSize = 14
+value.TextXAlignment = Enum.TextXAlignment.Left
+value.Parent = frame
+
+-- SLIDER LOGIC
+local sliding = false
+
+local function updateSlider(x)
+	local seat = getCurrentSeat()
+	if not seat then
+		value.Text = "Not seated"
+		return
+	end
+
+	local percent = math.clamp(
+		(x - bar.AbsolutePosition.X) / bar.AbsoluteSize.X,
+		0, 1
+	)
+
+	local speed = math.floor(percent * MAX_SPEED)
+
+	fill.Size = UDim2.new(percent,0,1,0)
+	knob.Position = UDim2.new(percent,-9,0.5,-9)
+	value.Text = "Speed: "..speed
+
+	seat.MaxSpeed = speed
+end
+
+bar.InputBegan:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 then
+		sliding = true
+		updateSlider(i.Position.X)
+	end
+end)
+
+UIS.InputChanged:Connect(function(i)
+	if sliding and i.UserInputType == Enum.UserInputType.MouseMovement then
+		updateSlider(i.Position.X)
+	end
+end)
+
+UIS.InputEnded:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 then
+		sliding = false
+	end
+end)
