@@ -1,0 +1,871 @@
+--==// OLD SCRIPTS   
+
+local player = game.Players.LocalPlayer
+local sgui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+sgui.ResetOnSpawn = false
+sgui.Name = "Survive Bikini bottom"
+
+-- Main Frame
+local main = Instance.new("Frame", sgui)
+main.Size = UDim2.new(0, 280, 0, 360)
+main.Position = UDim2.new(0.5, -250, 0.5, -180)
+main.BackgroundColor3 = Color3.fromRGB(45, 35, 85)
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 16)
+
+-- Title
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, 0, 0, 45)
+title.BackgroundTransparency = 1
+title.Text = "Survive Bikini Bottom"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 24
+title.TextColor3 = Color3.fromRGB(220, 200, 255)
+
+-- Tab Buttons Frame
+local tabButtons = Instance.new("Frame", main)
+tabButtons.Size = UDim2.new(1, 0, 0, 40)
+tabButtons.Position = UDim2.new(0, 0, 0, 45)
+tabButtons.BackgroundColor3 = Color3.fromRGB(60, 45, 110)
+
+local tabList = Instance.new("UIListLayout", tabButtons)
+tabList.FillDirection = Enum.FillDirection.Horizontal
+tabList.Padding = UDim.new(0, 6)
+tabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- Content Frame
+local content = Instance.new("Frame", main)
+content.Size = UDim2.new(1, -20, 1, -100)
+content.Position = UDim2.new(0, 10, 0, 90)
+content.BackgroundTransparency = 1
+
+-- Tabs table
+local tabs = {}
+local currentTab = nil
+
+local function openTab(tabName)
+    if currentTab then currentTab.Visible = false end
+    currentTab = tabs[tabName]
+    currentTab.Visible = true
+end
+
+local function createTab(name)
+    local btn = Instance.new("TextButton", tabButtons)
+    btn.Size = UDim2.new(0.3, 0, 0, 32)
+    btn.BackgroundColor3 = Color3.fromRGB(100, 80, 160)
+    btn.Text = name
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextSize = 16
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+    local container = Instance.new("Frame", content)
+    container.Size = UDim2.new(1, 0, 1, 0)
+    container.BackgroundTransparency = 1
+    container.Visible = false
+
+    local list = Instance.new("UIListLayout", container)
+    list.Padding = UDim.new(0, 10)
+    list.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    list.SortOrder = Enum.SortOrder.LayoutOrder
+
+    tabs[name] = container
+
+    btn.MouseButton1Click:Connect(function()
+        openTab(name)
+        for _, b in pairs(tabButtons:GetChildren()) do
+            if b:IsA("TextButton") then
+                b.BackgroundColor3 = Color3.fromRGB(100, 80, 160)
+            end
+        end
+        btn.BackgroundColor3 = Color3.fromRGB(140, 100, 220)
+    end)
+
+    if not currentTab then
+        btn.BackgroundColor3 = Color3.fromRGB(140, 100, 220)
+        openTab(name)
+    end
+
+    return container
+end
+
+--==// FUNÇÕES GERAIS //==
+local angle = 0
+local function getPos()
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return CFrame.new() end
+    angle += 0.7
+    return hrp.CFrame * CFrame.new(math.cos(math.rad(angle))*8, 4, math.sin(math.rad(angle))*8)
+end
+
+local function bring(item)
+    if not item then return end
+    local part = item:FindFirstChild("Handle") or item:FindFirstChildWhichIsA("BasePart") or (item:IsA("Model") and item.PrimaryPart)
+    if part then
+        part.CFrame = getPos()
+        task.wait(0.07)
+        local p = item:FindFirstChildWhichIsA("ProximityPrompt")
+        if p then fireproximityprompt(p) end
+    end
+end
+
+local function newButton(parent, text, callback)
+    local btn = Instance.new("TextButton", parent)
+    btn.Size = UDim2.new(0.9, 0, 0, 45)
+    btn.BackgroundColor3 = Color3.fromRGB(100, 70, 160)
+    btn.Text = text
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 18
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
+    btn.MouseButton1Click:Connect(function() callback(btn) end)
+end
+
+--==// TAB: BRING //==
+local bringTab = createTab("Bring")
+
+newButton(bringTab, "Bring All Jelly", function(b)
+    b.Text = "Working..."
+    angle = 0 local c = 0
+    for _,v in workspace.LootDrops:GetDescendants() do
+        if v.Name:find("Jelly") then bring(v) c += 1 end
+    end
+    b.Text = c > 0 and ("Brought "..c.." Jelly!") or "No Jelly"
+    task.wait(2) b.Text = "Bring All Jelly"
+end)
+
+newButton(bringTab, "🍔Bring Food", function(b)
+    b.Text = "Working..."
+    angle = 0 local c = 0
+    local foods = {"ChocolateBar","CannedBread","KelpShake","Acorn","JellyPatty","BlueJellyPatty","KrabbyPatty"}
+    for _,v in workspace.LootDrops:GetDescendants() do
+        if table.find(foods, v.Name) then bring(v) c += 1 end
+    end
+    b.Text = c > 0 and ("Brought "..c.." Food!") or "No Food"
+    task.wait(2) b.Text = "🍔Bring Food"
+end)
+
+newButton(bringTab, "🔧Bring Scrap", function(b)
+    b.Text = "Working..."
+    angle = 0 local c = 0
+    local scrap = {"ToxicBarrel","BrokenMotorcycle","CyclopsHelmet","RubberTire","Muffler","OpenCan"}
+    for _,v in workspace.LootDrops:GetDescendants() do
+        if table.find(scrap, v.Name) then bring(v) c += 1 end
+    end
+    b.Text = c > 0 and ("Brought "..c.." Scrap!") or "No Scrap"
+    task.wait(2) b.Text = "🔧Bring Scrap"
+end)
+
+newButton(bringTab, "🩹Bring Bandages", function(b)
+    b.Text = "Healing..."
+    angle = 0 local c = 0
+    local folder = workspace.LootDrops:FindFirstChild("Bandages")
+    if folder then
+        for _,v in folder:GetChildren() do bring(v) c += 1 end
+    else
+        for _,v in workspace.LootDrops:GetDescendants() do
+            if v.Name:find("Bandage") then bring(v) c += 1 end
+        end
+    end
+    b.Text = c > 0 and ("Healed +"..c.."!") or "No Bandages"
+    task.wait(2) b.Text = "🩹Bring Bandages"
+end)
+
+newButton(bringTab, "🦀RESCUE ALL LOSTED", function(b)
+    b.Text = "RESCUING..."
+    local char = player.Character or player.CharacterAdded:Wait()
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then b.Text = "NO HRP" task.wait(2) b.Text = "🦀RESCUE ALL LOSTED" return end
+
+    local saved = 0
+    local names = {"MrKrabs", "SpongeBob", "Patrick", "Squidward", "Sandy"}
+    for _, name in pairs(names) do
+        for _, obj in workspace:GetDescendants() do
+            if obj:IsA("Model") and obj.Name == name then
+                local p = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+                if p then
+                    p.CFrame = root.CFrame * CFrame.new(0, 0, -5 - saved*2)
+                    saved += 1 task.wait(0.1) break
+                end
+            end
+        end
+    end
+    b.Text = saved > 0 and ("🦀 "..saved.."/5") or "🦀NOT FOUND"
+    task.wait(1.5) b.Text = "🦀RESCUE ALL LOSTED"
+end)
+
+--==// TAB: PLAYER //==
+local playerTab = createTab("Player")
+
+local function hum()
+    return player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+end
+
+-- Criador de toggle + number
+local function createToggleNumber(name, default, applyFunc)
+    local frame = Instance.new("Frame", playerTab)
+    frame.Size = UDim2.new(0.9, 0, 0, 45)
+    frame.BackgroundColor3 = Color3.fromRGB(100, 70, 160)
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+
+    local lbl = Instance.new("TextLabel", frame)
+    lbl.Size = UDim2.new(0.45, 0, 1, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = "  "..name
+    lbl.TextColor3 = Color3.new(1,1,1)
+    lbl.Font = Enum.Font.Gotham
+    lbl.TextSize = 18
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+
+    local toggle = Instance.new("TextButton", frame)
+    toggle.Size = UDim2.new(0.25, 0, 0.7, 0)
+    toggle.Position = UDim2.new(0.47, 0, 0.15, 0)
+    toggle.BackgroundColor3 = Color3.fromRGB(130, 90, 200)
+    toggle.Text = "OFF"
+    toggle.TextColor3 = Color3.new(1,1,1)
+    toggle.Font = Enum.Font.GothamBold
+    toggle.TextSize = 18
+    Instance.new("UICorner", toggle).CornerRadius = UDim.new(0, 10)
+
+    local box = Instance.new("TextBox", frame)
+    box.Size = UDim2.new(0.25, 0, 0.7, 0)
+    box.Position = UDim2.new(0.75, 0, 0.15, 0)
+    box.BackgroundTransparency = 1
+    box.PlaceholderText = tostring(default)
+    box.Text = ""
+    box.TextColor3 = Color3.new(1,1,1)
+    box.Font = Enum.Font.Gotham
+    box.TextSize = 18
+
+    local enabled = false
+    local value = default
+
+    toggle.MouseButton1Click:Connect(function()
+        enabled = not enabled
+        toggle.Text = enabled and "ON" or "OFF"
+        toggle.BackgroundColor3 =
+            enabled and Color3.fromRGB(80,200,120) or Color3.fromRGB(130,90,200)
+
+        applyFunc(enabled, value)
+    end)
+
+    box.FocusLost:Connect(function(enter)
+        if not enter then return end
+        local num = tonumber(box.Text)
+
+        if num and num >= 1 and num <= 200 then
+            value = num
+            box.PlaceholderText = tostring(value)
+            box.Text = ""
+
+            if enabled then
+                applyFunc(true, value)
+            end
+        else
+            box.Text = ""
+        end
+    end)
+end
+
+-- SPEED — totalmente fixado
+createToggleNumber("WalkSpeed", 16, function(on, val)
+    local h = hum()
+    if h then
+        h.WalkSpeed = on and val or 16
+    end
+end)
+
+-- JUMP — agora funciona 100% (JumpPower + JumpHeight)
+createToggleNumber("JumpPower", 50, function(on, val)
+    local h = hum()
+    if h then
+        if on then
+            h.JumpPower = val
+            h.JumpHeight = val / 3 -- conversão correta
+        else
+            h.JumpPower = 50
+            h.JumpHeight = 7
+        end
+    end
+end)
+
+-- Reset ao respawn
+player.CharacterAdded:Connect(function()
+    task.wait(1)
+    local h = hum()
+    if h then
+        h.WalkSpeed = 16
+        h.JumpPower = 50
+        h.JumpHeight = 7
+    end
+end)
+
+-- Botão Infinite Jump
+newButton(playerTab, "Infinite Jump", function(btn)
+    local inf = not _G.InfiniteJumpEnabled
+    _G.InfiniteJumpEnabled = inf
+
+    btn.Text = inf and "Infinite Jump: ON" or "Infinite Jump"
+
+    if inf and not _G.InfiniteJumpConnection then
+        _G.InfiniteJumpConnection = game:GetService("UserInputService").JumpRequest:Connect(function()
+            local chr = player.Character
+            local hum = chr and chr:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+    elseif not inf and _G.InfiniteJumpConnection then
+        _G.InfiniteJumpConnection:Disconnect()
+        _G.InfiniteJumpConnection = nil
+    end
+end)
+
+local noclip = false
+local noclipLoop = nil
+
+newButton(playerTab, "Noclip", function(btn)
+    noclip = not noclip
+    btn.Text = noclip and "Noclip: ON" or "Noclip"
+
+    if noclip then
+        -- Ativar
+        noclipLoop = task.spawn(function()
+            while noclip do
+                task.wait()
+                local char = player.Character
+                if char then
+                    for _, part in ipairs(char:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        -- Desativar
+        if noclipLoop then
+            task.cancel(noclipLoop)
+            noclipLoop = nil
+        end
+
+        -- Restaurar colisão
+        local char = player.Character
+        if char then
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+    end
+end)
+
+--==// REMOVE FOG (RESTORE SAFE) //==
+
+local lighting = game:GetService("Lighting")
+local fogEnabled = false
+
+-- Salvar valores originais
+local original = {
+    FogStart = lighting.FogStart,
+    FogEnd = lighting.FogEnd,
+    Brightness = lighting.Brightness,
+    GlobalShadows = lighting.GlobalShadows,
+    Atmosphere = {}
+}
+
+for _,v in lighting:GetChildren() do
+    if v:IsA("Atmosphere") then
+        original.Atmosphere[v] = {
+            Density = v.Density,
+            Haze = v.Haze,
+            Glare = v.Glare
+        }
+    end
+end
+
+newButton(playerTab, "Remove Fog", function(btn)
+    fogEnabled = not fogEnabled
+    btn.Text = fogEnabled and "Remove Fog: ON" or "Remove Fog"
+
+    if fogEnabled then
+        lighting.FogStart = 1e9
+        lighting.FogEnd = 1e9
+        lighting.Brightness = 3
+        lighting.GlobalShadows = false
+
+        for atm,data in pairs(original.Atmosphere) do
+            if atm and atm.Parent then
+                atm.Density = 0
+                atm.Haze = 0
+                atm.Glare = 0
+            end
+        end
+    else
+        -- Restaurar valores originais
+        lighting.FogStart = original.FogStart
+        lighting.FogEnd = original.FogEnd
+        lighting.Brightness = original.Brightness
+        lighting.GlobalShadows = original.GlobalShadows
+
+        for atm,data in pairs(original.Atmosphere) do
+            if atm and atm.Parent then
+                atm.Density = data.Density
+                atm.Haze = data.Haze
+                atm.Glare = data.Glare
+            end
+        end
+    end
+end)
+
+
+--==// TAB: ESP //==
+local espTab = createTab("ESP")
+
+local espEnabled = false
+local espConnections = {}
+
+local function applyESP(model)
+    if model:FindFirstChild("ESP_HL") then return end
+    local hl = Instance.new("Highlight")
+    hl.Name = "ESP_HL"
+    hl.FillColor = Color3.fromRGB(255, 0, 0)
+    hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+    hl.FillTransparency = 0.5
+    hl.OutlineTransparency = 0
+    hl.Parent = model
+end
+
+local function removeESP(model)
+    local hl = model:FindFirstChild("ESP_HL")
+    if hl then hl:Destroy() end
+end
+
+newButton(espTab, "ESP Players", function(btn)
+    espEnabled = not espEnabled
+    btn.Text = espEnabled and "ESP Players: ON" or "ESP Players"
+
+    if espEnabled then
+        for _,plr in ipairs(game.Players:GetPlayers()) do
+            if plr ~= player and plr.Character then
+                applyESP(plr.Character)
+            end
+        end
+
+        espConnections.playerAdded = game.Players.PlayerAdded:Connect(function(plr)
+            plr.CharacterAdded:Connect(function(char)
+                task.wait(1)
+                if espEnabled then
+                    applyESP(char)
+                end
+            end)
+        end)
+
+        espConnections.charAdded = game.Players.PlayerRemoving:Connect(function(plr)
+            if plr.Character then
+                removeESP(plr.Character)
+            end
+        end)
+    else
+        for _,plr in ipairs(game.Players:GetPlayers()) do
+            if plr.Character then
+                removeESP(plr.Character)
+            end
+        end
+
+        for _,con in pairs(espConnections) do
+            con:Disconnect()
+        end
+        espConnections = {}
+    end
+end)
+
+
+--==// ESP FOOD //==
+local espFoodEnabled = false
+local foodEsp = {}
+local espLoop = nil
+
+-- Lista de foods do loot (do seu bring)
+local foods = {"ChocolateBar","CannedBread","KelpShake","Acorn","JellyPatty","BlueJellyPatty","KrabbyPatty"}
+
+-- cores por food (já tem, mas fallback verde pros static)
+local foodColors = {
+    Pineapple = Color3.fromRGB(255, 220, 60),
+    Melon = Color3.fromRGB(255, 80, 80),
+    Watermelon = Color3.fromRGB(255, 70, 70),
+    CannedBread = Color3.fromRGB(210, 180, 120),
+    KelpShake = Color3.fromRGB(80, 200, 120),
+    ChocolateBar = Color3.fromRGB(120, 70, 40),
+}
+
+local function getFoodColor(name)
+    for key, color in pairs(foodColors) do
+        if name:lower():find(key:lower()) then
+            return color
+        end
+    end
+    return Color3.fromRGB(0, 255, 0) -- fallback verde
+end
+
+local function addFoodESP(obj)
+    if foodEsp[obj] then return end
+
+    local h = Instance.new("Highlight")
+    h.FillTransparency = 0.35
+    h.OutlineTransparency = 0
+    h.FillColor = getFoodColor(obj.Name)
+    h.OutlineColor = Color3.new(1,1,1)
+    h.Adornee = obj
+    h.Parent = obj
+
+    foodEsp[obj] = h
+end
+
+local function removeFoodESP()
+    for _,h in pairs(foodEsp) do
+        if h then h:Destroy() end
+    end
+    table.clear(foodEsp)
+end
+
+-- Scan STATIC (mapa)
+local function scanStatic()
+    local mapItems = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("Items") and workspace.Map.Items:FindFirstChild("BikiniBottom")
+    if not mapItems then return end
+    
+    for _,v in mapItems:GetDescendants() do
+        if v:IsA("Model") and v:FindFirstChild("VisualModel") then
+            local vm = v.VisualModel
+            if vm:FindFirstChild("Pineapple") or vm:FindFirstChild("Melon") or vm:FindFirstChild("CannedBread") or 
+               vm:FindFirstChild("KelpShake") or vm:FindFirstChild("ChocolateBar") or vm:FindFirstChild("Watermelon") then
+                addFoodESP(vm)
+            end
+        end
+    end
+end
+
+-- Scan DYNAMIC (loot drops) - NOVO!
+local function scanDynamic()
+    local lootFolder = workspace:FindFirstChild("LootDrops")
+    if not lootFolder then return end
+    
+    for _, item in ipairs(lootFolder:GetChildren()) do
+        if table.find(foods, item.Name) then
+            addFoodESP(item)
+        end
+    end
+end
+
+-- Botão atualizado
+newButton(espTab, "ESP Food", function(btn)
+    espFoodEnabled = not espFoodEnabled
+    btn.Text = espFoodEnabled and "ESP Food: ON" or "ESP Food"
+
+    if espFoodEnabled then
+        removeFoodESP()
+        scanStatic()      -- itens fixos no mapa
+        scanDynamic()     -- itens loot (ChocolateBar etc.)
+        
+        -- Loop pra atualizar loot dinâmico (spawn/despawn)
+        espLoop = task.spawn(function()
+            while espFoodEnabled do
+                task.wait(0.5)  -- checa a cada 0.5s
+                
+                -- Limpa só os que sumiram
+                for obj, h in pairs(foodEsp) do
+                    if not obj.Parent then
+                        h:Destroy()
+                        foodEsp[obj] = nil
+                    end
+                end
+                
+                scanDynamic()  -- rescan loot
+            end
+        end)
+    else
+        removeFoodESP()
+        if espLoop then
+            task.cancel(espLoop)
+            espLoop = nil
+        end
+    end
+end)
+
+--==// ESP JELLYFISH + AGGRESSIVE //==
+local espJellyEnabled = false
+local jellyEsp = {}
+local jellyLoop = nil
+
+local function addJellyESP(model, isAggressive)
+    if jellyEsp[model] then return end
+
+    local h = Instance.new("Highlight")
+    h.FillTransparency = 0.3
+    h.OutlineTransparency = 0
+    h.FillColor = isAggressive and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(200, 0, 255)  -- Vermelho = agressivo / Roxo = normal
+    h.OutlineColor = Color3.new(1,1,1)
+    h.Adornee = model
+    h.Parent = model
+
+    jellyEsp[model] = h
+end
+
+local function removeJellyESP()
+    for _, h in pairs(jellyEsp) do
+        if h then h:Destroy() end
+    end
+    table.clear(jellyEsp)
+end
+
+local function scanJellyfish()
+    local map = workspace:FindFirstChild("Map")
+    if not map then return end
+
+    -- Jellyfish normais (Map.Jellyfish.BikiniBottom)
+    local jellyBB = map:FindFirstChild("Jellyfish") and map.Jellyfish:FindFirstChild("BikiniBottom")
+    if jellyBB then
+        for _, folder in ipairs(jellyBB:GetChildren()) do
+            local entities = folder:FindFirstChild("Entities")
+            if entities then
+                for _, obj in ipairs(entities:GetChildren()) do
+                    if obj:IsA("Model") and obj.Name:find("Jellyfish") then
+                        addJellyESP(obj, false)  -- normal
+                    end
+                end
+            end
+            -- Caso tenha Core ou outro model direto
+            local core = folder:FindFirstChild("Core")
+            if core and core:IsA("Model") and core.Name:find("Jellyfish") then
+                addJellyESP(core, false)
+            end
+        end
+    end
+
+    -- AggressiveJellyfish (Map.Enemies.BikiniBottom)
+    local enemiesBB = map:FindFirstChild("Enemies") and map.Enemies:FindFirstChild("BikiniBottom")
+    if enemiesBB then
+        for _, folder in ipairs(enemiesBB:GetChildren()) do
+            if folder.Name:find("AggressiveJellyfish") then
+                local entities = folder:FindFirstChild("Entities")
+                if entities then
+                    for _, obj in ipairs(entities:GetChildren()) do
+                        if obj:IsA("Model") and (obj.Name:find("Jellyfish") or obj.Name:find("Aggressive")) then
+                            addJellyESP(obj, true)  -- agressivo = vermelho
+                        end
+                    end
+                end
+                -- Core pros agressivos tb
+                local core = folder:FindFirstChild("Core")
+                if core and core:IsA("Model") then
+                    addJellyESP(core, true)
+                end
+            end
+        end
+    end
+end
+
+-- BOTÃO ESP JELLYFISH
+newButton(espTab, "ESP Jellyfish", function(btn)
+    espJellyEnabled = not espJellyEnabled
+    btn.Text = espJellyEnabled and "ESP Jellyfish: ON" or "ESP Jellyfish"
+
+    if espJellyEnabled then
+        removeJellyESP()
+        scanJellyfish()
+
+        jellyLoop = task.spawn(function()
+            while espJellyEnabled do
+                task.wait(0.5)
+
+                -- remove jelly que sumiu
+                for obj, h in pairs(jellyEsp) do
+                    if not obj.Parent then
+                        h:Destroy()
+                        jellyEsp[obj] = nil
+                    end
+                end
+
+                scanJellyfish()
+            end
+        end)
+    else
+        removeJellyESP()
+        if jellyLoop then
+            task.cancel(jellyLoop)
+            jellyLoop = nil
+        end
+    end
+end)
+
+--==// ESP SEABEAR (FIXED - NÃO QUEBRA QUANDO ATACA) //==
+local espSeabearEnabled = false
+local seabearEsp = {}
+local seabearLoop = nil
+
+local function addSeabearESP(model)
+	if seabearEsp[model] then return end
+
+	local hl = Instance.new("Highlight")
+	hl.Name = "SeabearESP"
+	hl.FillColor = Color3.fromRGB(255, 170, 0)
+	hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+	hl.FillTransparency = 0.3
+	hl.OutlineTransparency = 0
+	hl.Adornee = model
+	hl.Parent = model
+
+	seabearEsp[model] = hl
+end
+
+local function removeSeabearESP()
+	for _,h in pairs(seabearEsp) do
+		if h then h:Destroy() end
+	end
+	table.clear(seabearEsp)
+end
+
+local function scanSeabear()
+	for _,obj in ipairs(workspace:GetDescendants()) do
+		if obj:IsA("Model") and obj.Name:lower():find("seabear") then
+			addSeabearESP(obj)
+		end
+	end
+end
+
+newButton(espTab, "ESP Sea Bear", function(btn)
+	espSeabearEnabled = not espSeabearEnabled
+	btn.Text = espSeabearEnabled and "ESP Sea Bear: ON" or "ESP Sea Bear"
+
+	if espSeabearEnabled then
+		removeSeabearESP()
+		scanSeabear()
+
+		seabearLoop = task.spawn(function()
+			while espSeabearEnabled do
+				task.wait(0.5)
+
+				-- remove os que sumiram
+				for model,hl in pairs(seabearEsp) do
+					if not model.Parent then
+						hl:Destroy()
+						seabearEsp[model] = nil
+					end
+				end
+
+				scanSeabear()
+			end
+		end)
+	else
+		removeSeabearESP()
+		if seabearLoop then
+			task.cancel(seabearLoop)
+			seabearLoop = nil
+		end
+	end
+end)
+
+--==// ESP CHEST //==
+local espChestEnabled = false
+local chestEsp = {}
+local chestLoop = nil
+
+local function addChestESP(model)
+    if chestEsp[model] then return end
+
+    local hl = Instance.new("Highlight")
+    hl.Name = "ChestESP"
+    hl.FillColor = Color3.fromRGB(255, 215, 0) -- dourado
+    hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+    hl.FillTransparency = 0.25
+    hl.OutlineTransparency = 0
+    hl.Adornee = model
+    hl.Parent = model
+
+    chestEsp[model] = hl
+end
+
+local function removeChestESP()
+    for _,h in pairs(chestEsp) do
+        if h then h:Destroy() end
+    end
+    table.clear(chestEsp)
+end
+
+local function scanChests()
+    local chunks = workspace:FindFirstChild("Map")
+        and workspace.Map:FindFirstChild("Chunks")
+        and workspace.Map.Chunks:FindFirstChild("BikiniBottom")
+
+    if not chunks then return end
+
+    for _,chunk in ipairs(chunks:GetChildren()) do
+        local chestsFolder = chunk:FindFirstChild("Chests")
+        if chestsFolder then
+            for _,chest in ipairs(chestsFolder:GetChildren()) do
+                if chest:IsA("Model") and chest.Name:lower():find("chest") then
+                    addChestESP(chest)
+                end
+            end
+        end
+    end
+end
+
+-- BOTÃO
+newButton(espTab, "ESP Chest", function(btn)
+    espChestEnabled = not espChestEnabled
+    btn.Text = espChestEnabled and "ESP Chest: ON" or "ESP Chest"
+
+    if espChestEnabled then
+        removeChestESP()
+        scanChests()
+
+        chestLoop = task.spawn(function()
+            while espChestEnabled do
+                task.wait(0.6)
+
+                -- remove chests que sumiram
+                for model,hl in pairs(chestEsp) do
+                    if not model.Parent then
+                        hl:Destroy()
+                        chestEsp[model] = nil
+                    end
+                end
+
+                scanChests()
+            end
+        end)
+    else
+        removeChestESP()
+        if chestLoop then
+            task.cancel(chestLoop)
+            chestLoop = nil
+        end
+    end
+end)
+
+
+-- NOTIFICAÇÃO 
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Made By ZeeHub";
+    Text = "Script loaded";
+    Icon = "rbxassetid://6034509993";  -- ícone verde de sucesso
+    Duration = 16;
+    Button1 = "OK"
+})
+
+-- Somzinho de carregado (opcional, mas fica foda)
+task.spawn(function()
+    local s = Instance.new("Sound")
+    s.SoundId = "rbxassetid://3023237993"  -- som de "ding" perfeito
+    s.Volume = 0.4
+    s.Parent = game:GetService("SoundService")
+    s:Play()
+    task.delay(3, function() s:Destroy() end)
+end)
+
+print("[loaded]")
