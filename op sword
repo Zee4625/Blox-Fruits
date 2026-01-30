@@ -1,0 +1,48 @@
+-- =====================================================
+-- OP BLADE v1.3.0
+-- Made by beranitakut
+-- =====================================================
+
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+local player = Players.LocalPlayer
+
+getgenv().__OPB_CONTEXT = {
+    issuedAt = os.time(),
+    nonce = tostring(math.random(100000, 999999))
+}
+
+local function notify(title, text, duration)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = title,
+            Text = text,
+            Duration = duration or 5
+        })
+    end)
+end
+
+notify(
+    "OP Blade by beranitakut v1.3.0",
+    "Getting script from server...",
+    3
+)
+
+task.wait(1)
+
+local success, err = pcall(function()
+    loadstring(
+        game:HttpGet(
+            "https://beranitakut.vercel.app/api/opblade?t=" .. os.time()
+        )
+    )()
+end)
+
+if not success then
+    notify(
+        "OP Blade - Error",
+        "Failed to load script.",
+        8
+    )
+    warn("[OP Blade] Error:", err)
+end
