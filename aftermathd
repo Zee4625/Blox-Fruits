@@ -1,17 +1,402 @@
--- Adaugă după Win:TabSection("Visuals")
+Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vovabro46/trash/refs/heads/main/Aurora.lua"))()
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- ========== CONFIG ==========
+local ESP = {
+    Players = false,
+    Weapons = false,
+    StaticWeapons = false,
+    PlayerColor = Color3.fromRGB(255, 50, 50),
+    WeaponColor = Color3.fromRGB(0, 150, 255),
+    MaxDistance = 400,
+}
+
+local RARITY = {
+    ["BerettaM9"] = { color = Color3.fromRGB(255, 165, 0),   label = "BerettaM9 [Legendary]" },
+    ["SigSaur"]   = { color = Color3.fromRGB(255, 165, 0),   label = "SigSaur [Legendary]" },
+    ["Mp5"]       = { color = Color3.fromRGB(150, 0, 255),   label = "MP5 [Rare]" },
+    ["DEFAULT"]   = { color = Color3.fromRGB(200, 200, 200), label = "Weapon [Common]" },
+}
+
+local function getRarity(name)
+    for key, data in pairs(RARITY) do
+        if key ~= "DEFAULT" and name:find(key) then
+            return data
+        end
+    end
+    return RARITY["DEFAULT"]
+end
+
+local trackedPlayers = {}
+local trackedWeapons = {}
+
+-- ========== DRAWING HELPERS ==========
+
+local function newText()
+    local d = Drawing.new("Text")
+    d.Visible = false
+    d.Center = true
+    d.Outline = true
+    d.OutlineColor = Color3.fromRGB(0, 0, 0)
+    d.Size = 14
+    d.Font = Drawing.Fonts.GothamSemibold
+    return d
+end
+
+local function newBox()
+    local d = Drawing.new("Square")
+    d.Visible = false
+    d.Filled = false
+    d.Thickness = 1.5
+    return d
+end
+
+local function newLine()
+    local d = Drawing.new("Line")
+    d.Visible = false
+    d.Thickness = 1
+    return d
+end
+
+local function removeDrawings(tbl)
+    for _, d in pairs(tbl) do
+        pcall(function() d:Remove() end)
+    end
+end
+
+-- ========== WORLD TO SCREEN ==========
+
+local function worldToScreen(pos)
+    local sp, onScreen = camera:WorldToViewportPoint(pos)
+    return Vector2.new(sp.X, sp.Y), onScreen, sp.Z
+end
+
+-- Simple bounding box using just the root part (no lag)
+local function getSimpleBounds(root)
+    local size = root.Size
+    local cf = root.CFrame
+
+    local corners = {
+        cf * Vector3.new( size.X/2,  size.Y/2,  size.Z/2),
+        cf * Vector3.new(-size.X/2,  size.Y/2,  size.Z/2),
+        cf * Vector3.new( size.X/2, -size.Y/2,  size.Z/2),
+        cf * Vector3.new(-size.X/2, -size.Y/2,  size.Z/2),
+        cf * Vector3.new( size.X/2,  size.Y/2, -size.Z/2),
+        cf * Vector3.new(-size.X/2,  size.Y/2, -size.Z/2),
+        cf * Vector3.new( size.X/2, -size.Y/2, -size.Z/2),
+        cf * Vector3.new(-size.X/2, -size.Y/2, -size.Z/2),
+    }
+
+    local minX, minY = math.huge, math.huge
+    local maxX, maxY = -math.huge, -math.huge
+    local visible = false
+
+    for _, corner in ipairs(corners) do
+        local sp, onScreen = worldToScreen(corner)
+        if onScreen then
+            visible = true
+            if sp.X < minX then minX = sp.X end
+            if sp.Y < minY then minY = sp.Y end
+            if sp.X > maxX then maxX = sp.X end
+            if sp.Y > maxY then maxY = sp.Y end
+        end
+    end
+
+    if not visible then return nil end
+    return minX, minY, maxX, maxY
+end
+
+-- For players use HRP + head to estimate full body height
+local function getPlayerBounds(root, head)
+    local rootSP, onScreen = worldToScreen(root.Position)
+    if not onScreen then return nil end
+
+    local headSP, headOn = worldToScreen(head.Position + Vector3.new(0, 0.5, 0))
+    local feetSP, feetOn = worldToScreen(root.Position - Vector3.new(0, root.Size.Y * 1.5, 0))
+
+    if not headOn or not feetOn then return nil end
+
+    local height = math.abs(headSP.Y - feetSP.Y)
+    local width  = height * 0.5
+
+    local centerX = rootSP.X
+    local topY    = headSP.Y
+
+    return centerX - width/2, topY, centerX + width/2, topY + height
+end
+
+-- ========== HELPERS ==========
+
+local function getMyRoot()
+    local c = localPlayer.Character
+    return c and c:FindFirstChild("HumanoidRootPart")
+end
+
+local function distFrom(pos)
+    local r = getMyRoot()
+    if not r then return math.huge end
+    return (r.Position - pos).Magnitude
+end
+
+-- ========== PLAYER ESP ==========
+
+local function createPlayerESP(player)
+    if player == localPlayer or trackedPlayers[player] then return end
+    trackedPlayers[player] = {
+        box    = newBox(),
+        name   = newText(),
+        tracer = newLine(),
+    }
+end
+
+local function removePlayerESP(player)
+    if not trackedPlayers[player] then return end
+    removeDrawings(trackedPlayers[player])
+    trackedPlayers[player] = nil
+end
+
+local function updatePlayerESP(player, d)
+    local char = player.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    local head = char and char:FindFirstChild("Head")
+
+    if not root or not head then
+        d.box.Visible    = false
+        d.name.Visible   = false
+        d.tracer.Visible = false
+        return
+    end
+
+    local dist = distFrom(root.Position)
+    local show = ESP.Players and dist <= ESP.MaxDistance
+
+    if not show then
+        d.box.Visible    = false
+        d.name.Visible   = false
+        d.tracer.Visible = false
+        return
+    end
+
+    local minX, minY, maxX, maxY = getPlayerBounds(root, head)
+    if not minX then
+        d.box.Visible    = false
+        d.name.Visible   = false
+        d.tracer.Visible = false
+        return
+    end
+
+    local col = ESP.PlayerColor
+    local pad = 2
+
+    d.box.Visible   = true
+    d.box.Position  = Vector2.new(minX - pad, minY - pad)
+    d.box.Size      = Vector2.new((maxX - minX) + pad*2, (maxY - minY) + pad*2)
+    d.box.Color     = col
+
+    d.name.Visible  = true
+    d.name.Position = Vector2.new((minX + maxX) / 2, minY - 18)
+    d.name.Text     = player.Name .. "  [" .. math.floor(dist) .. "m]"
+    d.name.Color    = col
+
+    local vp = camera.ViewportSize
+    d.tracer.Visible = true
+    d.tracer.From    = Vector2.new(vp.X / 2, vp.Y)
+    d.tracer.To      = Vector2.new((minX + maxX) / 2, maxY)
+    d.tracer.Color   = col
+end
+
+-- ========== WEAPON ESP ==========
+
+local function isStaticWeapon(part)
+    if not part:IsA("MeshPart") then return false end
+    for _, c in ipairs(part:GetChildren()) do
+        if c:IsA("SurfaceAppearance") then return true end
+    end
+    return false
+end
+
+local function isHeldWeapon(part)
+    return part.Name == "Handle" and part.Material == Enum.Material.SmoothPlastic
+end
+
+local function createWeaponESP(part, rarity, static)
+    if trackedWeapons[part] then return end
+    local myChar = localPlayer.Character
+    if myChar and part:IsDescendantOf(myChar) then return end
+    trackedWeapons[part] = {
+        box      = newBox(),
+        label    = newText(),
+        rarity   = rarity,
+        isStatic = static,
+    }
+end
+
+local function removeWeaponESP(part)
+    if not trackedWeapons[part] then return end
+    removeDrawings({ trackedWeapons[part].box, trackedWeapons[part].label })
+    trackedWeapons[part] = nil
+end
+
+local function updateWeaponESP(part, d)
+    local myChar = localPlayer.Character
+    if myChar and part:IsDescendantOf(myChar) then
+        removeWeaponESP(part)
+        return
+    end
+
+    local toggled = (d.isStatic and ESP.StaticWeapons) or (not d.isStatic and ESP.Weapons)
+    local dist = distFrom(part.Position)
+    local show = toggled and dist <= ESP.MaxDistance
+
+    if not show then
+        d.box.Visible   = false
+        d.label.Visible = false
+        return
+    end
+
+    local minX, minY, maxX, maxY = getSimpleBounds(part)
+    if not minX then
+        d.box.Visible   = false
+        d.label.Visible = false
+        return
+    end
+
+    local col = d.rarity.color
+    local pad = 2
+
+    d.box.Visible  = true
+    d.box.Position = Vector2.new(minX - pad, minY - pad)
+    d.box.Size     = Vector2.new((maxX - minX) + pad*2, (maxY - minY) + pad*2)
+    d.box.Color    = col
+
+    d.label.Visible  = true
+    d.label.Position = Vector2.new((minX + maxX) / 2, minY - 18)
+    d.label.Text     = d.rarity.label .. "  [" .. math.floor(dist) .. "m]"
+    d.label.Color    = col
+end
+
+-- ========== SCAN (async, no lag) ==========
+
+local function checkPart(part)
+    if isStaticWeapon(part) then
+        createWeaponESP(part, getRarity(part.Name), true)
+    elseif isHeldWeapon(part) then
+        createWeaponESP(part, getRarity(part.Name), false)
+    end
+end
+
+-- Scan in chunks to avoid freeze on load
+task.spawn(function()
+    local descendants = workspace:GetDescendants()
+    for i, part in ipairs(descendants) do
+        pcall(checkPart, part)
+        if i % 200 == 0 then
+            task.wait()  -- yield every 200 parts, no freeze
+        end
+    end
+end)
+
+workspace.DescendantAdded:Connect(function(part)
+    task.wait(0.1)
+    pcall(checkPart, part)
+end)
+
+workspace.DescendantRemoving:Connect(function(part)
+    removeWeaponESP(part)
+end)
+
+for _, player in ipairs(Players:GetPlayers()) do
+    createPlayerESP(player)
+end
+
+Players.PlayerAdded:Connect(function(player)
+    task.wait(0.5)
+    createPlayerESP(player)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    removePlayerESP(player)
+end)
+
+-- ========== AURORA UI ==========
+
+local Win = Library:Window("ZeeHub", "crown", "ZeeHub ESP", false)
+
+Win:TabSection("Visuals")
+local VisualsTab = Win:Tab("Visuals", "eye")
+local EspPage    = VisualsTab:Page("ESP", "eye")
+local ColorsPage = VisualsTab:Page("Colors", "palette")
+
+local PlayersSection = EspPage:Section("Players", "Left")
+local WeaponsSection = EspPage:Section("Weapons", "Right")
+
+PlayersSection:Toggle("Player ESP", "EspPlayers", false, "Show ESP on players", function(state)
+    ESP.Players = state
+    if not state then
+        for _, d in pairs(trackedPlayers) do
+            d.box.Visible    = false
+            d.name.Visible   = false
+            d.tracer.Visible = false
+        end
+    end
+end)
+
+WeaponsSection:Toggle("Held Weapons", "EspWeapons", false, "ESP on held weapons", function(state)
+    ESP.Weapons = state
+end)
+
+WeaponsSection:Toggle("Ground Weapons", "EspStatic", false, "ESP on ground weapons", function(state)
+    ESP.StaticWeapons = state
+end)
+
+local PC = ColorsPage:Section("Player",  "Left")
+local WC = ColorsPage:Section("Weapons", "Right")
+
+PC:ColorPicker("Player Color", "ColPlayer", Color3.fromRGB(255, 50, 50), 0, function(col)
+    ESP.PlayerColor = col
+end, "Color for player ESP")
+
+WC:ColorPicker("Weapon Color", "ColWeapon", Color3.fromRGB(0, 150, 255), 0, function(col)
+    ESP.WeaponColor = col
+end, "Color for weapon ESP")
+
 Win:TabSection("Info")
-local InfoTab = Win:Tab("Info", "info")
+local InfoTab   = Win:Tab("Info", "info")
 local AboutPage = InfoTab:Page("About", "star")
 
-local AboutSection = AboutPage:Section("ZeeHub", "Left")
+local LS = AboutPage:Section("ZeeHub", "Left")
+local RS = AboutPage:Section("Notes",  "Right")
 
--- Logo ZeeHub (pune URL-ul real aici)
--- AboutSection:Image("LINK_LOGO_ZEEHUB") -- decomentează când ai linkul
+LS:Label("ZeeHub ESP Script")
+LS:Label("Version 1.0.0")
+LS:Paragraph("About", "Welcome to ZeeHub ESP.\nFull featured ESP script.", "Left")
+RS:Paragraph("Note", "Creamy Donut is yummy", "Right")
+RS:Paragraph("Features", "Player ESP\nWeapon ESP\nRarity System\nColor Pickers", "Right")
+RS:Paragraph("Rarity", "Common - White\nRare - Purple\nLegendary - Orange", "Right")
 
-AboutSection:Label("ZeeHub ESP Script")
-AboutSection:Paragraph("Note", "Creamy Donut is yummy 🍩", "Left")
-AboutSection:Paragraph("Credits", "Script made for ZeeHub\nAurora UI Library", "Left")
+-- ========== UPDATE LOOP ==========
 
-local RightSection = AboutPage:Section("Version", "Right")
-RightSection:Label("Version 1.0.0")
-RightSection:Paragraph("Features", "✅ Player ESP\n✅ Weapon ESP\n✅ Vehicle ESP\n✅ Rarity System\n✅ Color Pickers", "Right")
+local frame = 0
+RunService.Heartbeat:Connect(function()
+    frame = frame + 1
+    if frame % 3 ~= 0 then return end
+
+    for player, d in pairs(trackedPlayers) do
+        updatePlayerESP(player, d)
+    end
+
+    for part, d in pairs(trackedWeapons) do
+        if not part or not part.Parent then
+            removeWeaponESP(part)
+        else
+            updateWeaponESP(part, d)
+        end
+    end
+end)
+
+Library:Notification("ZeeHub", "ESP loaded! All OFF by default.", 5)
+Library:ConfigSystem(Win)
