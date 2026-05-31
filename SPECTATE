@@ -1,0 +1,592 @@
+-- SpectatorGUI.lua
+-- Place this script inside: StarterPlayer > StarterPlayerScripts (as a LocalScript)
+
+local Players         = game:GetService("Players")
+local RunService      = game:GetService("RunService")
+local Stats           = game:GetService("Stats")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui   = LocalPlayer:WaitForChild("PlayerGui")
+local Camera      = workspace.CurrentCamera
+
+-- ============================================================
+-- COLORS
+-- ============================================================
+local NEON_GREEN      = Color3.fromRGB(0, 255, 100)
+local NEON_GREEN_DIM  = Color3.fromRGB(0, 180, 70)
+local NEON_GREEN_DARK = Color3.fromRGB(0, 60, 25)
+local BG_MAIN         = Color3.fromRGB(8, 12, 10)
+local BG_PANEL        = Color3.fromRGB(12, 20, 15)
+local BG_ROW          = Color3.fromRGB(14, 24, 18)
+local BG_ROW_HOVER    = Color3.fromRGB(20, 38, 27)
+local RED_NEON        = Color3.fromRGB(255, 45, 45)
+local TEXT_DIM        = Color3.fromRGB(100, 200, 140)
+
+-- ============================================================
+-- STATE
+-- ============================================================
+local spectatingTarget = nil
+local isSpectating     = false
+
+-- ============================================================
+-- SCREEN GUI
+-- ============================================================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name            = "SpectatorGUI"
+ScreenGui.ResetOnSpawn    = false
+ScreenGui.ZIndexBehavior  = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent          = PlayerGui
+
+-- ============================================================
+-- MAIN FRAME
+-- ============================================================
+local MainFrame = Instance.new("Frame")
+MainFrame.Name              = "MainFrame"
+MainFrame.Size              = UDim2.new(0, 270, 0, 400)
+MainFrame.Position          = UDim2.new(0, 20, 0.5, -200)
+MainFrame.BackgroundColor3  = BG_MAIN
+MainFrame.BorderSizePixel   = 0
+MainFrame.Active            = true
+MainFrame.Draggable         = true
+MainFrame.Parent            = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainFrame
+
+-- Outer neon glow stroke
+local OuterStroke = Instance.new("UIStroke")
+OuterStroke.Color     = NEON_GREEN
+OuterStroke.Thickness = 1.8
+OuterStroke.Parent    = MainFrame
+
+-- ============================================================
+-- TITLE BAR
+-- ============================================================
+local TitleBar = Instance.new("Frame")
+TitleBar.Name             = "TitleBar"
+TitleBar.Size             = UDim2.new(1, 0, 0, 40)
+TitleBar.BackgroundColor3 = BG_PANEL
+TitleBar.BorderSizePixel  = 0
+TitleBar.ZIndex           = 2
+TitleBar.Parent           = MainFrame
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 10)
+TitleCorner.Parent = TitleBar
+
+-- fix bottom corners
+local TitleFix = Instance.new("Frame")
+TitleFix.Size             = UDim2.new(1, 0, 0.5, 0)
+TitleFix.Position         = UDim2.new(0, 0, 0.5, 0)
+TitleFix.BackgroundColor3 = BG_PANEL
+TitleFix.BorderSizePixel  = 0
+TitleFix.ZIndex           = 2
+TitleFix.Parent           = TitleBar
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size               = UDim2.new(1, -90, 1, 0)
+TitleLabel.Position           = UDim2.new(0, 12, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text               = "SPECTATOR"
+TitleLabel.TextColor3         = NEON_GREEN
+TitleLabel.TextSize           = 15
+TitleLabel.Font               = Enum.Font.GothamBold
+TitleLabel.TextXAlignment     = Enum.TextXAlignment.Left
+TitleLabel.ZIndex             = 3
+TitleLabel.Parent             = TitleBar
+
+-- neon line under title
+local TitleLine = Instance.new("Frame")
+TitleLine.Size            = UDim2.new(1, 0, 0, 1)
+TitleLine.Position        = UDim2.new(0, 0, 1, -1)
+TitleLine.BackgroundColor3 = NEON_GREEN
+TitleLine.BorderSizePixel = 0
+TitleLine.ZIndex          = 3
+TitleLine.Parent          = TitleBar
+
+-- Close Button
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Name             = "CloseBtn"
+CloseBtn.Size             = UDim2.new(0, 28, 0, 28)
+CloseBtn.Position         = UDim2.new(1, -34, 0.5, -14)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(30, 8, 8)
+CloseBtn.Text             = "X"
+CloseBtn.TextColor3       = RED_NEON
+CloseBtn.TextSize         = 13
+CloseBtn.Font             = Enum.Font.GothamBold
+CloseBtn.BorderSizePixel  = 0
+CloseBtn.ZIndex           = 4
+CloseBtn.Parent           = TitleBar
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseBtn
+
+local CloseStroke = Instance.new("UIStroke")
+CloseStroke.Color     = RED_NEON
+CloseStroke.Thickness = 1.2
+CloseStroke.Parent    = CloseBtn
+
+-- ============================================================
+-- STATUS BAR
+-- ============================================================
+local StatusBar = Instance.new("Frame")
+StatusBar.Size            = UDim2.new(1, -16, 0, 28)
+StatusBar.Position        = UDim2.new(0, 8, 0, 46)
+StatusBar.BackgroundColor3 = NEON_GREEN_DARK
+StatusBar.BorderSizePixel = 0
+StatusBar.Parent          = MainFrame
+
+local StatusBarCorner = Instance.new("UICorner")
+StatusBarCorner.CornerRadius = UDim.new(0, 6)
+StatusBarCorner.Parent = StatusBar
+
+local StatusStroke = Instance.new("UIStroke")
+StatusStroke.Color     = NEON_GREEN_DIM
+StatusStroke.Thickness = 1
+StatusStroke.Parent    = StatusBar
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Name              = "StatusLabel"
+StatusLabel.Size              = UDim2.new(1, -8, 1, 0)
+StatusLabel.Position          = UDim2.new(0, 8, 0, 0)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text              = "Not spectating anyone"
+StatusLabel.TextColor3        = NEON_GREEN
+StatusLabel.TextSize          = 12
+StatusLabel.Font               = Enum.Font.Gotham
+StatusLabel.TextXAlignment    = Enum.TextXAlignment.Left
+StatusLabel.TextTruncate      = Enum.TextTruncate.AtEnd
+StatusLabel.Parent            = StatusBar
+
+-- ============================================================
+-- STATS PANEL (FPS / PING / IP)
+-- ============================================================
+local StatsPanel = Instance.new("Frame")
+StatsPanel.Name             = "StatsPanel"
+StatsPanel.Size             = UDim2.new(1, -16, 0, 54)
+StatsPanel.Position         = UDim2.new(0, 8, 0, 80)
+StatsPanel.BackgroundColor3 = BG_PANEL
+StatsPanel.BorderSizePixel  = 0
+StatsPanel.Visible          = false
+StatsPanel.Parent           = MainFrame
+
+local StatsPanelCorner = Instance.new("UICorner")
+StatsPanelCorner.CornerRadius = UDim.new(0, 8)
+StatsPanelCorner.Parent = StatsPanel
+
+local StatsPanelStroke = Instance.new("UIStroke")
+StatsPanelStroke.Color     = NEON_GREEN
+StatsPanelStroke.Thickness = 1.2
+StatsPanelStroke.Parent    = StatsPanel
+
+-- Helper: create a stat block
+local function makeStatBlock(parent, posX, label)
+	local block = Instance.new("Frame")
+	block.Size             = UDim2.new(0, 72, 1, -10)
+	block.Position         = UDim2.new(0, posX, 0, 5)
+	block.BackgroundColor3 = NEON_GREEN_DARK
+	block.BorderSizePixel  = 0
+	block.Parent           = parent
+
+	local bc = Instance.new("UICorner")
+	bc.CornerRadius = UDim.new(0, 5)
+	bc.Parent = block
+
+	local bs = Instance.new("UIStroke")
+	bs.Color     = NEON_GREEN_DIM
+	bs.Thickness = 1
+	bs.Parent    = block
+
+	local lbl = Instance.new("TextLabel")
+	lbl.Size              = UDim2.new(1, 0, 0.48, 0)
+	lbl.Position          = UDim2.new(0, 0, 0, 0)
+	lbl.BackgroundTransparency = 1
+	lbl.Text              = label
+	lbl.TextColor3        = TEXT_DIM
+	lbl.TextSize          = 10
+	lbl.Font               = Enum.Font.GothamBold
+	lbl.TextXAlignment    = Enum.TextXAlignment.Center
+	lbl.Parent            = block
+
+	local val = Instance.new("TextLabel")
+	val.Name              = "Value"
+	val.Size              = UDim2.new(1, 0, 0.52, 0)
+	val.Position          = UDim2.new(0, 0, 0.48, 0)
+	val.BackgroundTransparency = 1
+	val.Text              = "--"
+	val.TextColor3        = NEON_GREEN
+	val.TextSize          = 13
+	val.Font               = Enum.Font.GothamBold
+	val.TextXAlignment    = Enum.TextXAlignment.Center
+	val.Parent            = block
+
+	return val
+end
+
+local FPSValue  = makeStatBlock(StatsPanel, 6,   "FPS")
+local PingValue = makeStatBlock(StatsPanel, 84,  "PING")
+local IPValue   = makeStatBlock(StatsPanel, 162, "IP")
+
+-- IP label is wider
+IPValue.Parent.Size = UDim2.new(0, 72, 1, -10)
+IPValue.TextSize = 9
+
+-- ============================================================
+-- DIVIDER
+-- ============================================================
+local Divider = Instance.new("Frame")
+Divider.Name              = "Divider"
+Divider.Size              = UDim2.new(1, -16, 0, 1)
+Divider.Position          = UDim2.new(0, 8, 0, 140)
+Divider.BackgroundColor3  = NEON_GREEN_DIM
+Divider.BorderSizePixel   = 0
+Divider.Parent            = MainFrame
+
+local PlayersTitle = Instance.new("TextLabel")
+PlayersTitle.Size              = UDim2.new(1, -16, 0, 18)
+PlayersTitle.Position          = UDim2.new(0, 8, 0, 144)
+PlayersTitle.BackgroundTransparency = 1
+PlayersTitle.Text              = "PLAYERS IN SERVER"
+PlayersTitle.TextColor3        = NEON_GREEN_DIM
+PlayersTitle.TextSize          = 10
+PlayersTitle.Font               = Enum.Font.GothamBold
+PlayersTitle.TextXAlignment    = Enum.TextXAlignment.Left
+PlayersTitle.Parent            = MainFrame
+
+-- ============================================================
+-- SCROLL LIST
+-- ============================================================
+local ScrollFrame = Instance.new("ScrollingFrame")
+ScrollFrame.Name               = "ScrollFrame"
+ScrollFrame.Size               = UDim2.new(1, -16, 0, 175)
+ScrollFrame.Position           = UDim2.new(0, 8, 0, 164)
+ScrollFrame.BackgroundTransparency = 1
+ScrollFrame.BorderSizePixel    = 0
+ScrollFrame.ScrollBarThickness = 3
+ScrollFrame.ScrollBarImageColor3 = NEON_GREEN
+ScrollFrame.CanvasSize         = UDim2.new(0, 0, 0, 0)
+ScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ScrollFrame.Parent             = MainFrame
+
+local ListLayout = Instance.new("UIListLayout")
+ListLayout.SortOrder = Enum.SortOrder.Name
+ListLayout.Padding   = UDim.new(0, 4)
+ListLayout.Parent    = ScrollFrame
+
+-- ============================================================
+-- STOP SPECTATE BUTTON
+-- ============================================================
+local StopBtn = Instance.new("TextButton")
+StopBtn.Name             = "StopBtn"
+StopBtn.Size             = UDim2.new(1, -16, 0, 36)
+StopBtn.Position         = UDim2.new(0, 8, 1, -44)
+StopBtn.BackgroundColor3 = Color3.fromRGB(20, 6, 6)
+StopBtn.Text             = "STOP SPECTATE"
+StopBtn.TextColor3       = RED_NEON
+StopBtn.TextSize         = 13
+StopBtn.Font              = Enum.Font.GothamBold
+StopBtn.BorderSizePixel  = 0
+StopBtn.Visible          = false
+StopBtn.Parent           = MainFrame
+
+local StopCorner = Instance.new("UICorner")
+StopCorner.CornerRadius = UDim.new(0, 8)
+StopCorner.Parent = StopBtn
+
+local StopStroke = Instance.new("UIStroke")
+StopStroke.Color     = RED_NEON
+StopStroke.Thickness = 1.5
+StopStroke.Parent    = StopBtn
+
+-- ============================================================
+-- LOGIC: STOP SPECTATE
+-- ============================================================
+local function stopSpectate()
+	isSpectating    = false
+	spectatingTarget = nil
+
+	Camera.CameraType    = Enum.CameraType.Custom
+	Camera.CameraSubject = LocalPlayer.Character
+		and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+		or nil
+
+	StatusLabel.Text     = "Not spectating anyone"
+	StopBtn.Visible      = false
+	StatsPanel.Visible   = false
+
+	-- Reset stats
+	FPSValue.Text  = "--"
+	PingValue.Text = "--"
+	IPValue.Text   = "--"
+
+	-- Reset divider / scroll size
+	Divider.Position      = UDim2.new(0, 8, 0, 140)
+	PlayersTitle.Position = UDim2.new(0, 8, 0, 144)
+	ScrollFrame.Position  = UDim2.new(0, 8, 0, 164)
+	MainFrame.Size        = UDim2.new(0, 270, 0, 400)
+end
+
+-- ============================================================
+-- LOGIC: SPECTATE PLAYER
+-- ============================================================
+local function spectatePlayer(targetPlayer)
+	if targetPlayer == LocalPlayer then return end
+
+	local character = targetPlayer.Character
+	if not character then
+		StatusLabel.Text = "Player has no character"
+		return
+	end
+
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then
+		StatusLabel.Text = "Invalid character"
+		return
+	end
+
+	isSpectating     = true
+	spectatingTarget = targetPlayer
+
+	Camera.CameraType    = Enum.CameraType.Custom
+	Camera.CameraSubject = humanoid
+
+	StatusLabel.Text   = "Spectating: " .. targetPlayer.Name
+	StopBtn.Visible    = true
+	StatsPanel.Visible = true
+
+	-- Expand frame to show stats
+	Divider.Position      = UDim2.new(0, 8, 0, 200)
+	PlayersTitle.Position = UDim2.new(0, 8, 0, 204)
+	ScrollFrame.Position  = UDim2.new(0, 8, 0, 224)
+	MainFrame.Size        = UDim2.new(0, 270, 0, 460)
+end
+
+-- ============================================================
+-- PLAYER BUTTONS
+-- ============================================================
+local function createPlayerButton(player)
+	if player == LocalPlayer then return end
+
+	local Btn = Instance.new("TextButton")
+	Btn.Name             = player.Name
+	Btn.Size             = UDim2.new(1, 0, 0, 38)
+	Btn.BackgroundColor3 = BG_ROW
+	Btn.Text             = ""
+	Btn.BorderSizePixel  = 0
+	Btn.Parent           = ScrollFrame
+
+	local BtnCorner = Instance.new("UICorner")
+	BtnCorner.CornerRadius = UDim.new(0, 7)
+	BtnCorner.Parent = Btn
+
+	local BtnStroke = Instance.new("UIStroke")
+	BtnStroke.Color     = NEON_GREEN_DIM
+	BtnStroke.Thickness = 1
+	BtnStroke.Parent    = Btn
+
+	-- Player name label
+	local NameLbl = Instance.new("TextLabel")
+	NameLbl.Size              = UDim2.new(1, -80, 1, 0)
+	NameLbl.Position          = UDim2.new(0, 10, 0, 0)
+	NameLbl.BackgroundTransparency = 1
+	NameLbl.Text              = player.Name
+	NameLbl.TextColor3        = NEON_GREEN
+	NameLbl.TextSize          = 13
+	NameLbl.Font               = Enum.Font.Gotham
+	NameLbl.TextXAlignment    = Enum.TextXAlignment.Left
+	NameLbl.TextTruncate      = Enum.TextTruncate.AtEnd
+	NameLbl.Parent            = Btn
+
+	-- Spectate pill label
+	local SpectPill = Instance.new("Frame")
+	SpectPill.Size            = UDim2.new(0, 66, 0, 22)
+	SpectPill.Position        = UDim2.new(1, -72, 0.5, -11)
+	SpectPill.BackgroundColor3 = NEON_GREEN_DARK
+	SpectPill.BorderSizePixel = 0
+	SpectPill.Parent          = Btn
+
+	local SpectCorner = Instance.new("UICorner")
+	SpectCorner.CornerRadius = UDim.new(0, 5)
+	SpectCorner.Parent = SpectPill
+
+	local SpectStroke = Instance.new("UIStroke")
+	SpectStroke.Color     = NEON_GREEN
+	SpectStroke.Thickness = 1
+	SpectStroke.Parent    = SpectPill
+
+	local SpectLbl = Instance.new("TextLabel")
+	SpectLbl.Size              = UDim2.new(1, 0, 1, 0)
+	SpectLbl.BackgroundTransparency = 1
+	SpectLbl.Text              = "SPECTATE"
+	SpectLbl.TextColor3        = NEON_GREEN
+	SpectLbl.TextSize          = 10
+	SpectLbl.Font               = Enum.Font.GothamBold
+	SpectLbl.TextXAlignment    = Enum.TextXAlignment.Center
+	SpectLbl.Parent            = SpectPill
+
+	Btn.MouseEnter:Connect(function()
+		Btn.BackgroundColor3 = BG_ROW_HOVER
+		BtnStroke.Color      = NEON_GREEN
+	end)
+
+	Btn.MouseLeave:Connect(function()
+		Btn.BackgroundColor3 = BG_ROW
+		BtnStroke.Color      = NEON_GREEN_DIM
+	end)
+
+	Btn.MouseButton1Click:Connect(function()
+		spectatePlayer(player)
+	end)
+
+	return Btn
+end
+
+local function removePlayerButton(playerName)
+	local btn = ScrollFrame:FindFirstChild(playerName)
+	if btn then btn:Destroy() end
+	if spectatingTarget and spectatingTarget.Name == playerName then
+		stopSpectate()
+	end
+end
+
+local function refreshPlayerList()
+	for _, child in ipairs(ScrollFrame:GetChildren()) do
+		if child:IsA("TextButton") then child:Destroy() end
+	end
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer then
+			createPlayerButton(player)
+		end
+	end
+end
+
+-- ============================================================
+-- STATS UPDATE LOOP
+-- ============================================================
+local fpsBuffer    = {}
+local fpsBufferMax = 20
+local lastTime     = tick()
+
+RunService.RenderStepped:Connect(function()
+	-- FPS calculation (rolling average)
+	local now  = tick()
+	local delta = now - lastTime
+	lastTime   = now
+	if delta > 0 then
+		table.insert(fpsBuffer, 1 / delta)
+		if #fpsBuffer > fpsBufferMax then
+			table.remove(fpsBuffer, 1)
+		end
+	end
+
+	-- Spectate camera update
+	if isSpectating and spectatingTarget then
+		local char = spectatingTarget.Character
+		if char then
+			local humanoid = char:FindFirstChildOfClass("Humanoid")
+			if humanoid and Camera.CameraSubject ~= humanoid then
+				Camera.CameraSubject = humanoid
+			end
+		else
+			stopSpectate()
+		end
+	end
+end)
+
+-- Stats label update every 0.5s
+local statTimer = 0
+RunService.Heartbeat:Connect(function(dt)
+	statTimer = statTimer + dt
+	if statTimer < 0.5 then return end
+	statTimer = 0
+
+	if not isSpectating or not spectatingTarget then return end
+
+	-- FPS
+	if #fpsBuffer > 0 then
+		local sum = 0
+		for _, v in ipairs(fpsBuffer) do sum = sum + v end
+		local avg = math.floor(sum / #fpsBuffer)
+		FPSValue.Text = tostring(avg)
+		-- color by fps range
+		if avg >= 55 then
+			FPSValue.TextColor3 = NEON_GREEN
+		elseif avg >= 30 then
+			FPSValue.TextColor3 = Color3.fromRGB(200, 220, 0)
+		else
+			FPSValue.TextColor3 = RED_NEON
+		end
+	end
+
+	-- Ping (of local player only - Roblox does not expose other players' ping)
+	local ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+	PingValue.Text = ping .. " ms"
+	if ping < 80 then
+		PingValue.TextColor3 = NEON_GREEN
+	elseif ping < 150 then
+		PingValue.TextColor3 = Color3.fromRGB(200, 220, 0)
+	else
+		PingValue.TextColor3 = RED_NEON
+	end
+
+	-- IP: Roblox does not expose player IPs to LocalScripts for privacy/security reasons.
+	-- This displays the JobId (server instance ID) as the closest available identifier.
+	local jobId = game.JobId
+	if jobId and #jobId > 0 then
+		IPValue.Text = string.sub(jobId, 1, 10) .. "..."
+	else
+		IPValue.Text = "Studio"
+	end
+end)
+
+-- ============================================================
+-- BUTTON EVENTS
+-- ============================================================
+StopBtn.MouseButton1Click:Connect(stopSpectate)
+
+StopBtn.MouseEnter:Connect(function()
+	StopBtn.BackgroundColor3 = Color3.fromRGB(35, 10, 10)
+end)
+StopBtn.MouseLeave:Connect(function()
+	StopBtn.BackgroundColor3 = Color3.fromRGB(20, 6, 6)
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+	if isSpectating then stopSpectate() end
+	ScreenGui.Enabled = false
+end)
+
+CloseBtn.MouseEnter:Connect(function()
+	CloseBtn.BackgroundColor3 = Color3.fromRGB(50, 12, 12)
+end)
+CloseBtn.MouseLeave:Connect(function()
+	CloseBtn.BackgroundColor3 = Color3.fromRGB(30, 8, 8)
+end)
+
+-- ============================================================
+-- PLAYER EVENTS
+-- ============================================================
+Players.PlayerAdded:Connect(function(player)
+	createPlayerButton(player)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	removePlayerButton(player.Name)
+end)
+
+-- ============================================================
+-- INIT
+-- ============================================================
+refreshPlayerList()
+print("[SpectatorGUI] Loaded successfully!")
+
+-- ============================================================
+-- NOTE ABOUT IP:
+-- Roblox's security model does NOT allow LocalScripts to read
+-- other players' real IP addresses. The "IP" field above shows
+-- the Server Job ID as an alternative unique server identifier.
+-- This is intentional and cannot be bypassed in a standard game.
+-- ============================================================
