@@ -1,10 +1,17 @@
--- SpectatorGUI.lua
--- Place this script inside: StarterPlayer > StarterPlayerScripts (as a LocalScript)
+-- ============================================================
+--  SpectatorGUI.lua  |  Full Edition
+--  Place inside: StarterPlayer > StarterPlayerScripts (LocalScript)
+-- ============================================================
 
-local Players         = game:GetService("Players")
-local RunService      = game:GetService("RunService")
-local Stats           = game:GetService("Stats")
-local UserInputService = game:GetService("UserInputService")
+local Players           = game:GetService("Players")
+local RunService        = game:GetService("RunService")
+local Stats             = game:GetService("Stats")
+local UserInputService  = game:GetService("UserInputService")
+local TweenService      = game:GetService("TweenService")
+local TextService       = game:GetService("TextService")
+local LocalizationService = game:GetService("LocalizationService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local HttpService       = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui   = LocalPlayer:WaitForChild("PlayerGui")
@@ -13,355 +20,884 @@ local Camera      = workspace.CurrentCamera
 -- ============================================================
 -- COLORS
 -- ============================================================
-local NEON_GREEN      = Color3.fromRGB(0, 255, 100)
-local NEON_GREEN_DIM  = Color3.fromRGB(0, 180, 70)
-local NEON_GREEN_DARK = Color3.fromRGB(0, 60, 25)
-local BG_MAIN         = Color3.fromRGB(8, 12, 10)
-local BG_PANEL        = Color3.fromRGB(12, 20, 15)
-local BG_ROW          = Color3.fromRGB(14, 24, 18)
-local BG_ROW_HOVER    = Color3.fromRGB(20, 38, 27)
-local RED_NEON        = Color3.fromRGB(255, 45, 45)
-local TEXT_DIM        = Color3.fromRGB(100, 200, 140)
+local C = {
+	NEON        = Color3.fromRGB(0, 255, 100),
+	NEON_DIM    = Color3.fromRGB(0, 160, 65),
+	NEON_DARK   = Color3.fromRGB(0, 45, 20),
+	BG          = Color3.fromRGB(7, 11, 9),
+	BG_PANEL    = Color3.fromRGB(11, 18, 14),
+	BG_ROW      = Color3.fromRGB(13, 22, 16),
+	BG_ROW_H    = Color3.fromRGB(18, 36, 24),
+	RED         = Color3.fromRGB(255, 50, 50),
+	RED_DARK    = Color3.fromRGB(25, 6, 6),
+	YELLOW      = Color3.fromRGB(220, 200, 0),
+	WHITE       = Color3.fromRGB(230, 255, 240),
+	MUTED       = Color3.fromRGB(90, 180, 120),
+	TAB_SEL     = Color3.fromRGB(0, 255, 100),
+	TAB_UNSEL   = Color3.fromRGB(50, 80, 60),
+}
 
 -- ============================================================
 -- STATE
 -- ============================================================
-local spectatingTarget = nil
-local isSpectating     = false
+local spectatingTarget  = nil
+local isSpectating      = false
+local currentTab        = "players"
+local fpsBuffer         = {}
+local fpsBufferMax      = 30
+local lastFrameTime     = tick()
+local statTimer         = 0
+local refreshTimer      = 0
+local cachedInfo        = {}   -- per player cache
+local notifQueue        = {}
 
 -- ============================================================
 -- SCREEN GUI
 -- ============================================================
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name            = "SpectatorGUI"
-ScreenGui.ResetOnSpawn    = false
-ScreenGui.ZIndexBehavior  = Enum.ZIndexBehavior.Sibling
-ScreenGui.Parent          = PlayerGui
+ScreenGui.Name           = "SpectatorGUI"
+ScreenGui.ResetOnSpawn   = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.DisplayOrder   = 100
+ScreenGui.Parent         = PlayerGui
 
 -- ============================================================
--- MAIN FRAME
+-- HELPERS
+-- ============================================================
+local function addCorner(parent, radius)
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, radius or 8)
+	c.Parent = parent
+	return c
+end
+
+local function addStroke(parent, color, thickness)
+	local s = Instance.new("UIStroke")
+	s.Color     = color or C.NEON
+	s.Thickness = thickness or 1.5
+	s.Parent    = parent
+	return s
+end
+
+local function addPadding(parent, l, r, t, b)
+	local p = Instance.new("UIPadding")
+	p.PaddingLeft   = UDim.new(0, l or 0)
+	p.PaddingRight  = UDim.new(0, r or 0)
+	p.PaddingTop    = UDim.new(0, t or 0)
+	p.PaddingBottom = UDim.new(0, b or 0)
+	p.Parent = parent
+	return p
+end
+
+local function makeLabel(parent, text, size, color, font, xalign)
+	local l = Instance.new("TextLabel")
+	l.Size               = UDim2.new(1, 0, 1, 0)
+	l.BackgroundTransparency = 1
+	l.Text               = text or ""
+	l.TextColor3         = color or C.WHITE
+	l.TextSize           = size or 13
+	l.Font               = font or Enum.Font.Gotham
+	l.TextXAlignment     = xalign or Enum.TextXAlignment.Left
+	l.TextTruncate       = Enum.TextTruncate.AtEnd
+	l.Parent             = parent
+	return l
+end
+
+local function tween(obj, props, t)
+	TweenService:Create(obj, TweenInfo.new(t or 0.15, Enum.EasingStyle.Quad), props):Play()
+end
+
+-- ============================================================
+-- NOTIFICATION SYSTEM
+-- ============================================================
+local NotifHolder = Instance.new("Frame")
+NotifHolder.Size             = UDim2.new(0, 260, 0, 200)
+NotifHolder.Position         = UDim2.new(1, -270, 1, -210)
+NotifHolder.BackgroundTransparency = 1
+NotifHolder.Parent           = ScreenGui
+
+local NotifLayout = Instance.new("UIListLayout")
+NotifLayout.SortOrder   = Enum.SortOrder.LayoutOrder
+NotifLayout.Padding     = UDim.new(0, 4)
+NotifLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+NotifLayout.Parent      = NotifHolder
+
+local function showNotif(msg, isError)
+	local f = Instance.new("Frame")
+	f.Size             = UDim2.new(1, 0, 0, 36)
+	f.BackgroundColor3 = C.BG_PANEL
+	f.BorderSizePixel  = 0
+	f.BackgroundTransparency = 1
+	f.Parent           = NotifHolder
+
+	addCorner(f, 7)
+	addStroke(f, isError and C.RED or C.NEON, 1.2)
+
+	local lbl = makeLabel(f, msg, 12, isError and C.RED or C.NEON)
+	addPadding(lbl, 10, 10, 0, 0)
+	lbl.Size = UDim2.new(1, 0, 1, 0)
+
+	tween(f, {BackgroundTransparency = 0}, 0.2)
+	task.delay(3, function()
+		tween(f, {BackgroundTransparency = 1}, 0.3)
+		task.wait(0.35)
+		f:Destroy()
+	end)
+end
+
+-- ============================================================
+-- MAIN FRAME  (560 x 420)
 -- ============================================================
 local MainFrame = Instance.new("Frame")
-MainFrame.Name              = "MainFrame"
-MainFrame.Size              = UDim2.new(0, 270, 0, 400)
-MainFrame.Position          = UDim2.new(0, 20, 0.5, -200)
-MainFrame.BackgroundColor3  = BG_MAIN
-MainFrame.BorderSizePixel   = 0
-MainFrame.Active            = true
-MainFrame.Draggable         = true
-MainFrame.Parent            = ScreenGui
+MainFrame.Name             = "MainFrame"
+MainFrame.Size             = UDim2.new(0, 560, 0, 420)
+MainFrame.Position         = UDim2.new(0.5, -280, 0.5, -210)
+MainFrame.BackgroundColor3 = C.BG
+MainFrame.BorderSizePixel  = 0
+MainFrame.Active           = true
+MainFrame.Draggable        = true
+MainFrame.Parent           = ScreenGui
 
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 10)
-MainCorner.Parent = MainFrame
-
--- Outer neon glow stroke
-local OuterStroke = Instance.new("UIStroke")
-OuterStroke.Color     = NEON_GREEN
-OuterStroke.Thickness = 1.8
-OuterStroke.Parent    = MainFrame
+addCorner(MainFrame, 12)
+addStroke(MainFrame, C.NEON, 1.8)
 
 -- ============================================================
 -- TITLE BAR
 -- ============================================================
 local TitleBar = Instance.new("Frame")
-TitleBar.Name             = "TitleBar"
-TitleBar.Size             = UDim2.new(1, 0, 0, 40)
-TitleBar.BackgroundColor3 = BG_PANEL
+TitleBar.Size             = UDim2.new(1, 0, 0, 42)
+TitleBar.BackgroundColor3 = C.BG_PANEL
 TitleBar.BorderSizePixel  = 0
 TitleBar.ZIndex           = 2
 TitleBar.Parent           = MainFrame
 
-local TitleCorner = Instance.new("UICorner")
-TitleCorner.CornerRadius = UDim.new(0, 10)
-TitleCorner.Parent = TitleBar
+addCorner(TitleBar, 12)
 
--- fix bottom corners
-local TitleFix = Instance.new("Frame")
-TitleFix.Size             = UDim2.new(1, 0, 0.5, 0)
-TitleFix.Position         = UDim2.new(0, 0, 0.5, 0)
-TitleFix.BackgroundColor3 = BG_PANEL
-TitleFix.BorderSizePixel  = 0
-TitleFix.ZIndex           = 2
-TitleFix.Parent           = TitleBar
+-- Fix bottom rounded corners of title bar
+local TFix = Instance.new("Frame")
+TFix.Size = UDim2.new(1, 0, 0.5, 0)
+TFix.Position = UDim2.new(0, 0, 0.5, 0)
+TFix.BackgroundColor3 = C.BG_PANEL
+TFix.BorderSizePixel = 0
+TFix.ZIndex = 2
+TFix.Parent = TitleBar
 
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Size               = UDim2.new(1, -90, 1, 0)
-TitleLabel.Position           = UDim2.new(0, 12, 0, 0)
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Text               = "SPECTATOR"
-TitleLabel.TextColor3         = NEON_GREEN
-TitleLabel.TextSize           = 15
-TitleLabel.Font               = Enum.Font.GothamBold
-TitleLabel.TextXAlignment     = Enum.TextXAlignment.Left
-TitleLabel.ZIndex             = 3
-TitleLabel.Parent             = TitleBar
+-- Neon bottom line
+local TLine = Instance.new("Frame")
+TLine.Size = UDim2.new(1, 0, 0, 1)
+TLine.Position = UDim2.new(0, 0, 1, -1)
+TLine.BackgroundColor3 = C.NEON
+TLine.BorderSizePixel = 0
+TLine.ZIndex = 3
+TLine.Parent = TitleBar
 
--- neon line under title
-local TitleLine = Instance.new("Frame")
-TitleLine.Size            = UDim2.new(1, 0, 0, 1)
-TitleLine.Position        = UDim2.new(0, 0, 1, -1)
-TitleLine.BackgroundColor3 = NEON_GREEN
-TitleLine.BorderSizePixel = 0
-TitleLine.ZIndex          = 3
-TitleLine.Parent          = TitleBar
+local TitleLbl = Instance.new("TextLabel")
+TitleLbl.Size = UDim2.new(1, -140, 1, 0)
+TitleLbl.Position = UDim2.new(0, 14, 0, 0)
+TitleLbl.BackgroundTransparency = 1
+TitleLbl.Text = "SPECTATOR  //  FULL EDITION"
+TitleLbl.TextColor3 = C.NEON
+TitleLbl.TextSize = 13
+TitleLbl.Font = Enum.Font.GothamBold
+TitleLbl.TextXAlignment = Enum.TextXAlignment.Left
+TitleLbl.ZIndex = 3
+TitleLbl.Parent = TitleBar
 
--- Close Button
+-- Server player count badge
+local CountBadge = Instance.new("Frame")
+CountBadge.Size = UDim2.new(0, 70, 0, 22)
+CountBadge.Position = UDim2.new(1, -110, 0.5, -11)
+CountBadge.BackgroundColor3 = C.NEON_DARK
+CountBadge.BorderSizePixel = 0
+CountBadge.ZIndex = 3
+CountBadge.Parent = TitleBar
+addCorner(CountBadge, 5)
+addStroke(CountBadge, C.NEON_DIM, 1)
+
+local CountLbl = Instance.new("TextLabel")
+CountLbl.Size = UDim2.new(1, 0, 1, 0)
+CountLbl.BackgroundTransparency = 1
+CountLbl.Text = "0 / 0"
+CountLbl.TextColor3 = C.NEON
+CountLbl.TextSize = 11
+CountLbl.Font = Enum.Font.GothamBold
+CountLbl.TextXAlignment = Enum.TextXAlignment.Center
+CountLbl.ZIndex = 4
+CountLbl.Parent = CountBadge
+
+-- Minimize button
+local MinBtn = Instance.new("TextButton")
+MinBtn.Size = UDim2.new(0, 26, 0, 26)
+MinBtn.Position = UDim2.new(1, -66, 0.5, -13)
+MinBtn.BackgroundColor3 = C.NEON_DARK
+MinBtn.Text = "_"
+MinBtn.TextColor3 = C.NEON
+MinBtn.TextSize = 14
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.BorderSizePixel = 0
+MinBtn.ZIndex = 4
+MinBtn.Parent = TitleBar
+addCorner(MinBtn, 6)
+addStroke(MinBtn, C.NEON_DIM, 1)
+
+-- Close button
 local CloseBtn = Instance.new("TextButton")
-CloseBtn.Name             = "CloseBtn"
-CloseBtn.Size             = UDim2.new(0, 28, 0, 28)
-CloseBtn.Position         = UDim2.new(1, -34, 0.5, -14)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(30, 8, 8)
-CloseBtn.Text             = "X"
-CloseBtn.TextColor3       = RED_NEON
-CloseBtn.TextSize         = 13
-CloseBtn.Font             = Enum.Font.GothamBold
-CloseBtn.BorderSizePixel  = 0
-CloseBtn.ZIndex           = 4
-CloseBtn.Parent           = TitleBar
-
-local CloseCorner = Instance.new("UICorner")
-CloseCorner.CornerRadius = UDim.new(0, 6)
-CloseCorner.Parent = CloseBtn
-
-local CloseStroke = Instance.new("UIStroke")
-CloseStroke.Color     = RED_NEON
-CloseStroke.Thickness = 1.2
-CloseStroke.Parent    = CloseBtn
+CloseBtn.Size = UDim2.new(0, 26, 0, 26)
+CloseBtn.Position = UDim2.new(1, -34, 0.5, -13)
+CloseBtn.BackgroundColor3 = C.RED_DARK
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = C.RED
+CloseBtn.TextSize = 12
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.BorderSizePixel = 0
+CloseBtn.ZIndex = 4
+CloseBtn.Parent = TitleBar
+addCorner(CloseBtn, 6)
+addStroke(CloseBtn, C.RED, 1.2)
 
 -- ============================================================
--- STATUS BAR
+-- TAB BAR
 -- ============================================================
-local StatusBar = Instance.new("Frame")
-StatusBar.Size            = UDim2.new(1, -16, 0, 28)
-StatusBar.Position        = UDim2.new(0, 8, 0, 46)
-StatusBar.BackgroundColor3 = NEON_GREEN_DARK
-StatusBar.BorderSizePixel = 0
-StatusBar.Parent          = MainFrame
+local TabBar = Instance.new("Frame")
+TabBar.Size = UDim2.new(1, -16, 0, 30)
+TabBar.Position = UDim2.new(0, 8, 0, 46)
+TabBar.BackgroundTransparency = 1
+TabBar.Parent = MainFrame
 
-local StatusBarCorner = Instance.new("UICorner")
-StatusBarCorner.CornerRadius = UDim.new(0, 6)
-StatusBarCorner.Parent = StatusBar
+local TabLayout = Instance.new("UIListLayout")
+TabLayout.FillDirection = Enum.FillDirection.Horizontal
+TabLayout.Padding = UDim.new(0, 4)
+TabLayout.Parent = TabBar
 
-local StatusStroke = Instance.new("UIStroke")
-StatusStroke.Color     = NEON_GREEN_DIM
-StatusStroke.Thickness = 1
-StatusStroke.Parent    = StatusBar
+local tabs = {"PLAYERS", "SPECTATE INFO", "SERVER", "SETTINGS"}
+local tabBtns = {}
 
-local StatusLabel = Instance.new("TextLabel")
-StatusLabel.Name              = "StatusLabel"
-StatusLabel.Size              = UDim2.new(1, -8, 1, 0)
-StatusLabel.Position          = UDim2.new(0, 8, 0, 0)
-StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text              = "Not spectating anyone"
-StatusLabel.TextColor3        = NEON_GREEN
-StatusLabel.TextSize          = 12
-StatusLabel.Font               = Enum.Font.Gotham
-StatusLabel.TextXAlignment    = Enum.TextXAlignment.Left
-StatusLabel.TextTruncate      = Enum.TextTruncate.AtEnd
-StatusLabel.Parent            = StatusBar
-
--- ============================================================
--- STATS PANEL (FPS / PING / IP)
--- ============================================================
-local StatsPanel = Instance.new("Frame")
-StatsPanel.Name             = "StatsPanel"
-StatsPanel.Size             = UDim2.new(1, -16, 0, 54)
-StatsPanel.Position         = UDim2.new(0, 8, 0, 80)
-StatsPanel.BackgroundColor3 = BG_PANEL
-StatsPanel.BorderSizePixel  = 0
-StatsPanel.Visible          = false
-StatsPanel.Parent           = MainFrame
-
-local StatsPanelCorner = Instance.new("UICorner")
-StatsPanelCorner.CornerRadius = UDim.new(0, 8)
-StatsPanelCorner.Parent = StatsPanel
-
-local StatsPanelStroke = Instance.new("UIStroke")
-StatsPanelStroke.Color     = NEON_GREEN
-StatsPanelStroke.Thickness = 1.2
-StatsPanelStroke.Parent    = StatsPanel
-
--- Helper: create a stat block
-local function makeStatBlock(parent, posX, label)
-	local block = Instance.new("Frame")
-	block.Size             = UDim2.new(0, 72, 1, -10)
-	block.Position         = UDim2.new(0, posX, 0, 5)
-	block.BackgroundColor3 = NEON_GREEN_DARK
-	block.BorderSizePixel  = 0
-	block.Parent           = parent
-
-	local bc = Instance.new("UICorner")
-	bc.CornerRadius = UDim.new(0, 5)
-	bc.Parent = block
-
-	local bs = Instance.new("UIStroke")
-	bs.Color     = NEON_GREEN_DIM
-	bs.Thickness = 1
-	bs.Parent    = block
-
-	local lbl = Instance.new("TextLabel")
-	lbl.Size              = UDim2.new(1, 0, 0.48, 0)
-	lbl.Position          = UDim2.new(0, 0, 0, 0)
-	lbl.BackgroundTransparency = 1
-	lbl.Text              = label
-	lbl.TextColor3        = TEXT_DIM
-	lbl.TextSize          = 10
-	lbl.Font               = Enum.Font.GothamBold
-	lbl.TextXAlignment    = Enum.TextXAlignment.Center
-	lbl.Parent            = block
-
-	local val = Instance.new("TextLabel")
-	val.Name              = "Value"
-	val.Size              = UDim2.new(1, 0, 0.52, 0)
-	val.Position          = UDim2.new(0, 0, 0.48, 0)
-	val.BackgroundTransparency = 1
-	val.Text              = "--"
-	val.TextColor3        = NEON_GREEN
-	val.TextSize          = 13
-	val.Font               = Enum.Font.GothamBold
-	val.TextXAlignment    = Enum.TextXAlignment.Center
-	val.Parent            = block
-
-	return val
+for i, name in ipairs(tabs) do
+	local tb = Instance.new("TextButton")
+	tb.Size = UDim2.new(0, 120, 1, 0)
+	tb.BackgroundColor3 = C.BG_PANEL
+	tb.Text = name
+	tb.TextColor3 = i == 1 and C.NEON or C.MUTED
+	tb.TextSize = 11
+	tb.Font = Enum.Font.GothamBold
+	tb.BorderSizePixel = 0
+	tb.Parent = TabBar
+	addCorner(tb, 6)
+	local s = addStroke(tb, i == 1 and C.NEON or C.NEON_DARK, 1.2)
+	tabBtns[name] = {btn = tb, stroke = s}
 end
 
-local FPSValue  = makeStatBlock(StatsPanel, 6,   "FPS")
-local PingValue = makeStatBlock(StatsPanel, 84,  "PING")
-local IPValue   = makeStatBlock(StatsPanel, 162, "IP")
-
--- IP label is wider
-IPValue.Parent.Size = UDim2.new(0, 72, 1, -10)
-IPValue.TextSize = 9
-
 -- ============================================================
--- DIVIDER
+-- CONTENT AREA
 -- ============================================================
-local Divider = Instance.new("Frame")
-Divider.Name              = "Divider"
-Divider.Size              = UDim2.new(1, -16, 0, 1)
-Divider.Position          = UDim2.new(0, 8, 0, 140)
-Divider.BackgroundColor3  = NEON_GREEN_DIM
-Divider.BorderSizePixel   = 0
-Divider.Parent            = MainFrame
-
-local PlayersTitle = Instance.new("TextLabel")
-PlayersTitle.Size              = UDim2.new(1, -16, 0, 18)
-PlayersTitle.Position          = UDim2.new(0, 8, 0, 144)
-PlayersTitle.BackgroundTransparency = 1
-PlayersTitle.Text              = "PLAYERS IN SERVER"
-PlayersTitle.TextColor3        = NEON_GREEN_DIM
-PlayersTitle.TextSize          = 10
-PlayersTitle.Font               = Enum.Font.GothamBold
-PlayersTitle.TextXAlignment    = Enum.TextXAlignment.Left
-PlayersTitle.Parent            = MainFrame
+local ContentArea = Instance.new("Frame")
+ContentArea.Size = UDim2.new(1, -16, 1, -130)
+ContentArea.Position = UDim2.new(0, 8, 0, 84)
+ContentArea.BackgroundTransparency = 1
+ContentArea.ClipsDescendants = true
+ContentArea.Parent = MainFrame
 
 -- ============================================================
--- SCROLL LIST
+-- TAB: PLAYERS
 -- ============================================================
+local PlayersTab = Instance.new("Frame")
+PlayersTab.Size = UDim2.new(1, 0, 1, 0)
+PlayersTab.BackgroundTransparency = 1
+PlayersTab.Parent = ContentArea
+
+-- Left panel: player list
+local ListPanel = Instance.new("Frame")
+ListPanel.Size = UDim2.new(0.42, -4, 1, 0)
+ListPanel.BackgroundColor3 = C.BG_PANEL
+ListPanel.BorderSizePixel = 0
+ListPanel.Parent = PlayersTab
+addCorner(ListPanel, 8)
+addStroke(ListPanel, C.NEON_DIM, 1)
+
+local SearchBox = Instance.new("TextBox")
+SearchBox.Size = UDim2.new(1, -12, 0, 28)
+SearchBox.Position = UDim2.new(0, 6, 0, 6)
+SearchBox.BackgroundColor3 = C.NEON_DARK
+SearchBox.Text = ""
+SearchBox.PlaceholderText = "Search player..."
+SearchBox.PlaceholderColor3 = C.MUTED
+SearchBox.TextColor3 = C.NEON
+SearchBox.TextSize = 12
+SearchBox.Font = Enum.Font.Gotham
+SearchBox.BorderSizePixel = 0
+SearchBox.ClearTextOnFocus = false
+SearchBox.Parent = ListPanel
+addCorner(SearchBox, 6)
+addStroke(SearchBox, C.NEON_DIM, 1)
+addPadding(SearchBox, 8, 8, 0, 0)
+
 local ScrollFrame = Instance.new("ScrollingFrame")
-ScrollFrame.Name               = "ScrollFrame"
-ScrollFrame.Size               = UDim2.new(1, -16, 0, 175)
-ScrollFrame.Position           = UDim2.new(0, 8, 0, 164)
+ScrollFrame.Size = UDim2.new(1, -8, 1, -44)
+ScrollFrame.Position = UDim2.new(0, 4, 0, 38)
 ScrollFrame.BackgroundTransparency = 1
-ScrollFrame.BorderSizePixel    = 0
+ScrollFrame.BorderSizePixel = 0
 ScrollFrame.ScrollBarThickness = 3
-ScrollFrame.ScrollBarImageColor3 = NEON_GREEN
-ScrollFrame.CanvasSize         = UDim2.new(0, 0, 0, 0)
+ScrollFrame.ScrollBarImageColor3 = C.NEON
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 ScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-ScrollFrame.Parent             = MainFrame
+ScrollFrame.Parent = ListPanel
 
 local ListLayout = Instance.new("UIListLayout")
 ListLayout.SortOrder = Enum.SortOrder.Name
-ListLayout.Padding   = UDim.new(0, 4)
-ListLayout.Parent    = ScrollFrame
+ListLayout.Padding = UDim.new(0, 3)
+ListLayout.Parent = ScrollFrame
+
+-- Right panel: selected player info
+local InfoPanel = Instance.new("Frame")
+InfoPanel.Size = UDim2.new(0.58, -4, 1, 0)
+InfoPanel.Position = UDim2.new(0.42, 4, 0, 0)
+InfoPanel.BackgroundColor3 = C.BG_PANEL
+InfoPanel.BorderSizePixel = 0
+InfoPanel.Parent = PlayersTab
+addCorner(InfoPanel, 8)
+addStroke(InfoPanel, C.NEON_DIM, 1)
+
+-- Info panel: Avatar placeholder
+local AvatarFrame = Instance.new("Frame")
+AvatarFrame.Size = UDim2.new(0, 64, 0, 64)
+AvatarFrame.Position = UDim2.new(0, 10, 0, 10)
+AvatarFrame.BackgroundColor3 = C.NEON_DARK
+AvatarFrame.BorderSizePixel = 0
+AvatarFrame.Parent = InfoPanel
+addCorner(AvatarFrame, 8)
+addStroke(AvatarFrame, C.NEON, 1.5)
+
+local AvatarLbl = makeLabel(AvatarFrame, "?", 28, C.NEON, Enum.Font.GothamBold, Enum.TextXAlignment.Center)
+AvatarLbl.TextYAlignment = Enum.TextYAlignment.Center
+
+-- Username big
+local UsernameLbl = Instance.new("TextLabel")
+UsernameLbl.Size = UDim2.new(1, -90, 0, 22)
+UsernameLbl.Position = UDim2.new(0, 84, 0, 10)
+UsernameLbl.BackgroundTransparency = 1
+UsernameLbl.Text = "Select a player"
+UsernameLbl.TextColor3 = C.NEON
+UsernameLbl.TextSize = 15
+UsernameLbl.Font = Enum.Font.GothamBold
+UsernameLbl.TextXAlignment = Enum.TextXAlignment.Left
+UsernameLbl.TextTruncate = Enum.TextTruncate.AtEnd
+UsernameLbl.Parent = InfoPanel
+
+local DisplayNameLbl = Instance.new("TextLabel")
+DisplayNameLbl.Size = UDim2.new(1, -90, 0, 16)
+DisplayNameLbl.Position = UDim2.new(0, 84, 0, 34)
+DisplayNameLbl.BackgroundTransparency = 1
+DisplayNameLbl.Text = ""
+DisplayNameLbl.TextColor3 = C.MUTED
+DisplayNameLbl.TextSize = 11
+DisplayNameLbl.Font = Enum.Font.Gotham
+DisplayNameLbl.TextXAlignment = Enum.TextXAlignment.Left
+DisplayNameLbl.Parent = InfoPanel
+
+-- Info rows
+local InfoScroll = Instance.new("ScrollingFrame")
+InfoScroll.Size = UDim2.new(1, -8, 1, -84)
+InfoScroll.Position = UDim2.new(0, 4, 0, 80)
+InfoScroll.BackgroundTransparency = 1
+InfoScroll.BorderSizePixel = 0
+InfoScroll.ScrollBarThickness = 3
+InfoScroll.ScrollBarImageColor3 = C.NEON
+InfoScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+InfoScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+InfoScroll.Parent = InfoPanel
+
+local InfoLayout = Instance.new("UIListLayout")
+InfoLayout.SortOrder = Enum.SortOrder.LayoutOrder
+InfoLayout.Padding = UDim.new(0, 3)
+InfoLayout.Parent = InfoScroll
+
+local function makeInfoRow(labelText, valueId, order)
+	local row = Instance.new("Frame")
+	row.Size = UDim2.new(1, -4, 0, 26)
+	row.BackgroundColor3 = C.BG_ROW
+	row.BorderSizePixel = 0
+	row.LayoutOrder = order
+	row.Parent = InfoScroll
+	addCorner(row, 5)
+
+	local lbl = Instance.new("TextLabel")
+	lbl.Size = UDim2.new(0.42, 0, 1, 0)
+	lbl.BackgroundTransparency = 1
+	lbl.Text = labelText
+	lbl.TextColor3 = C.MUTED
+	lbl.TextSize = 11
+	lbl.Font = Enum.Font.GothamBold
+	lbl.TextXAlignment = Enum.TextXAlignment.Left
+	lbl.Parent = row
+	addPadding(lbl, 8, 0, 0, 0)
+
+	local val = Instance.new("TextLabel")
+	val.Name = valueId
+	val.Size = UDim2.new(0.58, 0, 1, 0)
+	val.Position = UDim2.new(0.42, 0, 0, 0)
+	val.BackgroundTransparency = 1
+	val.Text = "--"
+	val.TextColor3 = C.WHITE
+	val.TextSize = 11
+	val.Font = Enum.Font.Gotham
+	val.TextXAlignment = Enum.TextXAlignment.Left
+	val.TextTruncate = Enum.TextTruncate.AtEnd
+	val.Parent = row
+	return val
+end
+
+local infoFields = {
+	{label = "User ID",       id = "UserId",      order = 1},
+	{label = "Account Age",   id = "AccountAge",  order = 2},
+	{label = "Join Date",     id = "JoinDate",    order = 3},
+	{label = "Membership",    id = "Membership",  order = 4},
+	{label = "Location",      id = "Location",    order = 5},
+	{label = "Health",        id = "Health",      order = 6},
+	{label = "Walk Speed",    id = "WalkSpeed",   order = 7},
+	{label = "Jump Power",    id = "JumpPower",   order = 8},
+	{label = "Position",      id = "Position",    order = 9},
+	{label = "Team",          id = "Team",        order = 10},
+	{label = "Friend Status", id = "Friend",      order = 11},
+	{label = "FPS",           id = "FPS",         order = 12},
+	{label = "Ping",          id = "Ping",        order = 13},
+	{label = "Server ID",     id = "ServerID",    order = 14},
+}
+
+local infoValues = {}
+for _, f in ipairs(infoFields) do
+	infoValues[f.id] = makeInfoRow(f.label, f.id, f.order)
+end
+
+-- Action buttons row
+local ActionRow = Instance.new("Frame")
+ActionRow.Size = UDim2.new(1, -8, 0, 32)
+ActionRow.Position = UDim2.new(0, 4, 1, -36)
+ActionRow.BackgroundTransparency = 1
+ActionRow.Parent = InfoPanel
+
+local ActionLayout = Instance.new("UIListLayout")
+ActionLayout.FillDirection = Enum.FillDirection.Horizontal
+ActionLayout.Padding = UDim.new(0, 4)
+ActionLayout.Parent = ActionRow
+
+local function makeActionBtn(label, bgColor, textColor)
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.new(0, 94, 1, 0)
+	b.BackgroundColor3 = bgColor or C.NEON_DARK
+	b.Text = label
+	b.TextColor3 = textColor or C.NEON
+	b.TextSize = 11
+	b.Font = Enum.Font.GothamBold
+	b.BorderSizePixel = 0
+	b.Parent = ActionRow
+	addCorner(b, 6)
+	addStroke(b, textColor or C.NEON, 1.1)
+	return b
+end
+
+local SpectateBtn = makeActionBtn("SPECTATE", C.NEON_DARK, C.NEON)
+local CopyNameBtn = makeActionBtn("COPY NAME", C.BG_PANEL, C.MUTED)
+local CopyIDBtn   = makeActionBtn("COPY ID",   C.BG_PANEL, C.MUTED)
 
 -- ============================================================
--- STOP SPECTATE BUTTON
+-- TAB: SPECTATE INFO
 -- ============================================================
-local StopBtn = Instance.new("TextButton")
-StopBtn.Name             = "StopBtn"
-StopBtn.Size             = UDim2.new(1, -16, 0, 36)
-StopBtn.Position         = UDim2.new(0, 8, 1, -44)
-StopBtn.BackgroundColor3 = Color3.fromRGB(20, 6, 6)
-StopBtn.Text             = "STOP SPECTATE"
-StopBtn.TextColor3       = RED_NEON
-StopBtn.TextSize         = 13
-StopBtn.Font              = Enum.Font.GothamBold
-StopBtn.BorderSizePixel  = 0
-StopBtn.Visible          = false
-StopBtn.Parent           = MainFrame
+local SpectateTab = Instance.new("Frame")
+SpectateTab.Size = UDim2.new(1, 0, 1, 0)
+SpectateTab.BackgroundTransparency = 1
+SpectateTab.Visible = false
+SpectateTab.Parent = ContentArea
 
-local StopCorner = Instance.new("UICorner")
-StopCorner.CornerRadius = UDim.new(0, 8)
-StopCorner.Parent = StopBtn
+-- live stats grid
+local StatsGrid = Instance.new("Frame")
+StatsGrid.Size = UDim2.new(1, 0, 0, 120)
+StatsGrid.BackgroundColor3 = C.BG_PANEL
+StatsGrid.BorderSizePixel = 0
+StatsGrid.Parent = SpectateTab
+addCorner(StatsGrid, 8)
+addStroke(StatsGrid, C.NEON, 1.5)
 
-local StopStroke = Instance.new("UIStroke")
-StopStroke.Color     = RED_NEON
-StopStroke.Thickness = 1.5
-StopStroke.Parent    = StopBtn
+local GridLayout = Instance.new("UIGridLayout")
+GridLayout.CellSize    = UDim2.new(0.25, -4, 0, 50)
+GridLayout.CellPadding = UDim2.new(0, 4, 0, 4)
+GridLayout.Parent      = StatsGrid
+addPadding(StatsGrid, 6, 6, 6, 6)
+
+local liveStats = {}
+local function makeStat(id, label)
+	local cell = Instance.new("Frame")
+	cell.BackgroundColor3 = C.NEON_DARK
+	cell.BorderSizePixel  = 0
+	cell.Parent           = StatsGrid
+	addCorner(cell, 6)
+	addStroke(cell, C.NEON_DIM, 1)
+
+	local lbl = makeLabel(cell, label, 10, C.MUTED, Enum.Font.GothamBold, Enum.TextXAlignment.Center)
+	lbl.Size = UDim2.new(1, 0, 0.45, 0)
+	lbl.TextYAlignment = Enum.TextYAlignment.Bottom
+
+	local val = makeLabel(cell, "--", 15, C.NEON, Enum.Font.GothamBold, Enum.TextXAlignment.Center)
+	val.Name = id
+	val.Size = UDim2.new(1, 0, 0.55, 0)
+	val.Position = UDim2.new(0, 0, 0.45, 0)
+	val.TextYAlignment = Enum.TextYAlignment.Top
+
+	liveStats[id] = val
+	return val
+end
+
+makeStat("sFPS",    "FPS")
+makeStat("sPing",   "PING")
+makeStat("sHealth", "HEALTH")
+makeStat("sSpeed",  "WALK SPEED")
+makeStat("sJump",   "JUMP POWER")
+makeStat("sPos",    "POSITION Y")
+makeStat("sTeam",   "TEAM")
+makeStat("sServerID","SERVER ID")
+
+-- Camera mode selector
+local CamLabel = Instance.new("TextLabel")
+CamLabel.Size = UDim2.new(1, 0, 0, 18)
+CamLabel.Position = UDim2.new(0, 0, 0, 128)
+CamLabel.BackgroundTransparency = 1
+CamLabel.Text = "CAMERA MODE"
+CamLabel.TextColor3 = C.MUTED
+CamLabel.TextSize = 11
+CamLabel.Font = Enum.Font.GothamBold
+CamLabel.TextXAlignment = Enum.TextXAlignment.Left
+CamLabel.Parent = SpectateTab
+
+local CamRow = Instance.new("Frame")
+CamRow.Size = UDim2.new(1, 0, 0, 30)
+CamRow.Position = UDim2.new(0, 0, 0, 148)
+CamRow.BackgroundTransparency = 1
+CamRow.Parent = SpectateTab
+
+local CamRowLayout = Instance.new("UIListLayout")
+CamRowLayout.FillDirection = Enum.FillDirection.Horizontal
+CamRowLayout.Padding = UDim.new(0, 4)
+CamRowLayout.Parent = CamRow
+
+local camModes = {"Follow", "First Person", "Top Down", "Fixed"}
+local camBtns = {}
+local selectedCam = "Follow"
+
+for _, mode in ipairs(camModes) do
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.new(0, 124, 1, 0)
+	b.BackgroundColor3 = mode == "Follow" and C.NEON_DARK or C.BG_PANEL
+	b.Text = mode
+	b.TextColor3 = mode == "Follow" and C.NEON or C.MUTED
+	b.TextSize = 11
+	b.Font = Enum.Font.Gotham
+	b.BorderSizePixel = 0
+	b.Parent = CamRow
+	addCorner(b, 6)
+	addStroke(b, mode == "Follow" and C.NEON or C.NEON_DARK, 1)
+	camBtns[mode] = b
+end
+
+-- Stop spectate button inside tab
+local StopBtnMain = Instance.new("TextButton")
+StopBtnMain.Size = UDim2.new(1, 0, 0, 36)
+StopBtnMain.Position = UDim2.new(0, 0, 1, -38)
+StopBtnMain.BackgroundColor3 = C.RED_DARK
+StopBtnMain.Text = "STOP SPECTATING"
+StopBtnMain.TextColor3 = C.RED
+StopBtnMain.TextSize = 13
+StopBtnMain.Font = Enum.Font.GothamBold
+StopBtnMain.BorderSizePixel = 0
+StopBtnMain.Visible = false
+StopBtnMain.Parent = SpectateTab
+addCorner(StopBtnMain, 8)
+addStroke(StopBtnMain, C.RED, 1.5)
 
 -- ============================================================
--- LOGIC: STOP SPECTATE
+-- TAB: SERVER INFO
 -- ============================================================
-local function stopSpectate()
-	isSpectating    = false
-	spectatingTarget = nil
+local ServerTab = Instance.new("Frame")
+ServerTab.Size = UDim2.new(1, 0, 1, 0)
+ServerTab.BackgroundTransparency = 1
+ServerTab.Visible = false
+ServerTab.Parent = ContentArea
 
-	Camera.CameraType    = Enum.CameraType.Custom
-	Camera.CameraSubject = LocalPlayer.Character
-		and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-		or nil
+local serverFields = {
+	{label = "Game Name",     id = "SGameName"},
+	{label = "Game ID",       id = "SGameID"},
+	{label = "Place ID",      id = "SPlaceID"},
+	{label = "Job ID",        id = "SJobID"},
+	{label = "Players Online",id = "SPlayers"},
+	{label = "Max Players",   id = "SMaxPlayers"},
+	{label = "Server Age",    id = "SAge"},
+	{label = "VIP Server",    id = "SVIP"},
+}
 
-	StatusLabel.Text     = "Not spectating anyone"
-	StopBtn.Visible      = false
-	StatsPanel.Visible   = false
+local serverValues = {}
+local ServerScroll = Instance.new("ScrollingFrame")
+ServerScroll.Size = UDim2.new(1, 0, 1, 0)
+ServerScroll.BackgroundTransparency = 1
+ServerScroll.BorderSizePixel = 0
+ServerScroll.ScrollBarThickness = 3
+ServerScroll.ScrollBarImageColor3 = C.NEON
+ServerScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+ServerScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ServerScroll.Parent = ServerTab
 
-	-- Reset stats
-	FPSValue.Text  = "--"
-	PingValue.Text = "--"
-	IPValue.Text   = "--"
+local ServerLayout = Instance.new("UIListLayout")
+ServerLayout.SortOrder = Enum.SortOrder.LayoutOrder
+ServerLayout.Padding = UDim.new(0, 3)
+ServerLayout.Parent = ServerScroll
 
-	-- Reset divider / scroll size
-	Divider.Position      = UDim2.new(0, 8, 0, 140)
-	PlayersTitle.Position = UDim2.new(0, 8, 0, 144)
-	ScrollFrame.Position  = UDim2.new(0, 8, 0, 164)
-	MainFrame.Size        = UDim2.new(0, 270, 0, 400)
+local function makeServerRow(labelText, valueId, order)
+	local row = Instance.new("Frame")
+	row.Size = UDim2.new(1, -2, 0, 28)
+	row.BackgroundColor3 = C.BG_ROW
+	row.BorderSizePixel = 0
+	row.LayoutOrder = order
+	row.Parent = ServerScroll
+	addCorner(row, 5)
+
+	local lbl = Instance.new("TextLabel")
+	lbl.Size = UDim2.new(0.38, 0, 1, 0)
+	lbl.BackgroundTransparency = 1
+	lbl.Text = labelText
+	lbl.TextColor3 = C.MUTED
+	lbl.TextSize = 11
+	lbl.Font = Enum.Font.GothamBold
+	lbl.TextXAlignment = Enum.TextXAlignment.Left
+	lbl.Parent = row
+	addPadding(lbl, 8, 0, 0, 0)
+
+	local val = Instance.new("TextLabel")
+	val.Name = valueId
+	val.Size = UDim2.new(0.62, 0, 1, 0)
+	val.Position = UDim2.new(0.38, 0, 0, 0)
+	val.BackgroundTransparency = 1
+	val.Text = "--"
+	val.TextColor3 = C.WHITE
+	val.TextSize = 11
+	val.Font = Enum.Font.Gotham
+	val.TextXAlignment = Enum.TextXAlignment.Left
+	val.TextTruncate = Enum.TextTruncate.AtEnd
+	val.Parent = row
+	serverValues[valueId] = val
+	return val
+end
+
+for i, f in ipairs(serverFields) do
+	makeServerRow(f.label, f.id, i)
 end
 
 -- ============================================================
--- LOGIC: SPECTATE PLAYER
+-- TAB: SETTINGS
 -- ============================================================
-local function spectatePlayer(targetPlayer)
-	if targetPlayer == LocalPlayer then return end
+local SettingsTab = Instance.new("Frame")
+SettingsTab.Size = UDim2.new(1, 0, 1, 0)
+SettingsTab.BackgroundTransparency = 1
+SettingsTab.Visible = false
+SettingsTab.Parent = ContentArea
 
-	local character = targetPlayer.Character
-	if not character then
-		StatusLabel.Text = "Player has no character"
-		return
+local settingItems = {
+	"Show FPS Counter",
+	"Show Health Bar",
+	"Notifications ON",
+	"Auto-follow on join",
+}
+local settingValues = {}
+
+local SetLayout = Instance.new("UIListLayout")
+SetLayout.SortOrder = Enum.SortOrder.LayoutOrder
+SetLayout.Padding = UDim.new(0, 4)
+SetLayout.Parent = SettingsTab
+
+for i, name in ipairs(settingItems) do
+	local row = Instance.new("Frame")
+	row.Size = UDim2.new(1, 0, 0, 36)
+	row.BackgroundColor3 = C.BG_ROW
+	row.BorderSizePixel = 0
+	row.LayoutOrder = i
+	row.Parent = SettingsTab
+	addCorner(row, 6)
+
+	local lbl = makeLabel(row, name, 12, C.WHITE, Enum.Font.Gotham)
+	addPadding(lbl, 12, 0, 0, 0)
+
+	local toggle = Instance.new("TextButton")
+	toggle.Size = UDim2.new(0, 44, 0, 22)
+	toggle.Position = UDim2.new(1, -52, 0.5, -11)
+	toggle.BackgroundColor3 = C.NEON
+	toggle.Text = "ON"
+	toggle.TextColor3 = C.BG
+	toggle.TextSize = 11
+	toggle.Font = Enum.Font.GothamBold
+	toggle.BorderSizePixel = 0
+	toggle.Parent = row
+	addCorner(toggle, 11)
+
+	settingValues[name] = true
+	toggle.MouseButton1Click:Connect(function()
+		settingValues[name] = not settingValues[name]
+		local on = settingValues[name]
+		toggle.Text = on and "ON" or "OFF"
+		tween(toggle, {BackgroundColor3 = on and C.NEON or C.BG_PANEL, TextColor3 = on and C.BG or C.MUTED}, 0.15)
+	end)
+end
+
+-- Credits row
+local CreditsLbl = Instance.new("TextLabel")
+CreditsLbl.Size = UDim2.new(1, 0, 0, 20)
+CreditsLbl.BackgroundTransparency = 1
+CreditsLbl.Text = "SpectatorGUI Full Edition  |  claude.ai"
+CreditsLbl.TextColor3 = C.NEON_DIM
+CreditsLbl.TextSize = 10
+CreditsLbl.Font = Enum.Font.Gotham
+CreditsLbl.TextXAlignment = Enum.TextXAlignment.Center
+CreditsLbl.LayoutOrder = 99
+CreditsLbl.Parent = SettingsTab
+
+-- ============================================================
+-- STATUS BAR AT BOTTOM
+-- ============================================================
+local BottomBar = Instance.new("Frame")
+BottomBar.Size = UDim2.new(1, -16, 0, 30)
+BottomBar.Position = UDim2.new(0, 8, 1, -36)
+BottomBar.BackgroundColor3 = C.BG_PANEL
+BottomBar.BorderSizePixel = 0
+BottomBar.Parent = MainFrame
+addCorner(BottomBar, 7)
+addStroke(BottomBar, C.NEON_DIM, 1)
+
+local StatusLbl = makeLabel(BottomBar, "Ready  |  Select a player to inspect", 11, C.NEON, Enum.Font.Gotham)
+addPadding(StatusLbl, 10, 10, 0, 0)
+
+-- ============================================================
+-- SELECTED PLAYER TRACKING
+-- ============================================================
+local selectedPlayer = nil
+
+local function setStatus(text)
+	StatusLbl.Text = text
+end
+
+local function clearInfoPanel()
+	UsernameLbl.Text    = "Select a player"
+	DisplayNameLbl.Text = ""
+	AvatarLbl.Text      = "?"
+	for _, v in pairs(infoValues) do
+		v.Text = "--"
+		v.TextColor3 = C.WHITE
+	end
+end
+
+local function getAccountAge(player)
+	local age = player.AccountAge
+	if age < 30 then
+		return age .. " days  (NEW)"
+	elseif age < 365 then
+		return math.floor(age / 30) .. " months"
+	else
+		return math.floor(age / 365) .. " years " .. math.floor((age % 365) / 30) .. " mo"
+	end
+end
+
+local function getMembership(player)
+	local m = player.MembershipType
+	if m == Enum.MembershipType.Premium then
+		return "Roblox Premium"
+	else
+		return "None"
+	end
+end
+
+local function getTeamName(player)
+	if player.Team then return player.Team.Name end
+	return "No Team"
+end
+
+local function getCharStats(player)
+	local char = player.Character
+	if not char then return nil end
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	local root = char:FindFirstChild("HumanoidRootPart")
+	if not hum then return nil end
+	return {
+		health    = math.floor(hum.Health) .. " / " .. math.floor(hum.MaxHealth),
+		walkspeed = tostring(hum.WalkSpeed),
+		jumppower = tostring(hum.JumpPower),
+		position  = root and
+			("X:"..math.floor(root.Position.X)
+			.." Y:"..math.floor(root.Position.Y)
+			.." Z:"..math.floor(root.Position.Z))
+			or "--",
+		posY = root and math.floor(root.Position.Y) or 0,
+	}
+end
+
+local function getFriendStatus(player)
+	local ok, result = pcall(function()
+		return LocalPlayer:IsFriendsWith(player.UserId)
+	end)
+	if ok and result then return "Friend" end
+	return "Not a friend"
+end
+
+local function getJoinDate(player)
+	-- Roblox does not expose account creation date in LocalScript.
+	-- We can approximate from AccountAge relative to today.
+	local age   = player.AccountAge
+	local today = os.time()
+	local stamp = today - (age * 86400)
+	local d     = os.date("*t", stamp)
+	return string.format("%04d-%02d-%02d (approx)", d.year, d.month, d.mday)
+end
+
+local function refreshInfoPanel(player)
+	if not player then clearInfoPanel() return end
+
+	UsernameLbl.Text    = "@" .. player.Name
+	DisplayNameLbl.Text = player.DisplayName ~= player.Name
+		and ("aka " .. player.DisplayName) or ""
+	AvatarLbl.Text      = string.sub(player.Name, 1, 1):upper()
+
+	infoValues["UserId"].Text    = tostring(player.UserId)
+	infoValues["AccountAge"].Text = getAccountAge(player)
+	infoValues["JoinDate"].Text   = getJoinDate(player)
+	infoValues["Membership"].Text = getMembership(player)
+	infoValues["Friend"].Text     = getFriendStatus(player)
+	infoValues["Team"].Text       = getTeamName(player)
+	infoValues["ServerID"].Text   = string.sub(game.JobId, 1, 18) .. "..."
+
+	-- Premium highlight
+	if player.MembershipType == Enum.MembershipType.Premium then
+		infoValues["Membership"].TextColor3 = C.YELLOW
+	else
+		infoValues["Membership"].TextColor3 = C.WHITE
 	end
 
-	local humanoid = character:FindFirstChildOfClass("Humanoid")
-	if not humanoid then
-		StatusLabel.Text = "Invalid character"
-		return
+	-- Location (country via LocalizationService, may not always work)
+	local ok, country = pcall(function()
+		return LocalizationService:GetCountryRegionForPlayerAsync(player)
+	end)
+	infoValues["Location"].Text = (ok and country and country ~= "") and country or "Unknown"
+
+	local stats = getCharStats(player)
+	if stats then
+		infoValues["Health"].Text    = stats.health
+		infoValues["WalkSpeed"].Text = stats.walkspeed
+		infoValues["JumpPower"].Text = stats.jumppower
+		infoValues["Position"].Text  = stats.position
 	end
 
-	isSpectating     = true
-	spectatingTarget = targetPlayer
+	-- Ping is only available for local player in Roblox
+	local ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+	infoValues["Ping"].Text = ping .. " ms"
 
-	Camera.CameraType    = Enum.CameraType.Custom
-	Camera.CameraSubject = humanoid
-
-	StatusLabel.Text   = "Spectating: " .. targetPlayer.Name
-	StopBtn.Visible    = true
-	StatsPanel.Visible = true
-
-	-- Expand frame to show stats
-	Divider.Position      = UDim2.new(0, 8, 0, 200)
-	PlayersTitle.Position = UDim2.new(0, 8, 0, 204)
-	ScrollFrame.Position  = UDim2.new(0, 8, 0, 224)
-	MainFrame.Size        = UDim2.new(0, 270, 0, 460)
+	-- FPS
+	if #fpsBuffer > 0 then
+		local sum = 0
+		for _, v in ipairs(fpsBuffer) do sum = sum + v end
+		infoValues["FPS"].Text = math.floor(sum / #fpsBuffer) .. " fps"
+	end
 end
 
 -- ============================================================
@@ -370,78 +906,66 @@ end
 local function createPlayerButton(player)
 	if player == LocalPlayer then return end
 
-	local Btn = Instance.new("TextButton")
-	Btn.Name             = player.Name
-	Btn.Size             = UDim2.new(1, 0, 0, 38)
-	Btn.BackgroundColor3 = BG_ROW
-	Btn.Text             = ""
-	Btn.BorderSizePixel  = 0
-	Btn.Parent           = ScrollFrame
+	local btn = Instance.new("TextButton")
+	btn.Name             = player.Name
+	btn.Size             = UDim2.new(1, 0, 0, 34)
+	btn.BackgroundColor3 = C.BG_ROW
+	btn.Text             = ""
+	btn.BorderSizePixel  = 0
+	btn.Parent           = ScrollFrame
 
-	local BtnCorner = Instance.new("UICorner")
-	BtnCorner.CornerRadius = UDim.new(0, 7)
-	BtnCorner.Parent = Btn
+	addCorner(btn, 6)
+	local stroke = addStroke(btn, C.NEON_DARK, 1)
 
-	local BtnStroke = Instance.new("UIStroke")
-	BtnStroke.Color     = NEON_GREEN_DIM
-	BtnStroke.Thickness = 1
-	BtnStroke.Parent    = Btn
+	local initial = Instance.new("TextLabel")
+	initial.Size = UDim2.new(0, 28, 0, 28)
+	initial.Position = UDim2.new(0, 4, 0.5, -14)
+	initial.BackgroundColor3 = C.NEON_DARK
+	initial.Text = string.sub(player.Name, 1, 1):upper()
+	initial.TextColor3 = C.NEON
+	initial.TextSize = 13
+	initial.Font = Enum.Font.GothamBold
+	initial.TextXAlignment = Enum.TextXAlignment.Center
+	initial.BorderSizePixel = 0
+	initial.Parent = btn
+	addCorner(initial, 5)
 
-	-- Player name label
-	local NameLbl = Instance.new("TextLabel")
-	NameLbl.Size              = UDim2.new(1, -80, 1, 0)
-	NameLbl.Position          = UDim2.new(0, 10, 0, 0)
-	NameLbl.BackgroundTransparency = 1
-	NameLbl.Text              = player.Name
-	NameLbl.TextColor3        = NEON_GREEN
-	NameLbl.TextSize          = 13
-	NameLbl.Font               = Enum.Font.Gotham
-	NameLbl.TextXAlignment    = Enum.TextXAlignment.Left
-	NameLbl.TextTruncate      = Enum.TextTruncate.AtEnd
-	NameLbl.Parent            = Btn
+	local nameLbl = Instance.new("TextLabel")
+	nameLbl.Size = UDim2.new(1, -80, 1, 0)
+	nameLbl.Position = UDim2.new(0, 38, 0, 0)
+	nameLbl.BackgroundTransparency = 1
+	nameLbl.Text = player.Name
+	nameLbl.TextColor3 = C.WHITE
+	nameLbl.TextSize = 12
+	nameLbl.Font = Enum.Font.Gotham
+	nameLbl.TextXAlignment = Enum.TextXAlignment.Left
+	nameLbl.TextTruncate = Enum.TextTruncate.AtEnd
+	nameLbl.Parent = btn
 
-	-- Spectate pill label
-	local SpectPill = Instance.new("Frame")
-	SpectPill.Size            = UDim2.new(0, 66, 0, 22)
-	SpectPill.Position        = UDim2.new(1, -72, 0.5, -11)
-	SpectPill.BackgroundColor3 = NEON_GREEN_DARK
-	SpectPill.BorderSizePixel = 0
-	SpectPill.Parent          = Btn
+	local dot = Instance.new("Frame")
+	dot.Size = UDim2.new(0, 7, 0, 7)
+	dot.Position = UDim2.new(1, -12, 0.5, -3.5)
+	dot.BackgroundColor3 = C.NEON
+	dot.BorderSizePixel = 0
+	dot.Parent = btn
+	addCorner(dot, 4)
 
-	local SpectCorner = Instance.new("UICorner")
-	SpectCorner.CornerRadius = UDim.new(0, 5)
-	SpectCorner.Parent = SpectPill
-
-	local SpectStroke = Instance.new("UIStroke")
-	SpectStroke.Color     = NEON_GREEN
-	SpectStroke.Thickness = 1
-	SpectStroke.Parent    = SpectPill
-
-	local SpectLbl = Instance.new("TextLabel")
-	SpectLbl.Size              = UDim2.new(1, 0, 1, 0)
-	SpectLbl.BackgroundTransparency = 1
-	SpectLbl.Text              = "SPECTATE"
-	SpectLbl.TextColor3        = NEON_GREEN
-	SpectLbl.TextSize          = 10
-	SpectLbl.Font               = Enum.Font.GothamBold
-	SpectLbl.TextXAlignment    = Enum.TextXAlignment.Center
-	SpectLbl.Parent            = SpectPill
-
-	Btn.MouseEnter:Connect(function()
-		Btn.BackgroundColor3 = BG_ROW_HOVER
-		BtnStroke.Color      = NEON_GREEN
+	btn.MouseEnter:Connect(function()
+		tween(btn, {BackgroundColor3 = C.BG_ROW_H}, 0.1)
+		stroke.Color = C.NEON
+	end)
+	btn.MouseLeave:Connect(function()
+		tween(btn, {BackgroundColor3 = C.BG_ROW}, 0.1)
+		stroke.Color = C.NEON_DARK
 	end)
 
-	Btn.MouseLeave:Connect(function()
-		Btn.BackgroundColor3 = BG_ROW
-		BtnStroke.Color      = NEON_GREEN_DIM
+	btn.MouseButton1Click:Connect(function()
+		selectedPlayer = player
+		refreshInfoPanel(player)
+		setStatus("Inspecting: @" .. player.Name)
 	end)
 
-	Btn.MouseButton1Click:Connect(function()
-		spectatePlayer(player)
-	end)
-
-	return Btn
+	return btn
 end
 
 local function removePlayerButton(playerName)
@@ -450,6 +974,10 @@ local function removePlayerButton(playerName)
 	if spectatingTarget and spectatingTarget.Name == playerName then
 		stopSpectate()
 	end
+	if selectedPlayer and selectedPlayer.Name == playerName then
+		selectedPlayer = nil
+		clearInfoPanel()
+	end
 end
 
 local function refreshPlayerList()
@@ -457,38 +985,250 @@ local function refreshPlayerList()
 		if child:IsA("TextButton") then child:Destroy() end
 	end
 	for _, player in ipairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer then
-			createPlayerButton(player)
-		end
+		if player ~= LocalPlayer then createPlayerButton(player) end
 	end
 end
 
--- ============================================================
--- STATS UPDATE LOOP
--- ============================================================
-local fpsBuffer    = {}
-local fpsBufferMax = 20
-local lastTime     = tick()
-
-RunService.RenderStepped:Connect(function()
-	-- FPS calculation (rolling average)
-	local now  = tick()
-	local delta = now - lastTime
-	lastTime   = now
-	if delta > 0 then
-		table.insert(fpsBuffer, 1 / delta)
-		if #fpsBuffer > fpsBufferMax then
-			table.remove(fpsBuffer, 1)
+-- search filter
+SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+	local query = SearchBox.Text:lower()
+	for _, child in ipairs(ScrollFrame:GetChildren()) do
+		if child:IsA("TextButton") then
+			child.Visible = query == "" or child.Name:lower():find(query, 1, true) ~= nil
 		end
 	end
+end)
 
-	-- Spectate camera update
+-- ============================================================
+-- SPECTATE LOGIC
+-- ============================================================
+function stopSpectate()
+	isSpectating    = false
+	spectatingTarget = nil
+	Camera.CameraType    = Enum.CameraType.Custom
+	Camera.CameraSubject = LocalPlayer.Character
+		and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") or nil
+	StopBtnMain.Visible = false
+	setStatus("Spectate stopped  |  Camera returned")
+	showNotif("Spectate stopped", false)
+
+	for _, v in pairs(liveStats) do v.Text = "--" end
+end
+
+local function spectatePlayer(player)
+	if player == LocalPlayer then
+		showNotif("Cannot spectate yourself", true)
+		return
+	end
+
+	local char = player.Character
+	if not char then
+		showNotif("Player has no character", true)
+		return
+	end
+
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if not hum then
+		showNotif("Invalid character", true)
+		return
+	end
+
+	isSpectating    = true
+	spectatingTarget = player
+
+	Camera.CameraType    = Enum.CameraType.Custom
+	Camera.CameraSubject = hum
+	selectedCam          = "Follow"
+
+	StopBtnMain.Visible = true
+	setStatus("Spectating: @" .. player.Name)
+	showNotif("Spectating @" .. player.Name)
+
+	-- Switch to spectate tab
+	for _, t in ipairs(tabs) do
+		local data = tabBtns[t]
+		local isSelected = (t == "SPECTATE INFO")
+		tween(data.btn, {TextColor3 = isSelected and C.NEON or C.MUTED}, 0.15)
+		data.stroke.Color = isSelected and C.NEON or C.NEON_DARK
+	end
+	currentTab = "spectate"
+	PlayersTab.Visible  = false
+	SpectateTab.Visible = true
+	ServerTab.Visible   = false
+	SettingsTab.Visible = false
+end
+
+-- ============================================================
+-- CAMERA MODES
+-- ============================================================
+local camOffset = Vector3.new(0, 2, 8)
+
+for _, mode in ipairs(camModes) do
+	camBtns[mode].MouseButton1Click:Connect(function()
+		selectedCam = mode
+		for _, m in ipairs(camModes) do
+			tween(camBtns[m], {
+				BackgroundColor3 = m == mode and C.NEON_DARK or C.BG_PANEL,
+				TextColor3       = m == mode and C.NEON or C.MUTED,
+			}, 0.15)
+			local s2 = camBtns[m]:FindFirstChildOfClass("UIStroke")
+			if s2 then s2.Color = m == mode and C.NEON or C.NEON_DARK end
+		end
+	end)
+end
+
+-- ============================================================
+-- TAB SWITCHING
+-- ============================================================
+local tabMap = {
+	["PLAYERS"]       = {frame = PlayersTab,  key = "players"},
+	["SPECTATE INFO"] = {frame = SpectateTab, key = "spectate"},
+	["SERVER"]        = {frame = ServerTab,   key = "server"},
+	["SETTINGS"]      = {frame = SettingsTab, key = "settings"},
+}
+
+for name, data in pairs(tabMap) do
+	tabBtns[name].btn.MouseButton1Click:Connect(function()
+		currentTab = data.key
+		for n, d in pairs(tabMap) do
+			local sel = (n == name)
+			d.frame.Visible = sel
+			tween(tabBtns[n].btn, {TextColor3 = sel and C.NEON or C.MUTED}, 0.12)
+			tabBtns[n].stroke.Color = sel and C.NEON or C.NEON_DARK
+		end
+	end)
+end
+
+-- ============================================================
+-- COPY BUTTONS
+-- ============================================================
+CopyNameBtn.MouseButton1Click:Connect(function()
+	if selectedPlayer then
+		setClipboard = setClipboard or (function() end)
+		-- Use pcall since setclipboard may not be available in all exploits
+		local ok = pcall(function() setclipboard(selectedPlayer.Name) end)
+		showNotif(ok and ("Copied: " .. selectedPlayer.Name) or "Clipboard unavailable")
+	else
+		showNotif("No player selected", true)
+	end
+end)
+
+CopyIDBtn.MouseButton1Click:Connect(function()
+	if selectedPlayer then
+		local ok = pcall(function() setclipboard(tostring(selectedPlayer.UserId)) end)
+		showNotif(ok and ("Copied ID: " .. tostring(selectedPlayer.UserId)) or "Clipboard unavailable")
+	else
+		showNotif("No player selected", true)
+	end
+end)
+
+SpectateBtn.MouseButton1Click:Connect(function()
+	if selectedPlayer then
+		spectatePlayer(selectedPlayer)
+	else
+		showNotif("No player selected", true)
+	end
+end)
+
+StopBtnMain.MouseButton1Click:Connect(stopSpectate)
+
+-- ============================================================
+-- MINIMIZE / CLOSE
+-- ============================================================
+local minimized = false
+
+MinBtn.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	tween(MainFrame, {
+		Size = minimized
+			and UDim2.new(0, 560, 0, 42)
+			or  UDim2.new(0, 560, 0, 420)
+	}, 0.2)
+	ContentArea.Visible = not minimized
+	BottomBar.Visible   = not minimized
+	TabBar.Visible      = not minimized
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+	if isSpectating then stopSpectate() end
+	tween(MainFrame, {Size = UDim2.new(0, 560, 0, 0)}, 0.2)
+	task.wait(0.25)
+	ScreenGui.Enabled = false
+end)
+
+-- Hover states
+for _, b in ipairs({MinBtn, CloseBtn}) do
+	b.MouseEnter:Connect(function()
+		tween(b, {BackgroundTransparency = 0.2}, 0.1)
+	end)
+	b.MouseLeave:Connect(function()
+		tween(b, {BackgroundTransparency = 0}, 0.1)
+	end)
+end
+
+-- ============================================================
+-- SERVER INFO POPULATE
+-- ============================================================
+local function populateServerInfo()
+	serverValues["SGameID"].Text  = tostring(game.GameId)
+	serverValues["SPlaceID"].Text = tostring(game.PlaceId)
+	local jobId = game.JobId
+	serverValues["SJobID"].Text   = #jobId > 0 and jobId or "Studio"
+	serverValues["SVIP"].Text     = game.VIPServerId ~= "" and "Yes" or "No"
+
+	local ok, info = pcall(function()
+		return MarketplaceService:GetProductInfo(game.PlaceId)
+	end)
+	serverValues["SGameName"].Text = ok and info.Name or "Unknown"
+
+	local plrs    = #Players:GetPlayers()
+	local maxPlrs = Players.MaxPlayers
+	serverValues["SPlayers"].Text    = tostring(plrs)
+	serverValues["SMaxPlayers"].Text = tostring(maxPlrs)
+	CountLbl.Text = plrs .. " / " .. maxPlrs
+end
+
+-- ============================================================
+-- RUNTIME LOOP
+-- ============================================================
+RunService.RenderStepped:Connect(function()
+	-- FPS
+	local now   = tick()
+	local delta = now - lastFrameTime
+	lastFrameTime = now
+	if delta > 0 then
+		table.insert(fpsBuffer, 1 / delta)
+		if #fpsBuffer > fpsBufferMax then table.remove(fpsBuffer, 1) end
+	end
+
+	-- Camera modes
 	if isSpectating and spectatingTarget then
 		local char = spectatingTarget.Character
 		if char then
-			local humanoid = char:FindFirstChildOfClass("Humanoid")
-			if humanoid and Camera.CameraSubject ~= humanoid then
-				Camera.CameraSubject = humanoid
+			local hum  = char:FindFirstChildOfClass("Humanoid")
+			local root = char:FindFirstChild("HumanoidRootPart")
+
+			if not hum then stopSpectate() return end
+
+			if selectedCam == "Follow" then
+				Camera.CameraType    = Enum.CameraType.Custom
+				Camera.CameraSubject = hum
+
+			elseif selectedCam == "First Person" and root then
+				local head = char:FindFirstChild("Head")
+				if head then
+					Camera.CameraType = Enum.CameraType.Scriptable
+					Camera.CFrame     = head.CFrame
+				end
+
+			elseif selectedCam == "Top Down" and root then
+				Camera.CameraType = Enum.CameraType.Scriptable
+				Camera.CFrame     = CFrame.new(root.Position + Vector3.new(0, 40, 0),
+					root.Position)
+
+			elseif selectedCam == "Fixed" then
+				Camera.CameraType    = Enum.CameraType.Custom
+				Camera.CameraSubject = hum
 			end
 		else
 			stopSpectate()
@@ -496,74 +1236,67 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- Stats label update every 0.5s
-local statTimer = 0
 RunService.Heartbeat:Connect(function(dt)
-	statTimer = statTimer + dt
-	if statTimer < 0.5 then return end
-	statTimer = 0
+	statTimer   = statTimer + dt
+	refreshTimer = refreshTimer + dt
 
-	if not isSpectating or not spectatingTarget then return end
+	-- Update live stats every 0.5s
+	if statTimer >= 0.5 then
+		statTimer = 0
 
-	-- FPS
-	if #fpsBuffer > 0 then
-		local sum = 0
-		for _, v in ipairs(fpsBuffer) do sum = sum + v end
-		local avg = math.floor(sum / #fpsBuffer)
-		FPSValue.Text = tostring(avg)
-		-- color by fps range
-		if avg >= 55 then
-			FPSValue.TextColor3 = NEON_GREEN
-		elseif avg >= 30 then
-			FPSValue.TextColor3 = Color3.fromRGB(200, 220, 0)
-		else
-			FPSValue.TextColor3 = RED_NEON
+		-- Player count badge
+		local plrs = #Players:GetPlayers()
+		CountLbl.Text = plrs .. " / " .. Players.MaxPlayers
+		serverValues["SPlayers"].Text = tostring(plrs)
+
+		-- FPS calc
+		local fps = 0
+		if #fpsBuffer > 0 then
+			local sum = 0
+			for _, v in ipairs(fpsBuffer) do sum = sum + v end
+			fps = math.floor(sum / #fpsBuffer)
+		end
+
+		-- Ping
+		local ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+
+		-- Update spectate tab stats
+		if isSpectating and spectatingTarget then
+			liveStats["sFPS"].Text  = fps .. " fps"
+			liveStats["sPing"].Text = ping .. " ms"
+
+			local fpsColor = fps >= 55 and C.NEON or (fps >= 30 and C.YELLOW or C.RED)
+			local pingColor = ping < 80 and C.NEON or (ping < 150 and C.YELLOW or C.RED)
+			liveStats["sFPS"].TextColor3  = fpsColor
+			liveStats["sPing"].TextColor3 = pingColor
+
+			local stats = getCharStats(spectatingTarget)
+			if stats then
+				liveStats["sHealth"].Text = stats.health
+				liveStats["sSpeed"].Text  = stats.walkspeed
+				liveStats["sJump"].Text   = stats.jumppower
+				liveStats["sPos"].Text    = tostring(stats.posY)
+				liveStats["sTeam"].Text   = getTeamName(spectatingTarget)
+			end
+
+			local jobId = game.JobId
+			liveStats["sServerID"].Text = #jobId > 10 and string.sub(jobId, 1, 8) .. ".." or "Studio"
+		end
+
+		-- Update player info panel (if selected)
+		if selectedPlayer and selectedPlayer.Character then
+			local stats = getCharStats(selectedPlayer)
+			if stats then
+				infoValues["Health"].Text    = stats.health
+				infoValues["WalkSpeed"].Text = stats.walkspeed
+				infoValues["JumpPower"].Text = stats.jumppower
+				infoValues["Position"].Text  = stats.position
+			end
+			infoValues["FPS"].Text  = fps .. " fps"
+			infoValues["Ping"].Text = ping .. " ms"
+			infoValues["Team"].Text = getTeamName(selectedPlayer)
 		end
 	end
-
-	-- Ping (of local player only - Roblox does not expose other players' ping)
-	local ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-	PingValue.Text = ping .. " ms"
-	if ping < 80 then
-		PingValue.TextColor3 = NEON_GREEN
-	elseif ping < 150 then
-		PingValue.TextColor3 = Color3.fromRGB(200, 220, 0)
-	else
-		PingValue.TextColor3 = RED_NEON
-	end
-
-	-- IP: Roblox does not expose player IPs to LocalScripts for privacy/security reasons.
-	-- This displays the JobId (server instance ID) as the closest available identifier.
-	local jobId = game.JobId
-	if jobId and #jobId > 0 then
-		IPValue.Text = string.sub(jobId, 1, 10) .. "..."
-	else
-		IPValue.Text = "Studio"
-	end
-end)
-
--- ============================================================
--- BUTTON EVENTS
--- ============================================================
-StopBtn.MouseButton1Click:Connect(stopSpectate)
-
-StopBtn.MouseEnter:Connect(function()
-	StopBtn.BackgroundColor3 = Color3.fromRGB(35, 10, 10)
-end)
-StopBtn.MouseLeave:Connect(function()
-	StopBtn.BackgroundColor3 = Color3.fromRGB(20, 6, 6)
-end)
-
-CloseBtn.MouseButton1Click:Connect(function()
-	if isSpectating then stopSpectate() end
-	ScreenGui.Enabled = false
-end)
-
-CloseBtn.MouseEnter:Connect(function()
-	CloseBtn.BackgroundColor3 = Color3.fromRGB(50, 12, 12)
-end)
-CloseBtn.MouseLeave:Connect(function()
-	CloseBtn.BackgroundColor3 = Color3.fromRGB(30, 8, 8)
 end)
 
 -- ============================================================
@@ -571,22 +1304,39 @@ end)
 -- ============================================================
 Players.PlayerAdded:Connect(function(player)
 	createPlayerButton(player)
+	serverValues["SPlayers"].Text = tostring(#Players:GetPlayers())
+	if settingValues["Auto-follow on join"] then
+		spectatePlayer(player)
+	end
+	if settingValues["Notifications ON"] then
+		showNotif(player.Name .. " joined the server")
+	end
 end)
 
 Players.PlayerRemoving:Connect(function(player)
 	removePlayerButton(player.Name)
+	serverValues["SPlayers"].Text = tostring(#Players:GetPlayers() - 1)
+	if settingValues["Notifications ON"] then
+		showNotif(player.Name .. " left the server", true)
+	end
 end)
 
 -- ============================================================
 -- INIT
 -- ============================================================
 refreshPlayerList()
-print("[SpectatorGUI] Loaded successfully!")
+populateServerInfo()
 
--- ============================================================
--- NOTE ABOUT IP:
--- Roblox's security model does NOT allow LocalScripts to read
--- other players' real IP addresses. The "IP" field above shows
--- the Server Job ID as an alternative unique server identifier.
--- This is intentional and cannot be bypassed in a standard game.
--- ============================================================
+-- Server age timer
+local serverStartTime = tick()
+spawn(function()
+	while task.wait(1) do
+		local age     = math.floor(tick() - serverStartTime)
+		local minutes = math.floor(age / 60)
+		local seconds = age % 60
+		serverValues["SAge"].Text = string.format("%d min %02d sec", minutes, seconds)
+	end
+end)
+
+setStatus("Ready  |  " .. #Players:GetPlayers() .. " players online")
+print("[SpectatorGUI Full Edition] Loaded!")
